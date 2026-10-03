@@ -88,8 +88,8 @@ Railbound ships in four phases. Each phase is built in small sub-phases, and eve
 | | Sub-phase | Delivers |
 |:---:|---|---|
 | ✅ | **1.0 Foundation** | Design format, validation, datapack loading, multiplayer sync, trainset item and creative tab |
-| ⏳ | **1.1 Coach on rails** | Placing a carriage on track and assembling it into a real Create train |
-| ○ | **1.2 Coach interior** | Right-click seating and doors that open at stations |
+| ✅ | **1.1 Coach on rails** | Placing a carriage on track and assembling it into a real Create train |
+| ⏳ | **1.2 Coach interior** | Right-click seating and doors that open at stations |
 | ○ | **1.3 Coach visuals** | Full 3D models in game, animated doors, Blockbench-to-game converter |
 | ○ | **1.4 Steam locomotive** | Driver's cab, conductor seat and automatic running on schedules |
 | ○ | **1.5 Items carriage** | 160-stack storage, scrolling GUI, Portable Storage Interface |
