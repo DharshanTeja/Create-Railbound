@@ -1,0 +1,14 @@
+{
+  "itemGroup.railbound": "Railbound",
+  "item.railbound.trainset": "Trainset",
+  "item.railbound.trainset.empty": "Trainset (no design)",
+  "item.railbound.trainset.unknown": "Unknown Trainset (%s)",
+  "trainset.railbound.coach_standard": "Standard Passenger Coach",
+  "tooltip.railbound.category.passenger": "Passenger Coach",
+  "tooltip.railbound.category.box_car": "Box Car",
+  "tooltip.railbound.category.tank_car": "Tank Car",
+  "tooltip.railbound.category.locomotive": "Locomotive",
+  "tooltip.railbound.category.multiple_unit": "Multiple Unit",
+  "tooltip.railbound.length": "Length: %s blocks",
+  "tooltip.railbound.seats": "Seats: %s"
+}

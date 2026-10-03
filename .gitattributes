@@ -1,0 +1,11 @@
+* text=auto
+
+# Shell scripts must keep LF or they fail on macOS/Linux
+gradlew text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+
+# Binary files
+*.jar binary
+*.png binary
+*.bbmodel binary

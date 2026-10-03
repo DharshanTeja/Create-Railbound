@@ -1,0 +1,117 @@
+plugins {
+    id 'java-library'
+    id 'idea'
+    id 'net.neoforged.moddev' version '2.0.141'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+    version = project.neo_version
+
+    parchment {
+        mappingsVersion = project.parchment_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
+
+    runs {
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+        client {
+            client()
+        }
+        // Dev client that joins the local dev server (runServer) straight away — for multiplayer sync checks.
+        clientJoinLocal {
+            client()
+            programArguments.addAll('--quickPlayMultiplayer', 'localhost:25565')
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+        gameTestServer {
+            type = 'gameTestServer'
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+
+    unitTest {
+        enable()
+        testedMod = mods.railbound
+    }
+}
+
+repositories {
+    maven { url = 'https://maven.createmod.net' }                                  // Create, Ponder, Flywheel
+    maven { url = 'https://maven.ithundxr.dev/snapshots' }                         // Registrate
+    maven { url = 'https://raw.githubusercontent.com/Fuzss/modresources/main/maven' } // config api port used by Ponder
+}
+
+dependencies {
+    implementation("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
+    implementation("net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}")
+    compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-${minecraft_version}:${flywheel_version}")
+    runtimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}")
+    implementation("com.tterrag.registrate:Registrate:${registrate_version}")
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    var replaceProperties = [
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+// Copies the built jar into a Modrinth dev profile for testing alongside a real modpack.
+// Set railbound_dev_profile=<profile folder> in ~/.gradle/gradle.properties (machine-specific).
+var devProfile = providers.gradleProperty('railbound_dev_profile')
+tasks.register('deployToProfile', Copy) {
+    group = 'railbound'
+    description = 'Copies the mod jar into <railbound_dev_profile>/mods, replacing older railbound jars.'
+    from tasks.named('jar')
+    into devProfile.map { "${it}/mods" }.orElse(layout.buildDirectory.dir('no-dev-profile').map { it.asFile.path })
+    doFirst {
+        if (!devProfile.isPresent()) {
+            throw new GradleException('Set railbound_dev_profile in ~/.gradle/gradle.properties to use deployToProfile')
+        }
+        delete fileTree(dir: "${devProfile.get()}/mods", include: 'railbound-*.jar')
+    }
+}

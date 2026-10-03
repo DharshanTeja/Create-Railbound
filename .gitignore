@@ -1,0 +1,22 @@
+# Third-party reference clones (read-only, never committed)
+/Create-Source/
+
+# Personal planning notes
+/Plan.txt
+
+# Local tool state
+/.claude/
+/.superpowers/
+.idea/
+.vscode/
+*.iml
+out/
+
+# Gradle and build output
+.gradle/
+build/
+/Mod/run/
+
+# OS files
+Thumbs.db
+.DS_Store
