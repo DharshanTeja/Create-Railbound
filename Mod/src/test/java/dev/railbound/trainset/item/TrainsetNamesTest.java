@@ -50,7 +50,7 @@ class TrainsetNamesTest {
         assertEquals("tooltip.railbound.length", contents(lines.get(1)).getKey());
         assertEquals(16, contents(lines.get(1)).getArgs()[0]);
         assertEquals("tooltip.railbound.seats", contents(lines.get(2)).getKey());
-        assertEquals(40, contents(lines.get(2)).getArgs()[0]);
+        assertEquals(20, contents(lines.get(2)).getArgs()[0]);
     }
 
     @Test

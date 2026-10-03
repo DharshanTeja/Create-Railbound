@@ -1,9 +1,15 @@
 package dev.railbound.carriage;
 
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.trains.bogey.AbstractBogeyBlock;
+import dev.railbound.trainset.design.TrainsetCategory;
 import dev.railbound.trainset.item.TrainsetItem;
+import dev.railbound.trainset.load.TrainsetDesigns;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -17,6 +23,7 @@ import java.util.function.Predicate;
 /**
  * A carriage's bogeys are ordinary Create bogeys with their own loot (Railway Casing). Breaking one must
  * remove the whole carriage for one trainset item instead, and explosions leave them to the carriage cascade.
+ * Train Controls are kept off cars that are not driven.
  */
 public final class CarriageProtection {
     private CarriageProtection() {}
@@ -39,6 +46,30 @@ public final class CarriageProtection {
         });
     }
 
+    /** Train Controls may only go on cars a crew drives; coaches and wagons refuse them. */
+    public static void onPlace(BlockEvent.EntityPlaceEvent event) {
+        if (!(event.getLevel() instanceof Level level) || level.isClientSide
+                || !AllBlocks.TRAIN_CONTROLS.has(event.getPlacedBlock())) {
+            return;
+        }
+        Optional<BlockPos> part = carriagePartBeside(level, event.getPos());
+        if (part.isEmpty()) {
+            return;
+        }
+        Optional<TrainsetCategory> category = CarriageRemover.findDesign(level, part.get())
+                .flatMap(TrainsetDesigns::get)
+                .map(design -> design.design().category());
+        if (category.isEmpty() || ControlsRule.allowsControls(category.get())) {
+            return;
+        }
+        event.setCanceled(true);
+        if (event.getEntity() instanceof ServerPlayer player) {
+            player.displayClientMessage(Component.translatable("railbound.placement.no_controls")
+                    .withStyle(ChatFormatting.RED), true);
+            player.containerMenu.sendAllDataToRemote();
+        }
+    }
+
     public static void onDetonate(ExplosionEvent.Detonate event) {
         Level level = event.getLevel();
         removeCarriageBogeys(event.getAffectedBlocks(), pos -> isCarriageBogey(level, pos));
@@ -57,7 +88,7 @@ public final class CarriageProtection {
     private static Optional<BlockPos> carriagePartBeside(Level level, BlockPos pos) {
         for (Direction direction : Direction.values()) {
             BlockPos next = pos.relative(direction);
-            if (level.getBlockState(next).getBlock() instanceof CarriagePartBlock) {
+            if (CarriagePart.is(level.getBlockState(next))) {
                 return Optional.of(next);
             }
         }

@@ -112,6 +112,23 @@ public final class DesignValidator {
             }
         }
 
+        // Doors are two cells tall (lower and upper half) and open outwards, so they need a side column.
+        for (BlockPos door : doorCells) {
+            if (doorCells.contains(door.below())) {
+                continue;
+            }
+            int height = 1;
+            while (doorCells.contains(door.above(height))) {
+                height++;
+            }
+            if (height != 2) {
+                errors.add("door at " + door.toShortString() + " must be exactly two cells tall, found " + height);
+            }
+            if (door.getX() == 0) {
+                errors.add("door at " + door.toShortString() + " must be on a side column, not the centre");
+            }
+        }
+
         // Layer 0 sits at bogey height: the bogey fills its own cell, and something beside or above must hold it.
         Set<BlockPos> cellPositions = cells.stream().map(LayoutCell::pos).collect(Collectors.toSet());
         for (BogeySpec bogey : design.bogeys()) {

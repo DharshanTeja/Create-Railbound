@@ -149,6 +149,23 @@ class DesignValidatorTest {
     }
 
     @Test
+    void rejectsADoorThatIsNotTwoCellsTall() {
+        List<List<String>> layers = copyLayers();
+        layers.get(2).set(2, "L.R");
+        assertProblem(TestDesigns.withLayout(SAMPLE, new LayoutSpec(SAMPLE.layout().palette(), layers)),
+                "must be exactly two cells tall");
+    }
+
+    @Test
+    void rejectsADoorOnTheCentreColumn() {
+        List<List<String>> layers = copyLayers();
+        layers.get(1).set(5, "SDS");
+        layers.get(2).set(5, "LDR");
+        assertProblem(TestDesigns.withLayout(SAMPLE, new LayoutSpec(SAMPLE.layout().palette(), layers)),
+                "must be on a side column");
+    }
+
+    @Test
     void rejectsDisconnectedCells() {
         TrainsetDesign island = TestDesigns.parse("""
                 {"name":"n","category":"box_car","size":{"length":4,"width":1,"height":1},

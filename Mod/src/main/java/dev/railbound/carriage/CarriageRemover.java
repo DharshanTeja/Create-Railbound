@@ -11,6 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -44,8 +45,33 @@ public final class CarriageRemover {
         return removeConnected(level, seeds, pos.immutable());
     }
 
-    private static Optional<ResourceLocation> removeConnected(Level level, Set<BlockPos> seeds, BlockPos target) {
-        Predicate<BlockPos> isPart = p -> level.getBlockState(p).getBlock() instanceof CarriagePartBlock;
+    /** The design of the carriage that the part at partPos belongs to, without changing anything. */
+    public static Optional<ResourceLocation> findDesign(Level level, BlockPos partPos) {
+        return Optional.ofNullable(collect(level, Set.of(partPos.immutable()), partPos.immutable()).design());
+    }
+
+    /** A standing carriage found from one of its parts: where its anchor is, which way it faces, and its design. */
+    public record FoundCarriage(BlockPos anchor, Direction facing, ParsedDesign design) {}
+
+    /** The carriage that the part at partPos belongs to, if its anchor and design can be found. */
+    public static Optional<FoundCarriage> findCarriage(Level level, BlockPos partPos) {
+        return found(level, collect(level, Set.of(partPos.immutable()), partPos.immutable()).anchor());
+    }
+
+    /** Swaps a part for another block without the rest of the carriage reacting to the removal. */
+    public static void replacePart(Level level, BlockPos pos, BlockState state) {
+        removing++;
+        try {
+            level.setBlock(pos, state, Block.UPDATE_ALL);
+        } finally {
+            removing--;
+        }
+    }
+
+    private record CarriageScan(Set<BlockPos> parts, ResourceLocation design, BlockPos anchor) {}
+
+    private static CarriageScan collect(Level level, Set<BlockPos> seeds, BlockPos target) {
+        Predicate<BlockPos> isPart = p -> CarriagePart.is(level.getBlockState(p));
         Set<BlockPos> parts = new LinkedHashSet<>();
         for (BlockPos seed : seeds) {
             if (!parts.contains(seed)) {
@@ -59,18 +85,24 @@ public final class CarriageRemover {
                 anchors.add(part);
             }
         }
-        ResourceLocation design = anchors.isEmpty() ? null : designAt(level, anchors.get(0));
+        BlockPos chosen = anchors.isEmpty() ? null : anchors.get(0);
         if (anchors.size() > 1) {
-            // Touching carriages: remove only the one the target block belongs to.
+            // Touching carriages: keep only the one the target block belongs to.
             for (BlockPos anchor : anchors) {
                 Optional<Set<BlockPos>> footprint = footprintOf(level, anchor);
                 if (footprint.isPresent() && footprint.get().contains(target)) {
                     parts.retainAll(footprint.get());
-                    design = designAt(level, anchor);
+                    chosen = anchor;
                     break;
                 }
             }
         }
+        return new CarriageScan(parts, chosen == null ? null : designAt(level, chosen), chosen);
+    }
+
+    private static Optional<ResourceLocation> removeConnected(Level level, Set<BlockPos> seeds, BlockPos target) {
+        CarriageScan carriage = collect(level, seeds, target);
+        Set<BlockPos> parts = carriage.parts();
 
         Set<BlockPos> bogeys = new LinkedHashSet<>();
         for (BlockPos part : parts) {
@@ -84,6 +116,14 @@ public final class CarriageRemover {
 
         removing++;
         try {
+            // Fittings built into the walls are the player's own blocks: drop them rather than leave them floating.
+            found(level, carriage.anchor()).ifPresent(found -> {
+                for (BlockPos pos : CarriageFootprint.positions(found.design(), found.anchor(), found.facing())) {
+                    if (CarriageFittings.is(level.getBlockState(pos))) {
+                        level.destroyBlock(pos, true);
+                    }
+                }
+            });
             for (BlockPos pos : parts) {
                 level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
             }
@@ -93,7 +133,19 @@ public final class CarriageRemover {
         } finally {
             removing--;
         }
-        return Optional.ofNullable(design);
+        return Optional.ofNullable(carriage.design());
+    }
+
+    private static Optional<FoundCarriage> found(Level level, @Nullable BlockPos anchor) {
+        if (anchor == null) {
+            return Optional.empty();
+        }
+        BlockState state = level.getBlockState(anchor);
+        if (!state.hasProperty(AnchorBlock.FACING)) {
+            return Optional.empty();
+        }
+        return TrainsetDesigns.get(designAt(level, anchor))
+                .map(design -> new FoundCarriage(anchor, state.getValue(AnchorBlock.FACING), design));
     }
 
     private static ResourceLocation designAt(Level level, BlockPos anchor) {

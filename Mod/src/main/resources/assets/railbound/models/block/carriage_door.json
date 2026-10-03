@@ -1,0 +1,6 @@
+{
+  "textures": { "all": "railbound:block/placeholder_door", "particle": "railbound:block/placeholder_door" },
+  "elements": [
+    { "from": [0, 0, 0], "to": [16, 16, 2], "faces": {"north":{"texture":"#all"},"south":{"texture":"#all"},"east":{"texture":"#all"},"west":{"texture":"#all"},"up":{"texture":"#all"},"down":{"texture":"#all"}} }
+  ]
+}

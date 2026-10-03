@@ -14,12 +14,15 @@
   "block.railbound.carriage_frame": "Carriage Frame",
   "block.railbound.carriage_placeholder": "Carriage Part (placeholder)",
   "block.railbound.carriage_anchor": "Carriage Anchor",
+  "block.railbound.carriage_seat": "Carriage Seat",
+  "block.railbound.carriage_door": "Carriage Door",
   "railbound.placement.unknown_design": "This trainset's design is not loaded",
   "railbound.placement.no_station": "Use this on a station's assembly track while the station is in assembly mode",
   "railbound.placement.wrong_gauge": "Trainsets need standard-gauge Create track",
   "railbound.placement.does_not_fit": "The carriage does not fit on the remaining assembly track",
   "railbound.placement.too_close": "Too close to another bogey (Create needs 3 blocks between bogeys)",
   "railbound.placement.touching": "Too close to another carriage: leave at least one block of space beside it",
-  "railbound.placement.blocked":"Something is in the way at %s",
+  "railbound.placement.blocked": "Something is in the way at %s",
+  "railbound.placement.no_controls": "Train Controls can only go on locomotives and cab cars",
   "railbound.placement.placed": "Placed %s"
 }

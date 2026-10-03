@@ -29,7 +29,7 @@ public class PlaceholderPartBlock extends CarriagePartBlock {
     public PlaceholderPartBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any()
-                .setValue(PART, PlaceholderPart.SEAT)
+                .setValue(PART, PlaceholderPart.CAB)
                 .setValue(FLOOR, true)
                 .setValue(SIDE, PlaceholderSide.NONE)
                 .setValue(FACING, Direction.NORTH));

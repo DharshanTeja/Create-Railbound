@@ -6,7 +6,7 @@ import com.simibubi.create.content.trains.track.ITrackBlock;
 import com.simibubi.create.content.trains.track.TrackBlock;
 import com.simibubi.create.content.trains.track.TrackMaterial;
 import dev.railbound.carriage.CarriageBuilder;
-import dev.railbound.carriage.CarriagePartBlock;
+import dev.railbound.carriage.CarriagePart;
 import dev.railbound.trainset.design.ParsedDesign;
 import dev.railbound.trainset.item.TrainsetItem;
 import dev.railbound.trainset.load.TrainsetDesigns;
@@ -72,7 +72,7 @@ public final class TrainsetPlacement {
         if (problem.isPresent()) {
             return refuse(player, problem.get().key());
         }
-        if (CarriagePlanner.touchesOtherParts(plan, pos -> level.getBlockState(pos).getBlock() instanceof CarriagePartBlock)) {
+        if (CarriagePlanner.touchesOtherParts(plan, pos -> CarriagePart.is(level.getBlockState(pos)))) {
             return refuse(player, PlacementProblem.TOUCHING.key());
         }
         Optional<BlockPos> blocked = firstBlocked(level, plan);
@@ -82,7 +82,7 @@ public final class TrainsetPlacement {
             return InteractionResult.FAIL;
         }
 
-        CarriageBuilder.build(level, plan, designId);
+        CarriageBuilder.build(level, plan, design.get(), designId);
         if (!player.isCreative()) {
             stack.shrink(1);
         }

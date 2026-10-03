@@ -2,6 +2,8 @@ package dev.railbound;
 
 import com.mojang.logging.LogUtils;
 import dev.railbound.carriage.CarriageAttachment;
+import dev.railbound.carriage.CarriageBehaviours;
+import dev.railbound.carriage.CarriageFittings;
 import dev.railbound.carriage.CarriageProtection;
 import dev.railbound.network.RailboundNetwork;
 import dev.railbound.registry.RailboundBlockEntities;
@@ -38,6 +40,9 @@ public final class Railbound {
         NeoForge.EVENT_BUS.addListener(RailboundNetwork::onDatapackSync);
         NeoForge.EVENT_BUS.addListener(CarriageProtection::onBreak);
         NeoForge.EVENT_BUS.addListener(CarriageProtection::onDetonate);
+        NeoForge.EVENT_BUS.addListener(CarriageProtection::onPlace);
+        NeoForge.EVENT_BUS.addListener(CarriageFittings::onRightClick);
+        NeoForge.EVENT_BUS.addListener(CarriageFittings::onBreak);
     }
 
     public static ResourceLocation rl(String path) {
@@ -46,6 +51,7 @@ public final class Railbound {
 
     private static void onCommonSetup(FMLCommonSetupEvent event) {
         CarriageAttachment.register();
+        event.enqueueWork(CarriageBehaviours::register);
     }
 
     private static void onAddReloadListeners(AddReloadListenerEvent event) {

@@ -26,5 +26,5 @@ public record TrainsetDesign(
             LayoutSpec.CODEC.fieldOf("layout").forGetter(TrainsetDesign::layout)
     ).apply(i, TrainsetDesign::new));
 
-    public static final int SEATS_PER_BLOCK = 2;
+    public static final int SEATS_PER_BLOCK = 1;
 }

@@ -1,9 +1,5 @@
 {
   "multipart": [
-    {"when": {"part": "seat", "floor": "true"}, "apply": {"model": "railbound:block/placeholder/seat_floor"}},
-    {"when": {"part": "seat", "floor": "false"}, "apply": {"model": "railbound:block/placeholder/seat"}},
-    {"when": {"part": "door", "floor": "true"}, "apply": {"model": "railbound:block/placeholder/door_floor"}},
-    {"when": {"part": "door", "floor": "false"}, "apply": {"model": "railbound:block/placeholder/door"}},
     {"when": {"part": "cab", "floor": "true"}, "apply": {"model": "railbound:block/placeholder/cab_floor"}},
     {"when": {"part": "cab", "floor": "false"}, "apply": {"model": "railbound:block/placeholder/cab"}},
     {"when": {"part": "cargo_item", "floor": "true"}, "apply": {"model": "railbound:block/placeholder/cargo_item_floor"}},
