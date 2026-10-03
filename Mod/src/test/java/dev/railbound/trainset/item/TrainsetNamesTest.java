@@ -1,6 +1,7 @@
 package dev.railbound.trainset.item;
 
 import dev.railbound.testutil.TestDesigns;
+import dev.railbound.trainset.design.ParsedDesign;
 import dev.railbound.trainset.design.TrainsetDesign;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -43,13 +44,13 @@ class TrainsetNamesTest {
 
     @Test
     void tooltipListsCategoryLengthAndSeats() {
-        List<Component> lines = TrainsetNames.tooltip(TestDesigns.sample());
+        List<Component> lines = TrainsetNames.tooltip(ParsedDesign.of(TestDesigns.sample()));
         assertEquals(3, lines.size());
         assertEquals("tooltip.railbound.category.passenger", contents(lines.get(0)).getKey());
         assertEquals("tooltip.railbound.length", contents(lines.get(1)).getKey());
         assertEquals(16, contents(lines.get(1)).getArgs()[0]);
         assertEquals("tooltip.railbound.seats", contents(lines.get(2)).getKey());
-        assertEquals(40, contents(lines.get(2)).getArgs()[0]);
+        assertEquals(20, contents(lines.get(2)).getArgs()[0]);
     }
 
     @Test
@@ -58,7 +59,7 @@ class TrainsetNamesTest {
                 {"name":"n","category":"box_car","size":{"length":2,"width":1,"height":1},
                  "bogeys":[{"z":0},{"z":1}],
                  "layout":{"palette":{"A":"anchor","#":"frame:floor"},"layers":[["A","#"]]}}""");
-        List<Component> lines = TrainsetNames.tooltip(boxCar);
+        List<Component> lines = TrainsetNames.tooltip(ParsedDesign.of(boxCar));
         assertEquals(2, lines.size());
         assertEquals("tooltip.railbound.category.box_car", contents(lines.get(0)).getKey());
     }

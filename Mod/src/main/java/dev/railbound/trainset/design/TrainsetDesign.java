@@ -26,13 +26,5 @@ public record TrainsetDesign(
             LayoutSpec.CODEC.fieldOf("layout").forGetter(TrainsetDesign::layout)
     ).apply(i, TrainsetDesign::new));
 
-    public static final int SEATS_PER_BLOCK = 2;
-
-    /** Total seats; only call on a validated design. */
-    public int seatCount() {
-        long seatBlocks = LayoutParser.parse(this).stream()
-                .filter(cell -> cell.part().type() == PartType.SEAT)
-                .count();
-        return (int) seatBlocks * SEATS_PER_BLOCK;
-    }
+    public static final int SEATS_PER_BLOCK = 1;
 }

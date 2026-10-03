@@ -1,17 +1,17 @@
 {
   "name": "trainset.railbound.coach_standard",
   "category": "passenger",
-  "size": { "length": 16, "width": 3, "height": 3 },
+  "size": { "length": 16, "width": 3, "height": 4 },
   "bogeys": [
-    { "z": 3, "style": "create:standard" },
-    { "z": 12, "style": "create:standard" }
+    { "z": 4, "style": "railbound:coach" },
+    { "z": 11, "style": "railbound:coach" }
   ],
   "power": "none",
   "doors": [
-    { "part": "door_left_front",  "pos": [-1, 0, 2] },
-    { "part": "door_right_front", "pos": [1, 0, 2] },
-    { "part": "door_left_rear",   "pos": [-1, 0, 13] },
-    { "part": "door_right_rear",  "pos": [1, 0, 13] }
+    { "part": "door_left_front",  "pos": [-1, 1, 2] },
+    { "part": "door_right_front", "pos": [1, 1, 2] },
+    { "part": "door_left_rear",   "pos": [-1, 1, 13] },
+    { "part": "door_right_rear",  "pos": [1, 1, 13] }
   ],
   "layout": {
     "palette": {
@@ -20,17 +20,22 @@
       "r": "frame:floor_wall_right",
       "L": "frame:wall_left",
       "R": "frame:wall_right",
+      "c": "frame:ceiling",
+      "K": "frame:wall_ceiling_left",
+      "J": "frame:wall_ceiling_right",
       "t": "frame:roof",
       "q": "frame:roof_wall_left",
       "p": "frame:roof_wall_right",
       "S": "seat",
+      "T": "step",
       "D": "door",
       "A": "anchor",
       ".": "air"
     },
     "layers": [
-      ["l#r", "l#r", "D#D", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "D#D", "l#r", "l#r"],
+      ["l#r", "l#r", "T#T", "S#S", "S.S", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "S.S", "S#S", "T#T", "l#r", "l#r"],
       ["L.R", "L.R", "D.D", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "D.D", "L.R", "L.R"],
+      ["KcJ", "KcJ", "DcD", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "DcD", "KcJ", "KcJ"],
       ["qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qAp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp"]
     ]
   }

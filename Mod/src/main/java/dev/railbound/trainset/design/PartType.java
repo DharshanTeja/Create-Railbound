@@ -7,6 +7,7 @@ public enum PartType {
     FRAME("frame"),
     SEAT("seat"),
     DOOR("door"),
+    STEP("step"),
     ANCHOR("anchor"),
     CAB("cab"),
     CARGO_ITEM("cargo_item"),

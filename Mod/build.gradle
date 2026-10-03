@@ -38,6 +38,7 @@ neoForge {
         server {
             server()
             programArgument '--nogui'
+            gameDirectory = project.file('run/server')
         }
         gameTestServer {
             type = 'gameTestServer'
@@ -99,6 +100,18 @@ var generateModMetadata = tasks.register('generateModMetadata', ProcessResources
 }
 sourceSets.main.resources.srcDir generateModMetadata
 neoForge.ideSyncTask generateModMetadata
+
+// Trainset and bogey art (art/trainsets/<id>/<id>.bbmodel, art/bogeys/bogey_<style>.bbmodel) -> OBJ parts and textures.
+var convertTrainsets = tasks.register('convertTrainsets', dev.railbound.convert.ConvertTrainsetsTask) {
+    group = 'railbound'
+    namespace = mod_id
+    designDir = file('src/main/resources/data/railbound/railbound/trainsets')
+    artDir = file('../art/trainsets')
+    bogeyDir = file('../art/bogeys')
+    outputDir = layout.buildDirectory.dir('generated/trainsetAssets')
+}
+sourceSets.main.resources.srcDir convertTrainsets
+neoForge.ideSyncTask convertTrainsets
 
 // Copies the built jar into a Modrinth dev profile for testing alongside a real modpack.
 // Set railbound_dev_profile=<profile folder> in ~/.gradle/gradle.properties (machine-specific).

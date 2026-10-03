@@ -1,5 +1,6 @@
 package dev.railbound.trainset.item;
 
+import dev.railbound.trainset.design.ParsedDesign;
 import dev.railbound.trainset.design.TrainsetDesign;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -24,15 +25,15 @@ public final class TrainsetNames {
                 .orElseGet(() -> Component.translatable("item.railbound.trainset.unknown", designId.toString()));
     }
 
-    public static List<Component> tooltip(TrainsetDesign design) {
+    public static List<Component> tooltip(ParsedDesign parsed) {
+        TrainsetDesign design = parsed.design();
         List<Component> lines = new ArrayList<>();
         lines.add(Component.translatable("tooltip.railbound.category." + design.category().getSerializedName())
                 .withStyle(ChatFormatting.GRAY));
         lines.add(Component.translatable("tooltip.railbound.length", design.size().length())
                 .withStyle(ChatFormatting.GRAY));
-        int seats = design.seatCount();
-        if (seats > 0) {
-            lines.add(Component.translatable("tooltip.railbound.seats", seats).withStyle(ChatFormatting.GRAY));
+        if (parsed.seatCount() > 0) {
+            lines.add(Component.translatable("tooltip.railbound.seats", parsed.seatCount()).withStyle(ChatFormatting.GRAY));
         }
         return lines;
     }

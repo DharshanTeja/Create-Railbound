@@ -1,8 +1,11 @@
 package dev.railbound.trainset.design;
 
+import dev.railbound.util.BlockGraph;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +13,7 @@ import java.util.stream.Collectors;
 
 public final class DesignValidator {
     public static final int REQUIRED_BOGEYS = 2;
+    public static final int MIN_BOGEY_SPACING = 3;
 
     private DesignValidator() {}
 
@@ -33,8 +37,14 @@ public final class DesignValidator {
                 errors.add("bogey z=" + bogey.z() + " is outside carriage length " + size.length());
             }
         }
-        if (bogeys.size() == REQUIRED_BOGEYS && bogeys.get(0).z() == bogeys.get(1).z()) {
-            errors.add("bogeys must be at different positions");
+        if (bogeys.size() == REQUIRED_BOGEYS) {
+            int spacing = Math.abs(bogeys.get(0).z() - bogeys.get(1).z());
+            if (spacing == 0) {
+                errors.add("bogeys must be at different positions");
+            } else if (spacing < MIN_BOGEY_SPACING) {
+                // Create refuses to assemble bogeys closer than this (StationBlockEntity "bogeys_too_close").
+                errors.add("bogeys must be at least 3 blocks apart, got " + spacing);
+            }
         }
 
         List<String> layoutErrors = validateLayoutStructure(design);
@@ -99,6 +109,50 @@ public final class DesignValidator {
         for (DoorSpec door : design.doors()) {
             if (!doorCells.contains(door.pos())) {
                 errors.add("door '" + door.part() + "' at " + door.pos().toShortString() + " is not a door cell");
+            }
+        }
+
+        // Doors are two cells tall (lower and upper half) and open outwards, so they need a side column.
+        for (BlockPos door : doorCells) {
+            if (doorCells.contains(door.below())) {
+                continue;
+            }
+            int height = 1;
+            while (doorCells.contains(door.above(height))) {
+                height++;
+            }
+            if (height != 2) {
+                errors.add("door at " + door.toShortString() + " must be exactly two cells tall, found " + height);
+            }
+            if (door.getX() == 0) {
+                errors.add("door at " + door.toShortString() + " must be on a side column, not the centre");
+            }
+        }
+
+        // Steps are the climbable cell you board through, so they only make sense under a door.
+        cells.stream().filter(c -> c.part().type() == PartType.STEP).map(LayoutCell::pos)
+                .filter(step -> !doorCells.contains(step.above()))
+                .forEach(step -> errors.add("step at " + step.toShortString() + " needs a door directly above it"));
+
+        // Layer 0 sits at bogey height: the bogey fills its own cell, and something beside or above must hold it.
+        Set<BlockPos> cellPositions = cells.stream().map(LayoutCell::pos).collect(Collectors.toSet());
+        for (BogeySpec bogey : design.bogeys()) {
+            if (bogey.z() < 0 || bogey.z() >= design.size().length()) {
+                continue;
+            }
+            BlockPos bogeyCell = new BlockPos(0, 0, bogey.z());
+            if (cellPositions.contains(bogeyCell)) {
+                errors.add("bogey z=" + bogey.z() + " needs layer 0 at x=0 to be air: the bogey goes there");
+            } else if (Arrays.stream(Direction.values()).noneMatch(d -> cellPositions.contains(bogeyCell.relative(d)))) {
+                errors.add("bogey z=" + bogey.z() + " is not next to any carriage part");
+            }
+        }
+
+        if (!cells.isEmpty()) {
+            Set<BlockPos> reachable = BlockGraph.connected(cells.get(0).pos(), cellPositions::contains, cellPositions.size() + 1);
+            int cutOff = cellPositions.size() - reachable.size();
+            if (cutOff > 0) {
+                errors.add("layout cells are not connected: " + cutOff + " cell(s) are cut off from the rest");
             }
         }
     }

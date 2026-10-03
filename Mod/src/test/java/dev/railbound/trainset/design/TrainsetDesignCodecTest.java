@@ -20,14 +20,14 @@ class TrainsetDesignCodecTest {
         TrainsetDesign d = TestDesigns.sample();
         assertEquals("trainset.railbound.coach_standard", d.name());
         assertEquals(TrainsetCategory.PASSENGER, d.category());
-        assertEquals(new CarriageSize(16, 3, 3), d.size());
+        assertEquals(new CarriageSize(16, 3, 4), d.size());
         assertEquals(List.of(
-                new BogeySpec(3, ResourceLocation.fromNamespaceAndPath("create", "standard")),
-                new BogeySpec(12, ResourceLocation.fromNamespaceAndPath("create", "standard"))), d.bogeys());
+                new BogeySpec(4, ResourceLocation.fromNamespaceAndPath("railbound", "coach")),
+                new BogeySpec(11, ResourceLocation.fromNamespaceAndPath("railbound", "coach"))), d.bogeys());
         assertEquals(PowerType.NONE, d.power());
         assertEquals(CargoSpec.NONE, d.cargo());
-        assertEquals(new DoorSpec("door_left_front", new BlockPos(-1, 0, 2)), d.doors().get(0));
-        assertEquals(3, d.layout().layers().size());
+        assertEquals(new DoorSpec("door_left_front", new BlockPos(-1, 1, 2)), d.doors().get(0));
+        assertEquals(4, d.layout().layers().size());
         assertEquals("frame:floor", d.layout().palette().get("#"));
     }
 

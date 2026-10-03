@@ -36,7 +36,7 @@ Building a good-looking train in Create takes hours of block-by-block work. Rail
 |---|---|
 | **Single-item trainsets** | Every locomotive and carriage is one item rendering a full, detailed model — no block-by-block building. |
 | **Real Create trains** | Placed with Create's own station assembly. Schedules, signals, stations and other train addons see an ordinary Create train. |
-| **Walkable interiors** | Step inside, walk the aisle and right-click a seat to sit. Passenger cars seat four abreast — two each side of a centre aisle. |
+| **Walkable interiors** | Step inside, walk the aisle and right-click a seat to sit. Passenger cars seat two abreast — a window seat each side of a centre aisle. |
 | **Doors that work** | Doors open automatically when the train stops at a station, using Create's train-door behaviour. |
 | **Freight that works** | The items carriage holds 160 stacks and the fluid carriage 144 buckets. Open them by hand, or load and unload through Create's Portable Storage and Portable Fluid Interfaces. |
 | **Mix and match** | Couple trainset cars with your own hand-built carriages in the same train. |
@@ -44,7 +44,7 @@ Building a good-looking train in Create takes hours of block-by-block work. Rail
 
 <div align="center">
 <img src="art/previews/coach_standard_interior.png" alt="Interior of the Standard Passenger Coach: two-plus-two seating, luggage racks and a lit ceiling" width="640"><br>
-<sub><i>Inside the Standard Passenger Coach — 40 seats in a 2 + 2 layout. Prototype model.</i></sub>
+<sub><i>Inside the Standard Passenger Coach — prototype model. The final coach seats 20, one window seat each side of the aisle.</i></sub>
 </div>
 
 ### Planned rolling stock
@@ -88,9 +88,9 @@ Railbound ships in four phases. Each phase is built in small sub-phases, and eve
 | | Sub-phase | Delivers |
 |:---:|---|---|
 | ✅ | **1.0 Foundation** | Design format, validation, datapack loading, multiplayer sync, trainset item and creative tab |
-| ⏳ | **1.1 Coach on rails** | Placing a carriage on track and assembling it into a real Create train |
-| ○ | **1.2 Coach interior** | Right-click seating and doors that open at stations |
-| ○ | **1.3 Coach visuals** | Full 3D models in game, animated doors, Blockbench-to-game converter |
+| ✅ | **1.1 Coach on rails** | Placing a carriage on track and assembling it into a real Create train |
+| ✅ | **1.2 Coach interior** | Right-click seating, doors that open at stations, interfaces that fit into the coach wall |
+| ⏳ | **1.3 Coach visuals** | Full 3D models in game, sliding doors, glowing lamps, Blockbench-to-game converter |
 | ○ | **1.4 Steam locomotive** | Driver's cab, conductor seat and automatic running on schedules |
 | ○ | **1.5 Items carriage** | 160-stack storage, scrolling GUI, Portable Storage Interface |
 | ○ | **1.6 Fluid carriage** | 144-bucket tank, fill-and-drain GUI, Portable Fluid Interface |
@@ -110,7 +110,7 @@ data/<namespace>/railbound/trainsets/<id>.json
 {
   "name": "trainset.mypack.observation_car",   // translation key
   "category": "passenger",                    // passenger · box_car · tank_car · locomotive · multiple_unit
-  "size": { "length": 16, "width": 3, "height": 3 },
+  "size": { "length": 16, "width": 3, "height": 4 },
   "bogeys": [ { "z": 3 }, { "z": 12 } ],      // always exactly two
   "power": "none",
   "layout": {
@@ -119,6 +119,8 @@ data/<namespace>/railbound/trainsets/<id>.json
   }
 }
 ```
+
+Layer 0 sits at bogey height and holds the floor, which people walk on level with the top of the bogeys. Leave the centre cell of layer 0 empty above each bogey position: the bogey itself goes there.
 
 Broken designs never crash the game — they are skipped with a log line that names the file and the exact problem, and every other design still loads. A complete working example ships with the mod: [`coach_standard.json`](Mod/src/main/resources/data/railbound/railbound/trainsets/coach_standard.json).
 
