@@ -1,7 +1,7 @@
-# Create: Railbound — Trainsets v1 Design
+# Create: Railbound — Trainsets Design
 
-**Date:** 2026-10-02
-**Status:** Draft for review
+**Date:** 2026-10-02 (updated 2026-10-03 for the phased release plan — see §15)
+**Status:** Approved; Phase 1 scope set by the user's phase plan
 **Sub-project:** #1 of the Railbound roadmap (trainsets). Catenary, signals, tracks and the network planner are separate sub-projects with their own specs.
 
 ---
@@ -28,38 +28,44 @@ Give players complete, MTR-quality trains as **single inventory items** that beh
 | Build | ModDevGradle, JDK 21 |
 | Libraries (via Create) | Flywheel 1.0.x (rendering), Ponder, Registrate (registration) |
 | Maven | `maven.createmod.net` (Create, Ponder, Flywheel), `maven.ithundxr.dev/snapshots` (Registrate) |
-| Optional compat | Create: Steam 'n' Rails NeoForge port — must not conflict; no integration code in v1 |
+| Optional compat | Create: Steam 'n' Rails NeoForge port — must not conflict; no integration code in Phase 1 |
 | Mod ID | `railbound` (working ID; display name to be checked for conflicts before first public release — see §13) |
 
 Reference sources live in `Create-Source/` (Create `mc1.21.1/dev`, Steam 'n' Rails `1.20/dev`, Steam 'n' Rails 1.21.1 port). They are read-only references; nothing is copied into or modified in them.
 
 ## 3. Scope
 
-### In v1
+Releases follow the user's phase plan (§15). This spec covers the trainset system as a whole; **Phase 1 is the first release**.
+
+### In Phase 1
 
 - Trainset item (one item type, many designs) placed via Create's station assembly flow.
-- Hidden-structure carriages (§5) with walkable interiors.
-- Design categories and initial designs:
+- Hidden-structure carriages (§5) with walkable interiors, double seats and station doors.
+- Four designs:
 
-| Category | v1 designs |
+| Category | Phase 1 design |
 |---|---|
-| `locomotive` | Steam locomotive, diesel locomotive, electric locomotive |
-| `multiple_unit` | Multiple-unit cab car (cab + passenger seats); pairs with passenger coaches |
+| `locomotive` | Steam locomotive (Create-style: needs no fuel) |
 | `passenger` | Standard passenger coach (prototype exists) |
-| `box_car` | Box car (item cargo) |
-| `tank_car` | Tank car (fluid cargo) |
+| `box_car` | Items carriage — 160 stacks, scrolling chest-style GUI (§5.7) |
+| `tank_car` | Fluid carriage — 144 buckets by default, fill/drain GUI (§5.7) |
 
-- Coupler part for player-built carriages (visual, linked at assembly).
-- Power-source hook (no fuel needed in v1).
+- Works with all of Create's navigation, schedules and signals. Automatic running keeps Create's rule: a conductor (a mob or Blaze Burner seated at the loco's controls) must be given a schedule by the player.
+- Wrench pickup of disassembled carriages (§5.5); goods carriages connect to Portable Storage/Fluid Interfaces.
+- Power-source hook (no fuel needed in Phase 1).
 - Data-driven design format, converter tool, Blockbench template.
 
-### Explicitly out of v1
+### Later phases (§15)
 
-- Crafting recipes (deferred by the user; items obtainable in creative/commands until decided).
-- Live coupling/shunting while trains run (possible later sub-project).
-- Fuel or electric power requirements (catenary sub-project adds them).
+- Phase 2: more carriage types, crafting recipes and crafting components (steam engine, bogeys), Ponder scenes, coupler/bogey/anti-climber blocks.
+- Phase 3: diesel locomotives and multiple units that burn fuel.
+- Phase 4: electric locomotives with catenary and power generation.
+
+### Out of scope for now
+
+- Live coupling/shunting while trains run.
 - Alternative liveries, distance LOD, dynamic interior lighting.
-- Catenary, signals, track types, network planner (separate sub-projects).
+- Signals, track types, network planner (separate sub-projects).
 
 ## 4. Player flow
 
@@ -67,9 +73,9 @@ Reference sources live in `Create-Source/` (Create `mc1.21.1/dev`, Steam 'n' Rai
 2. Right-click the track with a trainset item.
 3. The item validates space, places **two Create bogeys** and the carriage's hidden blocks, and is consumed.
 4. Repeat with more items: each click places the next carriage behind the previous one, with a **1-block gap**. Sneak + right-click places a carriage reversed (e.g. the rear cab car of a multiple unit).
-5. Optionally add player-built carriages (with coupler parts) in the same assembly zone.
-6. Press **Assemble Train**. The result is a normal Create train.
-7. When disassembled at a station, carriages stay visible as models. Breaking any part, or using a wrench on it, removes the whole carriage and returns its item.
+5. Optionally add player-built carriages in the same assembly zone (coupler parts arrive in Phase 2).
+6. Press **Assemble Train**. The result is a normal Create train. To run it automatically, seat a conductor at the loco's controls and give it a schedule, as in Create.
+7. When disassembled at a station, carriages stay visible as models. **Shift + right-click with a wrench** picks the whole carriage up as its item (goods carriages must be empty first, §5.5).
 
 ## 5. Carriage construction (approach: hidden-structure carriage)
 
@@ -90,7 +96,7 @@ Fallback: if hidden-structure carriages prove unworkable during implementation, 
 | `seat` (double) | Two seats per block, left and right halves | Create `SeatBlock` behaviour + mixins (§5.4) |
 | `door` | Opens/closes automatically at stations | Create sliding door (`SlidingDoorBlock` / `SlidingDoorMovementBehaviour`), invisible render |
 | `cargo_item` / `cargo_fluid` | Box car / tank car storage, merged by Create into the contraption inventory reachable by Portable Storage/Fluid Interfaces | Create 6 `MountedItemStorageType` / `MountedFluidStorageType` API |
-| `cab` | Driver controls; required for a train to be drivable | Create train controls block |
+| `cab` | Driver controls plus the conductor seat behind them; required to drive the train and to run schedules | Create's own `TRAIN_CONTROLS` block — Create's conductor check (`CarriageContraption.inControl`) accepts only that exact block, so it stays visible inside the cab model — plus a seat directly behind it |
 | `anchor` | One per carriage; stores design ID; renders the model in world and in contraption; owns carriage removal and item drop | Our block + block entity |
 
 All hidden blocks render nothing themselves, let light through, and show no selection outline except seats (so players can see what they will click).
@@ -111,8 +117,10 @@ Create stores seats as one `BlockPos` per seat (`Contraption.seats`) and places 
 
 ### 5.5 Breaking and pickup
 
-- Breaking any hidden block, or right-clicking it with a wrench, removes the **entire carriage** and drops/returns **exactly one** item for its design.
-- The anchor coordinates removal so explosions or commands that hit several parts never drop more than one item.
+- **Shift + right-click with Create's wrench** on any part of a disassembled carriage removes the **entire carriage** and gives back **exactly one** item for its design.
+- **Goods carriages must be empty** to be picked up with the wrench; otherwise pickup is refused with an action-bar message.
+- **Breaking** any hidden block (mining, explosions, commands) also removes the whole carriage and drops exactly one item; a goods carriage spills its items like a broken chest (its fluid is lost).
+- The anchor coordinates removal so several parts breaking at once never drop more than one item.
 - Individual hidden blocks can never be left behind or broken loose.
 
 ### 5.6 Cross-section (one passenger seat row)
@@ -127,6 +135,19 @@ Create stores seats as one `BlockPos` per seat (`Contraption.seats`) and places 
 ```
 
 Passenger carriages are **3 blocks wide**, with 2+2 seating around a centre aisle.
+
+### 5.7 Goods carriages
+
+Both goods carriages work on parked carriages **and** on assembled trains (Create 6's `MountedItemStorage.handleInteraction` opens custom menus on moving contraptions), and both are reachable by Create's Portable Storage/Fluid Interfaces.
+
+| | Items carriage (`box_car`) | Fluid carriage (`tank_car`) |
+|---|---|---|
+| Capacity | **160 stacks** — a 2×2×2 Create vault (8 × Create's `vaultCapacity`, default 20) | **144 buckets** — a 3×3×2 Create tank (18 × Create's `fluidTankCapacity`, default 8 buckets) |
+| Follows Create's config | Yes — scales if a server changes `vaultCapacity` | Yes — scales if a server changes `fluidTankCapacity` |
+| Open | Shift + right-click with an empty hand | Shift + right-click with an empty hand |
+| GUI | Double-chest-style grid (54 slots visible) with a scrollbar over all 160 stacks | Fill slot (put in filled buckets/containers), drain slot (put in empty containers to take fluid out), and a gauge showing the fluid, amount and maximum |
+
+A design's `cargo` field (§7.2) sets which kind it is; the capacities above are the Phase 1 defaults.
 
 ## 6. Rendering
 
@@ -148,7 +169,7 @@ Passenger carriages are **3 blocks wide**, with 2+2 seating around a centre aisl
 | Design data (size, bogeys, layout, seats, cargo, power) | `data/<ns>/railbound/trainsets/<id>.json` | Server; synced to clients |
 | Visuals (OBJ parts, texture) | `assets/<ns>/models/trainset/<id>/…`, `assets/<ns>/textures/trainset/<id>.png` | Client |
 
-Designs are loaded as a NeoForge **datapack registry** with a network codec so clients receive the design list (creative tab, tooltips, placement preview).
+Designs are loaded by a server **reload listener** (`SimpleJsonResourceReloadListener` over `railbound/trainsets`) and sent to clients with a sync payload on join and after `/reload`, so clients receive the design list (creative tab, tooltips, placement preview). *(Changed from a NeoForge datapack registry during Plan 1: a datapack registry fails the whole world load on a single bad entry, which contradicts §7.3, and it cannot be reloaded.)*
 
 ### 7.2 Design JSON
 
@@ -169,7 +190,7 @@ Designs are loaded as a NeoForge **datapack registry** with a network codec so c
 ```
 
 - `category`: `passenger` | `box_car` | `tank_car` | `locomotive` | `multiple_unit`.
-- `power`: `none` | `steam` | `diesel` | `electric`. In v1 all values behave the same (no fuel); the field is the hook for the catenary sub-project.
+- `power`: `none` | `steam` | `diesel` | `electric`. In Phase 1 all values behave the same (no fuel); Phase 3 adds fuel for `diesel` and Phase 4 catenary power for `electric` (§11).
 - `layout.layers`: one row of text per block along the carriage, one layer per height level, characters mapped through `palette`.
 - Coordinates are carriage-local: Z along the track (front = −Z), X across (−1, 0, +1), Y up from the carriage floor layer.
 
@@ -239,16 +260,17 @@ Required Blockbench plugins: Reference Models, Structure Importer, Simplify Mode
 - Carriages fill the assembly track from the station outward: the item scans the assembly track for the last bogey or carriage block already present and places the new carriage directly behind it with a 1-block gap. On an empty assembly track it starts at the station end.
 - The item is consumed only on successful placement.
 
-## 10. Couplers
+## 10. Couplers *(Phase 2)*
 
-- A placeable **coupler part** that players attach to the ends of their own carriages.
+- A placeable **coupler part** (not a chain type) that players attach to the ends of their own carriages.
 - At assembly, a coupler (with buffers) is drawn across the gap between any two adjacent carriages that have couplers — trainset carriages always count as having them.
 - Linking is still done by Create's assembly; couplers do not join or split running trains.
 
 ## 11. Power hook
 
-- Each design declares `power`. v1 exposes it through a small interface on the carriage (e.g. "requires external power: yes/no; currently powered: yes/no") that always reports powered.
-- The catenary sub-project will implement the provider side and a config option to make electric and multiple-unit designs require overhead wires.
+- Each design declares `power`. Phase 1 exposes it through a small interface on the carriage (e.g. "requires external power: yes/no; currently powered: yes/no") that always reports powered. The Phase 1 steam locomotive needs no fuel, like a standard Create train.
+- Phase 3 implements fuel for diesel designs (coal, wood and its sub-types such as planks, and fuels from other mods).
+- Phase 4 implements the electric side: catenary supplies power, and electric designs run only while in contact with a powered wire.
 
 ## 12. Testing and error handling
 
@@ -257,7 +279,7 @@ Required Blockbench plugins: Reference Models, Structure Importer, Simplify Mode
 | Level | Coverage | Tool |
 |---|---|---|
 | Unit | Design JSON parsing and validation; layout text → block positions; converter (`.bbmodel` → layout, OBJ, texture check); placement planning (track direction + click → all positions incl. gap); double-seat offsets | JUnit |
-| In-world | Place + Assemble succeeds; 2 bogeys per carriage; seat count matches design; right-click seat seats the correct side; Portable Storage Interface pulls from box car; Fluid Interface drains tank car; disassembly keeps anchor and model; breaking a part removes the carriage and drops one item | NeoForge GameTests |
+| In-world | Place + Assemble succeeds; 2 bogeys per carriage; seat count matches design; right-click seat seats the correct side; a seated conductor at the loco's controls runs a schedule; Portable Storage Interface pulls from box car; Fluid Interface drains tank car; box car holds 160 stacks and tank car 144 buckets by default; wrench pickup returns one item and is refused while cargo remains; disassembly keeps anchor and model; breaking a part removes the carriage and drops one item | NeoForge GameTests |
 | Build | Every design in `art/` converts cleanly | `gradle build` |
 
 ### 12.2 Manual (per release)
@@ -286,15 +308,50 @@ Required Blockbench plugins: Reference Models, Structure Importer, Simplify Mode
 |---|---|
 | Approach | Hidden-structure carriage; fall back to custom-bogey rendering if it proves unworkable |
 | Width | 3 blocks, two seats per block |
-| Couplers | Visual part, linked at assembly; live coupling deferred |
-| Power | Free in v1, hook for catenary |
+| Release scope | Phased (§15); Phase 1 = steam loco, passenger coach, items carriage, fluid carriage |
+| Couplers | Phase 2; visual part, linked at assembly; live coupling deferred |
+| Power | Phase 1 free (steam, like Create); fuel in Phase 3; catenary power in Phase 4 |
+| Automatic running | Create's rule kept: a seated conductor at the controls must be given a schedule |
 | Doors | Create's train-door behaviour |
-| Disassembled carriages | Keep rendering; wrench returns item |
-| Liveries | One per design in v1 |
-| Crafting recipes | Deferred — the user will decide later |
+| Pickup | Shift + right-click with Create's wrench; goods carriages must be empty |
+| Goods capacity | 160 stacks / 144 buckets by default, scaling with Create's vault and tank config |
+| Goods GUI | Shift + right-click with an empty hand; scrolling chest grid / fill-drain-gauge |
+| Disassembled carriages | Keep rendering |
+| Liveries | One per design for now |
+| Crafting recipes | Phase 2, with dedicated components (steam engine, bogeys) |
 | Mod display name | "Railbound" is also the name of an existing puzzle game; check for conflicts before the first public release. Mod ID `railbound` is used until then |
-| Source control | Project stays local (no git) until the first successful build |
+| Source control | Git since the first build; `Plan.txt` (the user's personal plan) is never committed |
 
 ## 14. Existing assets
 
-- `art/trainsets/coach_standard/coach_standard.bbmodel` — approved look for the passenger coach (191 cubes, 10 rows of 2+2 seats, 4 sliding-door groups, vanilla-style glass). Its texture is an unoptimised 1024×2048 sheet and must be reworked to ≤ 512×512 and given layout markers before it passes the converter.
+- `art/trainsets/coach_standard/coach_standard.bbmodel` — approved look for the passenger coach (203 cubes, 10 rows of 2+2 seats, 4 sliding-door groups with see-through door windows, vanilla-style glass). Its texture is an unoptimised 1024×2048 sheet and must be reworked to ≤ 512×512 and given layout markers before it passes the converter.
+
+## 15. Release phases
+
+From the user's phase plan. Each phase is its own release; this spec's trainset system underpins all of them.
+
+| Phase | Theme | Contents |
+|---|---|---|
+| **1** | First version of Railbound | Steam loco (no fuel, Create-style), passenger coach, items carriage (160 stacks), fluid carriage (144 buckets); full Create navigation and schedules with a seated conductor; wrench pickup; goods GUIs; Portable Interface support |
+| **2** | More carriages and crafting | More carriage types; improvements to Phase 1; crafting recipes with dedicated components (steam engine for locos, bogeys for carriages); Ponder scenes; new blocks/models: bogeys, couplers (not chain type), anti-climbers |
+| **3** | Fuel trains | Diesel locomotives that accept coal, wood (and sub-types such as planks) and fuels from other mods; 2 locomotive models; 2 multiple units (one passenger, one goods) |
+| **4** | Electric trains | Power generator (working name), catenary pole, wire holder, catenary wire (max 24 blocks per span), power connector (accepts our generator or connectors from Create: Power Grid / Create: New Age); electric designs run only while touching a powered wire; 2 electric locomotive types with 2 carriages each, and 2 EMUs. Catenary height is set once the models exist |
+
+### 15.1 Building in sub-phases
+
+Each phase is built in small sub-phases. Every sub-phase gets its own implementation plan, its own models and tests, a review, and a commit before the next one starts — so each piece of code and each model is finished and debugged in isolation.
+
+**Phase 1 sub-phases**
+
+| Sub-phase | Delivers | In-game check |
+|---|---|---|
+| 1.0 Foundation ✅ | Design format, validation, datapack loading, client sync, trainset item, creative tab | Done (2026-10-03) |
+| 1.1 Coach on rails | Frame blocks and anchor, placement on the assembly track (§9), glue-free attachment, Create assembly, wrench pickup and breaking (§5.5); grey-box visual; the four deferred Plan 1 review fixes | Place a coach, assemble it, move it, pick it up |
+| 1.2 Coach interior | Double seats with right-click sitting (§5.4), station doors | Sit on either seat half; doors open at a station |
+| 1.3 Coach visuals | OBJ models, Flywheel visual and fallback renderer, door animation, 3D inventory icon, `.bbmodel` converter (§6, §8); coach texture reworked to ≤ 512×512 | Real coach model in game |
+| 1.4 Steam locomotive | Cab with Create train controls and conductor seat, loco model | Drive it; a seated conductor runs a schedule |
+| 1.5 Items carriage | 160-stack storage, scrolling chest GUI, Portable Storage Interface, model (§5.7) | Fill by hand and by interface; wrench refuses while loaded |
+| 1.6 Fluid carriage | 144-bucket tank, fill/drain/gauge GUI, Portable Fluid Interface, model (§5.7) | Fill with buckets and pipes; gauge shows the amount |
+| 1.7 Phase 1 release | Compatibility and performance pass, polish, release build | 129-mod profile and multiplayer |
+
+Phases 2–4 are split into sub-phases when their turn comes.

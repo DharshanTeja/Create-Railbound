@@ -38,7 +38,7 @@ Building a good-looking train in Create takes hours of block-by-block work. Rail
 | **Real Create trains** | Placed with Create's own station assembly. Schedules, signals, stations and other train addons see an ordinary Create train. |
 | **Walkable interiors** | Step inside, walk the aisle and right-click a seat to sit. Passenger cars seat four abreast — two each side of a centre aisle. |
 | **Doors that work** | Doors open automatically when the train stops at a station, using Create's train-door behaviour. |
-| **Freight that works** | Box cars and tank cars load and unload through Create's Portable Storage and Portable Fluid Interfaces. |
+| **Freight that works** | The items carriage holds 160 stacks and the fluid carriage 144 buckets. Open them by hand, or load and unload through Create's Portable Storage and Portable Fluid Interfaces. |
 | **Mix and match** | Couple trainset cars with your own hand-built carriages in the same train. |
 | **Data-driven** | Every design is a datapack + resource pack. Modpacks can add their own trains without writing code. |
 
@@ -49,9 +49,12 @@ Building a good-looking train in Create takes hours of block-by-block work. Rail
 
 ### Planned rolling stock
 
-| Locomotives | Passenger | Freight |
-|---|---|---|
-| Steam · Diesel · Electric | Standard coach · Multiple-unit cab car | Box car · Tank car |
+| Phase | Locomotives | Carriages |
+|:---:|---|---|
+| 1 | Steam | Passenger coach · Items carriage · Fluid carriage |
+| 2 | — | More carriage types |
+| 3 | 2 × Diesel | Passenger and goods multiple units |
+| 4 | 2 × Electric | 2 carriages per type · 2 EMUs |
 
 <br>
 
@@ -62,7 +65,8 @@ Railbound plugs into the train assembly you already know from Create:
 1. **Build a station** beside straight track and switch it to **assembly mode**.
 2. **Right-click the track** with a trainset item — the carriage appears, already on its bogeys.
 3. Add more cars (sneak-click to place one facing backwards, for the rear cab of a multiple unit).
-4. Press **Assemble Train**. Drive it, schedule it, signal it — it is a Create train.
+4. Press **Assemble Train**. Drive it yourself, or seat a conductor at the controls and hand them a schedule — it is a Create train.
+5. Back at a station, disassemble and **shift + right-click with a wrench** to pick a carriage up again.
 
 Under the hood, each carriage is a set of invisible structural blocks — floor, walls, seats, doors and cargo — topped by a single model. Create assembles and runs it like any other train, which is why everything stays compatible.
 
@@ -70,18 +74,27 @@ Under the hood, each carriage is a set of invisible structural blocks — floor,
 
 ## Roadmap
 
-Railbound is built in focused milestones. Each one ships something that works before the next begins.
+Railbound ships in four phases. Each phase is built in small sub-phases, and every sub-phase is finished, tested and reviewed before the next one begins.
 
-| | Milestone | Delivers |
+| Phase | Theme | What arrives |
 |:---:|---|---|
-| ✅ | **Foundation** | Design format, validation, datapack loading, multiplayer sync, trainset item and creative tab |
-| ⏳ | **Placement & assembly** | Placing carriages on track and assembling real trains |
-| ○ | **Seats, doors & cargo** | Right-click seating, station doors, box and tank cars, driver's cab |
-| ○ | **Rendering & asset pipeline** | Full 3D models in game, animated doors, Blockbench-to-game converter |
-| ○ | **Couplers & power** | Coupler parts for player-built carriages, power hook for electric trains |
-| ○ | **Content** | Steam, diesel and electric locomotives, multiple units, coaches, box and tank cars |
+| **1** | **First version** | Steam locomotive, passenger coach, items carriage, fluid carriage — fully working with Create's navigation and schedules |
+| **2** | **More carriages & crafting** | New carriage types, crafting recipes with dedicated components, Ponder scenes, bogeys, couplers and anti-climbers |
+| **3** | **Fuel trains** | Diesel locomotives burning coal, wood or fuels from other mods, plus passenger and goods multiple units |
+| **4** | **Electric trains** | Catenary poles, wires and a power generator — compatible with Create: Power Grid and Create: New Age — plus electric locomotives, carriages and EMUs |
 
-**Beyond trainsets:** overhead catenary (with optional power from Create: New Age, Crafts & Additions or Create: Power Grid — never required), signals, new track types, and a network planner.
+### Phase 1 progress
+
+| | Sub-phase | Delivers |
+|:---:|---|---|
+| ✅ | **1.0 Foundation** | Design format, validation, datapack loading, multiplayer sync, trainset item and creative tab |
+| ⏳ | **1.1 Coach on rails** | Placing a carriage on track and assembling it into a real Create train |
+| ○ | **1.2 Coach interior** | Right-click seating and doors that open at stations |
+| ○ | **1.3 Coach visuals** | Full 3D models in game, animated doors, Blockbench-to-game converter |
+| ○ | **1.4 Steam locomotive** | Driver's cab, conductor seat and automatic running on schedules |
+| ○ | **1.5 Items carriage** | 160-stack storage, scrolling GUI, Portable Storage Interface |
+| ○ | **1.6 Fluid carriage** | 144-bucket tank, fill-and-drain GUI, Portable Fluid Interface |
+| ○ | **1.7 Release** | Compatibility, performance and polish |
 
 <br>
 

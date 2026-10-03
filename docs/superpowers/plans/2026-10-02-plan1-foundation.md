@@ -2113,3 +2113,5 @@ Report the build result and ask: "First build is done. Do you want me to `git in
 | 4 — Rendering and converter | OBJ loading, Flywheel visual + fallback renderer, door animation, 3D item renderer, `.bbmodel` converter Gradle task, Blockbench template | §6, §8 |
 | 5 — Couplers and power hook | Coupler part and rendering, power interface | §10, §11 |
 | 6 — Content | Seven designs built in Blockbench and converted; coach texture reworked to ≤ 512×512 | §3, §14 |
+
+> **Superseded (2026-10-03).** This plan is **sub-phase 1.0** of Phase 1. The roadmap above was replaced by the user's release phases (spec §15), each built in small sub-phases with one plan each: 1.1 Coach on rails · 1.2 Coach interior · 1.3 Coach visuals · 1.4 Steam locomotive · 1.5 Items carriage · 1.6 Fluid carriage · 1.7 Phase 1 release. Plan files are named `…-phase1-N-<name>.md`.
