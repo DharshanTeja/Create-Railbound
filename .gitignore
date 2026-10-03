@@ -1,8 +1,9 @@
 # Third-party reference clones (read-only, never committed)
 /Create-Source/
 
-# Personal planning notes
+# Personal planning notes, specs and implementation plans (kept local)
 /Plan.txt
+/docs/
 
 # Local tool state
 /.claude/

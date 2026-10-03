@@ -120,7 +120,7 @@ data/<namespace>/railbound/trainsets/<id>.json
 }
 ```
 
-Broken designs never crash the game — they are skipped with a log line that names the file and the exact problem, and every other design still loads. The full format is documented in the [design specification](docs/superpowers/specs/2026-10-02-trainsets-design.md#7-design-data-format). A complete working example ships with the mod: [`coach_standard.json`](Mod/src/main/resources/data/railbound/railbound/trainsets/coach_standard.json).
+Broken designs never crash the game — they are skipped with a log line that names the file and the exact problem, and every other design still loads. A complete working example ships with the mod: [`coach_standard.json`](Mod/src/main/resources/data/railbound/railbound/trainsets/coach_standard.json).
 
 <br>
 
@@ -165,8 +165,7 @@ Create-Railbound/
 │       │   ├── network/           design sync to clients
 │       │   └── registry/          items, data components, creative tab
 │       └── test/                  unit tests
-├── art/                    Blockbench source models and preview renders
-└── docs/                   design specification and implementation plans
+└── art/                    Blockbench source models and preview renders
 ```
 
 </details>
@@ -175,7 +174,7 @@ Create-Railbound/
 
 ## Contributing
 
-Issues and ideas are welcome. Before opening a pull request, please read the [design specification](docs/superpowers/specs/2026-10-02-trainsets-design.md) — it explains how carriages are built and why — and make sure `./gradlew build` passes.
+Issues and ideas are welcome. Before opening a pull request, please open an issue to discuss the change, and make sure `./gradlew build` passes.
 
 <br>
 
