@@ -14,6 +14,9 @@ public enum FrameShape implements StringRepresentable {
     ROOF("roof"),
     ROOF_WALL_LEFT("roof_wall_left"),
     ROOF_WALL_RIGHT("roof_wall_right"),
+    CEILING("ceiling"),
+    WALL_CEILING_LEFT("wall_ceiling_left"),
+    WALL_CEILING_RIGHT("wall_ceiling_right"),
     PARTITION("partition"),
     FULL("full");
 
@@ -36,6 +39,8 @@ public enum FrameShape implements StringRepresentable {
             case WALL_RIGHT -> WALL_LEFT;
             case ROOF_WALL_LEFT -> ROOF_WALL_RIGHT;
             case ROOF_WALL_RIGHT -> ROOF_WALL_LEFT;
+            case WALL_CEILING_LEFT -> WALL_CEILING_RIGHT;
+            case WALL_CEILING_RIGHT -> WALL_CEILING_LEFT;
             default -> this;
         };
     }

@@ -24,12 +24,12 @@ class CarriagePlannerTest {
     @Test
     void firstCarriagePutsItsFrontBogeyOnOffsetZero() {
         int start = CarriagePlanner.startOffset(COACH, false, OptionalInt.empty());
-        assertEquals(-3, start);
+        assertEquals(-4, start);
         PlacementPlan plan = CarriagePlanner.plan(COACH, EAST_TRACK, start, false);
-        assertEquals(List.of(0, 9), plan.bogeyOffsets());
-        assertEquals(List.of(new BlockPos(0, 65, 0), new BlockPos(9, 65, 0)), plan.bogeys());
-        assertEquals(-3, plan.firstOffset());
-        assertEquals(12, plan.lastOffset());
+        assertEquals(List.of(0, 7), plan.bogeyOffsets());
+        assertEquals(List.of(new BlockPos(0, 65, 0), new BlockPos(7, 65, 0)), plan.bogeys());
+        assertEquals(-4, plan.firstOffset());
+        assertEquals(11, plan.lastOffset());
     }
 
     @Test
@@ -50,19 +50,19 @@ class CarriagePlannerTest {
     void floorLayerSitsBesideTheBogey() {
         PlacementPlan plan = CarriagePlanner.plan(COACH, EAST_TRACK, -3, false);
         BlockPos frontBogey = plan.bogeys().get(0);
-        assertEquals(frontBogey.south(), worldOf(plan, new BlockPos(-1, 0, 3)));
+        assertEquals(frontBogey.south(), worldOf(plan, new BlockPos(-1, 0, 4)));
         assertTrue(plan.parts().stream().noneMatch(p -> p.pos().equals(frontBogey)), "the bogey's own cell stays free");
     }
 
     @Test
     void reversedCarriageFacesAwayAndMirrorsAlongTheTrack() {
         int start = CarriagePlanner.startOffset(COACH, true, OptionalInt.empty());
-        assertEquals(-3, start);
+        assertEquals(-4, start);
         PlacementPlan plan = CarriagePlanner.plan(COACH, EAST_TRACK, start, true);
         assertEquals(Direction.EAST, plan.facing());
-        assertEquals(List.of(9, 0), plan.bogeyOffsets());
-        // left of an east-facing car is north (-z); row 3 now lands on offset 9
-        assertEquals(new BlockPos(9, 66, -1), worldOf(plan, new BlockPos(-1, 1, 3)));
+        assertEquals(List.of(7, 0), plan.bogeyOffsets());
+        // left of an east-facing car is north (-z); row 3 now lands on offset 8
+        assertEquals(new BlockPos(8, 66, -1), worldOf(plan, new BlockPos(-1, 1, 3)));
     }
 
     @Test
@@ -70,7 +70,7 @@ class CarriagePlannerTest {
         int start = CarriagePlanner.startOffset(COACH, false, OptionalInt.of(12));
         assertEquals(14, start);
         PlacementPlan plan = CarriagePlanner.plan(COACH, EAST_TRACK, start, false);
-        assertEquals(List.of(17, 26), plan.bogeyOffsets());
+        assertEquals(List.of(18, 25), plan.bogeyOffsets());
     }
 
     @Test

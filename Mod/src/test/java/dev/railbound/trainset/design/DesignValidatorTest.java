@@ -133,9 +133,9 @@ class DesignValidatorTest {
     @Test
     void rejectsAPartInTheBogeysOwnCell() {
         List<List<String>> layers = copyLayers();
-        layers.get(0).set(3, "l#r");
+        layers.get(0).set(4, "l#r");
         assertProblem(TestDesigns.withLayout(SAMPLE, new LayoutSpec(SAMPLE.layout().palette(), layers)),
-                "bogey z=3 needs layer 0 at x=0 to be air");
+                "bogey z=4 needs layer 0 at x=0 to be air");
     }
 
     @Test
@@ -163,6 +163,15 @@ class DesignValidatorTest {
         layers.get(2).set(5, "LDR");
         assertProblem(TestDesigns.withLayout(SAMPLE, new LayoutSpec(SAMPLE.layout().palette(), layers)),
                 "must be on a side column");
+    }
+
+    @Test
+    void rejectsAStepWithoutADoorAbove() {
+        List<List<String>> layers = copyLayers();
+        layers.get(0).set(5, "T#r");
+        java.util.Map<String, String> palette = new java.util.HashMap<>(SAMPLE.layout().palette());
+        palette.put("T", "step");
+        assertProblem(TestDesigns.withLayout(SAMPLE, new LayoutSpec(palette, layers)), "needs a door directly above");
     }
 
     @Test

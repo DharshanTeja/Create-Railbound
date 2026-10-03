@@ -1,6 +1,7 @@
 package dev.railbound;
 
 import com.mojang.logging.LogUtils;
+import dev.railbound.bogey.RailboundBogeyStyles;
 import dev.railbound.carriage.CarriageAttachment;
 import dev.railbound.carriage.CarriageBehaviours;
 import dev.railbound.carriage.CarriageFittings;
@@ -29,6 +30,7 @@ public final class Railbound {
     public Railbound(IEventBus modBus, ModContainer container) {
         LOGGER.info("Create: Railbound loading");
         RailboundBlocks.BLOCKS.register(modBus);
+        RailboundBogeyStyles.register();
         RailboundBlockEntities.BLOCK_ENTITIES.register(modBus);
         modBus.addListener(Railbound::onCommonSetup);
         RailboundComponents.COMPONENTS.register(modBus);

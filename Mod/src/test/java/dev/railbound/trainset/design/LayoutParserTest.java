@@ -35,8 +35,8 @@ class LayoutParserTest {
     @Test
     void mapsCharactersToPositions() {
         List<LayoutCell> cells = LayoutParser.parse(TestDesigns.sample());
-        assertTrue(cells.contains(new LayoutCell(new BlockPos(-1, 1, 3), new HiddenPart(PartType.SEAT, Optional.empty()))),
-                "left seat on the walking layer, row 3");
+        assertTrue(cells.contains(new LayoutCell(new BlockPos(-1, 0, 3), new HiddenPart(PartType.SEAT, Optional.empty()))),
+                "left seat on the floor layer (the floor is half a block up it), row 3");
         assertTrue(cells.contains(new LayoutCell(new BlockPos(1, 1, 2), new HiddenPart(PartType.DOOR, Optional.empty()))),
                 "right door at row 2");
         assertTrue(cells.contains(new LayoutCell(new BlockPos(0, 3, 8), new HiddenPart(PartType.ANCHOR, Optional.empty()))),

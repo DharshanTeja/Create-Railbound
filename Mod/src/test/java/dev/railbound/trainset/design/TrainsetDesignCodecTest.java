@@ -22,8 +22,8 @@ class TrainsetDesignCodecTest {
         assertEquals(TrainsetCategory.PASSENGER, d.category());
         assertEquals(new CarriageSize(16, 3, 4), d.size());
         assertEquals(List.of(
-                new BogeySpec(3, ResourceLocation.fromNamespaceAndPath("create", "standard")),
-                new BogeySpec(12, ResourceLocation.fromNamespaceAndPath("create", "standard"))), d.bogeys());
+                new BogeySpec(4, ResourceLocation.fromNamespaceAndPath("railbound", "coach")),
+                new BogeySpec(11, ResourceLocation.fromNamespaceAndPath("railbound", "coach"))), d.bogeys());
         assertEquals(PowerType.NONE, d.power());
         assertEquals(CargoSpec.NONE, d.cargo());
         assertEquals(new DoorSpec("door_left_front", new BlockPos(-1, 1, 2)), d.doors().get(0));

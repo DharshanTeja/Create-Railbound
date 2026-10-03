@@ -27,6 +27,8 @@ public final class CarriageBlocks {
                     .setValue(DoorPartBlock.HALF, InteriorParts.doorHalf(design.partAt(local.below())
                             .map(below -> below.type() == PartType.DOOR).orElse(false)))
                     .setValue(DoorPartBlock.OPEN, false);
+            case STEP -> RailboundBlocks.STEP.get().defaultBlockState()
+                    .setValue(StepPartBlock.FACING, InteriorParts.outward(facing, local.getX()));
             case AIR -> throw new IllegalArgumentException("Air cells are never placed");
             default -> RailboundBlocks.PLACEHOLDER.get().defaultBlockState()
                     .setValue(PlaceholderPartBlock.PART, PlaceholderPart.of(part.type()).orElseThrow())

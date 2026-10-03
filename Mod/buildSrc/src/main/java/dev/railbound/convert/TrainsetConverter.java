@@ -1,0 +1,134 @@
+package dev.railbound.convert;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+
+/**
+ * Turns a trainset's `.bbmodel` into OBJ parts in design block space, plus their NeoForge loader JSON, a shared
+ * material and the design texture. Fails with every broken model rule listed at once.
+ */
+public final class TrainsetConverter {
+    public static final int MAX_TEXTURE = ModelSource.MAX_TEXTURE;
+    /** Half the 3-block body width, in model units. */
+    public static final double HALF_WIDTH = 24;
+    /** Gangways and buffers may reach this far past the carriage ends: half the one-block gap between carriages. */
+    public static final double END_OVERHANG = 8;
+    /** Create's bogey top sits just under y 0; upward faces need this much clearance (model units) above it. */
+    public static final double BOGEY_CLEARANCE = 0.3;
+    /** Half the width of a bogey top, in model units. */
+    private static final double BOGEY_HALF_WIDTH = 16;
+    private static final double EPSILON = 1e-6;
+
+    private TrainsetConverter() {}
+
+    public static ConvertedTrainset convert(String namespace, String id, JsonObject model, JsonObject design)
+            throws ConversionException {
+        List<String> problems = new ArrayList<>();
+        int length = design.getAsJsonObject("size").get("length").getAsInt();
+        ModelSpace space = new ModelSpace(length);
+        ModelSource source = new ModelSource(model);
+
+        List<double[]> bogeyZones = new ArrayList<>();
+        if (design.has("bogeys")) {
+            for (JsonElement bogey : design.getAsJsonArray("bogeys")) {
+                double start = 16 * bogey.getAsJsonObject().get("z").getAsInt() - 8 * length;
+                bogeyZones.add(new double[] {start, start + 16});
+            }
+        }
+
+        Map<String, List<CubeFace>> partFaces = new LinkedHashMap<>();
+        Set<Integer> texturesUsed = new TreeSet<>();
+        for (Element element : source.elements()) {
+            Optional<String> part = Parts.partFor(source.pathOf(element));
+            if (part.isEmpty()) {
+                continue;
+            }
+            List<CubeFace> faces = partFaces.computeIfAbsent(part.get(), p -> new ArrayList<>());
+            boolean outside = false;
+            for (String direction : Element.DIRECTIONS) {
+                Optional<CubeFace> face = element.face(direction);
+                if (face.isEmpty()) {
+                    continue;
+                }
+                faces.add(face.get());
+                texturesUsed.add(face.get().texture());
+                for (double[] corner : face.get().corners()) {
+                    outside |= Math.abs(corner[0]) > HALF_WIDTH + EPSILON || Math.abs(corner[2]) > 8 * length + END_OVERHANG + EPSILON;
+                }
+            }
+            if (outside) {
+                problems.add("cube '" + element.name() + "' sticks out past the 3-block width (x within ±24) or the carriage ends");
+            }
+            if (element.face("up").filter(face -> flushWithBogeyTop(face, bogeyZones)).isPresent()) {
+                problems.add("cube '" + element.name() + "' has its top at y 0 over a bogey; raise it to y "
+                        + BOGEY_CLEARANCE + " or more so Create's bogey top does not flicker through it");
+            }
+        }
+
+        if (!partFaces.containsKey(Parts.BODY)) {
+            problems.add("the model has no body cubes");
+        }
+        Set<String> modelDoors = new TreeSet<>();
+        partFaces.keySet().stream().filter(p -> p.startsWith("door_")).forEach(modelDoors::add);
+        Set<String> designDoors = new TreeSet<>();
+        if (design.has("doors")) {
+            for (JsonElement door : design.getAsJsonArray("doors")) {
+                designDoors.add(door.getAsJsonObject().get("part").getAsString());
+            }
+        }
+        for (String door : designDoors) {
+            if (!modelDoors.contains(door)) {
+                problems.add("the design has door '" + door + "' but the model has no group of that name");
+            }
+        }
+        for (String door : modelDoors) {
+            if (!designDoors.contains(door)) {
+                problems.add("the model has door group '" + door + "' that the design does not list");
+            }
+        }
+
+        ModelSource.Texture texture = source.texture(texturesUsed, problems);
+        if (!problems.isEmpty()) {
+            throw new ConversionException(id + ": " + String.join("; ", problems));
+        }
+
+        Map<String, String> objects = new LinkedHashMap<>();
+        Map<String, String> modelJsons = new LinkedHashMap<>();
+        for (Map.Entry<String, List<CubeFace>> part : partFaces.entrySet()) {
+            objects.put(part.getKey(), ModelSource.obj(part.getValue(), c -> space.toBlock(c[0], c[1], c[2]), texture));
+            modelJsons.put(part.getKey(), ModelSource.loaderJson(namespace, "trainset", id, part.getKey()));
+        }
+        return new ConvertedTrainset(namespace, id, objects, modelJsons, ModelSource.MATERIAL, texture.png());
+    }
+
+    /** An upward face within BOGEY_CLEARANCE of y 0, over the bogey's width, inside a bogey's cell. */
+    private static boolean flushWithBogeyTop(CubeFace face, List<double[]> bogeyZones) {
+        double minX = Double.MAX_VALUE, maxX = -Double.MAX_VALUE, minZ = Double.MAX_VALUE, maxZ = -Double.MAX_VALUE;
+        for (double[] c : face.corners()) {
+            if (Math.abs(c[1]) >= BOGEY_CLEARANCE) {
+                return false;
+            }
+            minX = Math.min(minX, c[0]);
+            maxX = Math.max(maxX, c[0]);
+            minZ = Math.min(minZ, c[2]);
+            maxZ = Math.max(maxZ, c[2]);
+        }
+        if (maxX <= -BOGEY_HALF_WIDTH || minX >= BOGEY_HALF_WIDTH) {
+            return false;
+        }
+        for (double[] zone : bogeyZones) {
+            if (maxZ > zone[0] && minZ < zone[1]) {
+                return true;
+            }
+        }
+        return false;
+    }
+}

@@ -6,13 +6,18 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.Optional;
+
 /** Pure helpers for seats and doors: which half, which way out, and their shapes. */
 public final class InteriorParts {
-    private static final VoxelShape SEAT_CUSHION = Block.box(0, 0, 0, 16, 7, 16);
-    /** Behind the passenger, who faces the carriage front (north in the reference orientation). */
-    private static final VoxelShape SEAT_BACK = Block.box(0, 7, 14, 16, 14, 16);
+    /** On the floor layer: the floor is half a block up, and the cushion sits on it. */
+    private static final VoxelShape SEAT_CUSHION = Block.box(0, 7, 0, 16, 15, 16);
+    /** Behind the passenger, who faces the carriage front (north in the reference orientation); the model's back rises above. */
+    private static final VoxelShape SEAT_BACK = Block.box(0, 15, 14, 16, 16, 16);
     private static final VoxelShape WALL_LEFT = Block.box(0, 0, 0, 2, 16, 16);
     private static final VoxelShape WALL_RIGHT = Block.box(14, 0, 0, 16, 16, 16);
+    /** A step's ladder on the outer (north) face below the floor, rotated to the step's outward direction. */
+    private static final VoxelShape STEP_LADDER = Block.box(0, 0, 0, 16, 7, 3);
     /** A closed door panel on the north face, rotated to the door's outward direction. */
     private static final VoxelShape DOOR_PANEL = Block.box(0, 0, 0, 16, 16, 2);
 
@@ -31,6 +36,15 @@ public final class InteriorParts {
         return localX > 0 ? facing.getClockWise() : facing.getCounterClockWise();
     }
 
+    /** The carriage side a side-column seat backs onto (where its outer wall is), or empty for a centre seat. */
+    public static Optional<Direction> seatOutward(Direction facing, PlaceholderSide side) {
+        return switch (side) {
+            case RIGHT -> Optional.of(facing.getClockWise());
+            case LEFT -> Optional.of(facing.getCounterClockWise());
+            case NONE -> Optional.empty();
+        };
+    }
+
     public static VoxelShape seatShape(Direction facing, PlaceholderSide side) {
         VoxelShape north = Shapes.or(SEAT_CUSHION, SEAT_BACK);
         if (side == PlaceholderSide.LEFT) {
@@ -39,6 +53,14 @@ public final class InteriorParts {
             north = Shapes.or(north, WALL_RIGHT);
         }
         return FrameShapes.rotate(north.optimize(), facing);
+    }
+
+    /**
+     * The ladder on the carriage's outer face below the floor (climbed from outside, see {@link StepClimbing}), plus
+     * the floor itself, so the doorway above stays open and nobody can fall through.
+     */
+    public static VoxelShape stepShape(Direction outward) {
+        return Shapes.or(FrameShapes.rotate(STEP_LADDER, outward), FrameShapes.FLOOR_SLAB);
     }
 
     public static VoxelShape doorShape(Direction outward, boolean open) {

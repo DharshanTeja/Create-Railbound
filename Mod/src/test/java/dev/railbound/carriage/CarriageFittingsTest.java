@@ -60,7 +60,7 @@ class CarriageFittingsTest {
 
     @Test
     void doesNotReplaceSeatsDoorsOrTheAnchor() {
-        assertFalse(CarriageFittings.canFitInto(COACH, new BlockPos(1, 1, 5), new BlockPos(2, 1, 5), Direction.EAST), "seat");
+        assertFalse(CarriageFittings.canFitInto(COACH, new BlockPos(1, 0, 5), new BlockPos(2, 0, 5), Direction.EAST), "seat");
         assertFalse(CarriageFittings.canFitInto(COACH, new BlockPos(1, 1, 2), new BlockPos(2, 1, 2), Direction.EAST), "door");
         BlockPos anchor = COACH.anchor();
         assertFalse(CarriageFittings.canFitInto(COACH, anchor, anchor.above(), Direction.UP), "anchor");

@@ -36,6 +36,11 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class SeatPartBlock extends SeatBlock implements CarriagePart, IWrenchable {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final EnumProperty<PlaceholderSide> SIDE = PlaceholderPartBlock.SIDE;
+    /**
+     * Create seats passengers at a fixed height above the seat block's base. Our seats stand on the floor layer, whose
+     * floor is half a block up, so passengers sit this much higher (applied by the seat mixins).
+     */
+    public static final double SIT_OFFSET = 0.5;
 
     public SeatPartBlock(BlockBehaviour.Properties properties) {
         super(properties, DyeColor.BLUE);
@@ -61,10 +66,24 @@ public class SeatPartBlock extends SeatBlock implements CarriagePart, IWrenchabl
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hitResult) {
-        if (stack.getItem() instanceof DyeItem) {
+        if (stack.getItem() instanceof DyeItem || clickedFromOutside(state, hitResult.getDirection())) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (clickedFromOutside(state, hitResult.getDirection())) {
+            return InteractionResult.PASS;
+        }
+        return super.useWithoutItem(state, level, pos, player, hitResult);
+    }
+
+    /** The seat block also carries the carriage's outer wall: clicking that wall from outside must not seat you. */
+    public static boolean clickedFromOutside(BlockState state, Direction face) {
+        return state.getBlock() instanceof SeatPartBlock
+                && InteriorParts.seatOutward(state.getValue(FACING), state.getValue(SIDE)).filter(face::equals).isPresent();
     }
 
     @Override

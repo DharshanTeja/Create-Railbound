@@ -1,5 +1,6 @@
 package dev.railbound.carriage;
 
+import dev.railbound.registry.RailboundBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -10,6 +11,10 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,12 +28,13 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A carriage door half. It carries the vanilla door properties, which is all Create's sliding-door
  * movement behaviour needs to open it at stations. FACING points out of the carriage.
  */
-public class DoorPartBlock extends CarriagePartBlock {
+public class DoorPartBlock extends CarriagePartBlock implements EntityBlock {
     public static final DirectionProperty FACING = DoorBlock.FACING;
     public static final BooleanProperty OPEN = DoorBlock.OPEN;
     public static final EnumProperty<DoubleBlockHalf> HALF = DoorBlock.HALF;
@@ -75,6 +81,20 @@ public class DoorPartBlock extends CarriagePartBlock {
         level.playSound(player, pos, open ? SoundEvents.IRON_DOOR_OPEN : SoundEvents.IRON_DOOR_CLOSE, SoundSource.BLOCKS, 1, 1);
         level.gameEvent(player, open ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, pos);
         return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new DoorPartBlockEntity(pos, state);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        if (!level.isClientSide || type != RailboundBlockEntities.DOOR.get()) {
+            return null;
+        }
+        return (lvl, pos, st, be) -> DoorPartBlockEntity.clientTick(lvl, pos, st, (DoorPartBlockEntity) be);
     }
 
     @Override

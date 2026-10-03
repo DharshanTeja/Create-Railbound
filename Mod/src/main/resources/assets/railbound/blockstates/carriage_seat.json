@@ -1,24 +1,5 @@
 {
-  "multipart": [
-    {"when": {"side": "none", "facing": "north"}, "apply": {"model": "railbound:block/carriage_seat"}},
-    {"when": {"side": "none", "facing": "east"}, "apply": {"model": "railbound:block/carriage_seat", "y": 90}},
-    {"when": {"side": "none", "facing": "south"}, "apply": {"model": "railbound:block/carriage_seat", "y": 180}},
-    {"when": {"side": "none", "facing": "west"}, "apply": {"model": "railbound:block/carriage_seat", "y": 270}},
-    {"when": {"side": "left", "facing": "north"}, "apply": {"model": "railbound:block/carriage_seat_left"}},
-    {"when": {"side": "left", "facing": "east"}, "apply": {"model": "railbound:block/carriage_seat_left", "y": 90}},
-    {"when": {"side": "left", "facing": "south"}, "apply": {"model": "railbound:block/carriage_seat_left", "y": 180}},
-    {"when": {"side": "left", "facing": "west"}, "apply": {"model": "railbound:block/carriage_seat_left", "y": 270}},
-    {"when": {"side": "right", "facing": "north"}, "apply": {"model": "railbound:block/carriage_seat_right"}},
-    {"when": {"side": "right", "facing": "east"}, "apply": {"model": "railbound:block/carriage_seat_right", "y": 90}},
-    {"when": {"side": "right", "facing": "south"}, "apply": {"model": "railbound:block/carriage_seat_right", "y": 180}},
-    {"when": {"side": "right", "facing": "west"}, "apply": {"model": "railbound:block/carriage_seat_right", "y": 270}},
-    {"when": {"side": "left", "facing": "north"}, "apply": {"model": "railbound:block/placeholder/wall_left"}},
-    {"when": {"side": "left", "facing": "east"}, "apply": {"model": "railbound:block/placeholder/wall_left", "y": 90}},
-    {"when": {"side": "left", "facing": "south"}, "apply": {"model": "railbound:block/placeholder/wall_left", "y": 180}},
-    {"when": {"side": "left", "facing": "west"}, "apply": {"model": "railbound:block/placeholder/wall_left", "y": 270}},
-    {"when": {"side": "right", "facing": "north"}, "apply": {"model": "railbound:block/placeholder/wall_right"}},
-    {"when": {"side": "right", "facing": "east"}, "apply": {"model": "railbound:block/placeholder/wall_right", "y": 90}},
-    {"when": {"side": "right", "facing": "south"}, "apply": {"model": "railbound:block/placeholder/wall_right", "y": 180}},
-    {"when": {"side": "right", "facing": "west"}, "apply": {"model": "railbound:block/placeholder/wall_right", "y": 270}}
-  ]
+  "variants": {
+    "": { "model": "railbound:block/carriage_invisible" }
+  }
 }

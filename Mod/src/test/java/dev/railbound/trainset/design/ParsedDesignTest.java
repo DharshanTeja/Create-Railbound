@@ -20,8 +20,10 @@ class ParsedDesignTest {
     @Test
     void looksUpPartsByPosition() {
         ParsedDesign parsed = ParsedDesign.of(TestDesigns.sample());
-        assertEquals(java.util.Optional.of(PartType.SEAT), parsed.partAt(new BlockPos(-1, 1, 3)).map(HiddenPart::type));
+        assertEquals(java.util.Optional.of(PartType.SEAT), parsed.partAt(new BlockPos(-1, 0, 3)).map(HiddenPart::type));
         assertEquals(java.util.Optional.of(PartType.DOOR), parsed.partAt(new BlockPos(1, 2, 2)).map(HiddenPart::type));
         assertTrue(parsed.partAt(new BlockPos(0, 1, 3)).isEmpty(), "aisle is air");
+        assertEquals(java.util.Optional.of(PartType.STEP), parsed.partAt(new BlockPos(-1, 0, 2)).map(HiddenPart::type));
+        assertEquals(java.util.Optional.of(PartType.STEP), parsed.partAt(new BlockPos(1, 0, 13)).map(HiddenPart::type));
     }
 }

@@ -47,18 +47,31 @@ class FrameShapesTest {
     }
 
     @Test
-    void roofLeavesHeadroomAndMatchesTheModel() {
+    void roofIsTheBottomQuarterOfTheTopLayerAndMatchesTheModel() {
         AABB box = single(FrameShape.ROOF, Direction.NORTH);
-        assertEquals(4 * PX, box.minY, 1e-9);
-        assertEquals(12 * PX, box.maxY, 1e-9);
+        assertEquals(0, box.minY, 1e-9);
+        assertEquals(4 * PX, box.maxY, 1e-9);
     }
 
     @Test
-    void floorIsAOnePixelSlabAtTheTopOfTheBlock() {
-        // the floor layer sits at bogey height, so people walk on top of it, level with the bogey's top
+    void floorIsAOnePixelSlabHalfwayUpTheBlock() {
+        // the floor layer sits at bogey height; the floor is half a block up it, so the coach sits low on its bogeys
         AABB box = single(FrameShape.FLOOR, Direction.WEST);
-        assertEquals(15 * PX, box.minY, 1e-9);
+        assertEquals(7 * PX, box.minY, 1e-9);
+        assertEquals(8 * PX, box.maxY, 1e-9);
+    }
+
+    @Test
+    void ceilingIsTheTopOfTheUpperInteriorLayerAndMatchesTheModel() {
+        AABB box = single(FrameShape.CEILING, Direction.NORTH);
+        assertEquals(11.5 * PX, box.minY, 1e-9);
         assertEquals(1, box.maxY, 1e-9);
+    }
+
+    @Test
+    void wallCeilingIsAWallUnderTheCeiling() {
+        assertEquals(FrameShape.WALL_CEILING_RIGHT, FrameShape.WALL_CEILING_LEFT.mirrored());
+        assertEquals(2, FrameShapes.get(FrameShape.WALL_CEILING_LEFT, Direction.NORTH).toAabbs().size());
     }
 
     @Test

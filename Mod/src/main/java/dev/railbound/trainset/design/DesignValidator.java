@@ -129,6 +129,11 @@ public final class DesignValidator {
             }
         }
 
+        // Steps are the climbable cell you board through, so they only make sense under a door.
+        cells.stream().filter(c -> c.part().type() == PartType.STEP).map(LayoutCell::pos)
+                .filter(step -> !doorCells.contains(step.above()))
+                .forEach(step -> errors.add("step at " + step.toShortString() + " needs a door directly above it"));
+
         // Layer 0 sits at bogey height: the bogey fills its own cell, and something beside or above must hold it.
         Set<BlockPos> cellPositions = cells.stream().map(LayoutCell::pos).collect(Collectors.toSet());
         for (BogeySpec bogey : design.bogeys()) {
