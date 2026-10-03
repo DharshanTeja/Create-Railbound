@@ -1,7 +1,9 @@
 package dev.railbound.trainset.load;
 
+import dev.railbound.trainset.design.ParsedDesign;
 import dev.railbound.trainset.design.TrainsetDesign;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,21 +14,31 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /** The designs currently in effect: set by the server reload listener and by the client sync payload. */
 public final class TrainsetDesigns {
-    private static volatile Map<ResourceLocation, TrainsetDesign> designs = Map.of();
+    private static volatile Map<ResourceLocation, ParsedDesign> designs = Map.of();
     private static final List<Runnable> CHANGE_LISTENERS = new CopyOnWriteArrayList<>();
 
     private TrainsetDesigns() {}
 
-    public static Map<ResourceLocation, TrainsetDesign> all() {
+    public static Map<ResourceLocation, ParsedDesign> all() {
         return designs;
     }
 
-    public static Optional<TrainsetDesign> get(ResourceLocation id) {
-        return Optional.ofNullable(designs.get(id));
+    public static Optional<ParsedDesign> get(@Nullable ResourceLocation id) {
+        return id == null ? Optional.empty() : Optional.ofNullable(designs.get(id));
     }
 
+    /** The plain designs, for syncing to clients. */
+    public static Map<ResourceLocation, TrainsetDesign> rawDesigns() {
+        Map<ResourceLocation, TrainsetDesign> raw = new TreeMap<>();
+        designs.forEach((id, parsed) -> raw.put(id, parsed.design()));
+        return raw;
+    }
+
+    /** Only pass validated designs. */
     public static void replace(Map<ResourceLocation, TrainsetDesign> newDesigns) {
-        designs = Collections.unmodifiableMap(new TreeMap<>(newDesigns));
+        Map<ResourceLocation, ParsedDesign> parsed = new TreeMap<>();
+        newDesigns.forEach((id, design) -> parsed.put(id, ParsedDesign.of(design)));
+        designs = Collections.unmodifiableMap(parsed);
         CHANGE_LISTENERS.forEach(Runnable::run);
     }
 

@@ -1,0 +1,22 @@
+{
+  "multipart": [
+    {"when": {"part": "seat", "floor": "true"}, "apply": {"model": "railbound:block/placeholder/seat_floor"}},
+    {"when": {"part": "seat", "floor": "false"}, "apply": {"model": "railbound:block/placeholder/seat"}},
+    {"when": {"part": "door", "floor": "true"}, "apply": {"model": "railbound:block/placeholder/door_floor"}},
+    {"when": {"part": "door", "floor": "false"}, "apply": {"model": "railbound:block/placeholder/door"}},
+    {"when": {"part": "cab", "floor": "true"}, "apply": {"model": "railbound:block/placeholder/cab_floor"}},
+    {"when": {"part": "cab", "floor": "false"}, "apply": {"model": "railbound:block/placeholder/cab"}},
+    {"when": {"part": "cargo_item", "floor": "true"}, "apply": {"model": "railbound:block/placeholder/cargo_item_floor"}},
+    {"when": {"part": "cargo_item", "floor": "false"}, "apply": {"model": "railbound:block/placeholder/cargo_item"}},
+    {"when": {"part": "cargo_fluid", "floor": "true"}, "apply": {"model": "railbound:block/placeholder/cargo_fluid_floor"}},
+    {"when": {"part": "cargo_fluid", "floor": "false"}, "apply": {"model": "railbound:block/placeholder/cargo_fluid"}},
+    {"when": {"side": "left", "facing": "north"}, "apply": {"model": "railbound:block/placeholder/wall_left"}},
+    {"when": {"side": "left", "facing": "east"}, "apply": {"model": "railbound:block/placeholder/wall_left", "y": 90}},
+    {"when": {"side": "left", "facing": "south"}, "apply": {"model": "railbound:block/placeholder/wall_left", "y": 180}},
+    {"when": {"side": "left", "facing": "west"}, "apply": {"model": "railbound:block/placeholder/wall_left", "y": 270}},
+    {"when": {"side": "right", "facing": "north"}, "apply": {"model": "railbound:block/placeholder/wall_right"}},
+    {"when": {"side": "right", "facing": "east"}, "apply": {"model": "railbound:block/placeholder/wall_right", "y": 90}},
+    {"when": {"side": "right", "facing": "south"}, "apply": {"model": "railbound:block/placeholder/wall_right", "y": 180}},
+    {"when": {"side": "right", "facing": "west"}, "apply": {"model": "railbound:block/placeholder/wall_right", "y": 270}}
+  ]
+}

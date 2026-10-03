@@ -1,17 +1,17 @@
 {
   "name": "trainset.railbound.coach_standard",
   "category": "passenger",
-  "size": { "length": 16, "width": 3, "height": 3 },
+  "size": { "length": 16, "width": 3, "height": 4 },
   "bogeys": [
     { "z": 3, "style": "create:standard" },
     { "z": 12, "style": "create:standard" }
   ],
   "power": "none",
   "doors": [
-    { "part": "door_left_front",  "pos": [-1, 0, 2] },
-    { "part": "door_right_front", "pos": [1, 0, 2] },
-    { "part": "door_left_rear",   "pos": [-1, 0, 13] },
-    { "part": "door_right_rear",  "pos": [1, 0, 13] }
+    { "part": "door_left_front",  "pos": [-1, 1, 2] },
+    { "part": "door_right_front", "pos": [1, 1, 2] },
+    { "part": "door_left_rear",   "pos": [-1, 1, 13] },
+    { "part": "door_right_rear",  "pos": [1, 1, 13] }
   ],
   "layout": {
     "palette": {
@@ -29,7 +29,8 @@
       ".": "air"
     },
     "layers": [
-      ["l#r", "l#r", "D#D", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "D#D", "l#r", "l#r"],
+      ["l#r", "l#r", "l#r", "l.r", "l#r", "l#r", "l#r", "l#r", "l#r", "l#r", "l#r", "l#r", "l.r", "l#r", "l#r", "l#r"],
+      ["L.R", "L.R", "D.D", "S.S", "S.S", "S.S", "S.S", "S.S", "S.S", "S.S", "S.S", "S.S", "S.S", "D.D", "L.R", "L.R"],
       ["L.R", "L.R", "D.D", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "D.D", "L.R", "L.R"],
       ["qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qAp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp"]
     ]

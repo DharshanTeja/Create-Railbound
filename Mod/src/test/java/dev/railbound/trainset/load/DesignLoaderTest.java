@@ -69,4 +69,25 @@ class DesignLoaderTest {
         assertTrue(errors.get(0).startsWith("railbound:alpha"));
         assertTrue(errors.get(1).startsWith("railbound:zeta"));
     }
+
+    @Test
+    void validatorExceptionIsRecordedNotThrown() {
+        Map<ResourceLocation, JsonElement> input = new HashMap<>();
+        input.put(id("coach_standard"), TestDesigns.sampleJson());
+        DesignLoader.LoadResult result = DesignLoader.load(input, design -> {
+            throw new IllegalStateException("boom");
+        });
+        assertTrue(result.designs().isEmpty());
+        assertEquals(1, result.errors().size());
+        assertTrue(result.errors().get(0).contains("internal error"));
+    }
+
+    @Test
+    void longDecodeErrorsAreShortened() {
+        com.google.gson.JsonObject json = TestDesigns.sampleJson().getAsJsonObject().deepCopy();
+        json.remove("name");
+        DesignLoader.LoadResult result = DesignLoader.load(Map.of(id("no_name"), json));
+        String error = result.errors().get(0);
+        assertTrue(error.length() <= "railbound:no_name: ".length() + DesignLoader.MAX_MESSAGE_LENGTH + 1, error);
+    }
 }

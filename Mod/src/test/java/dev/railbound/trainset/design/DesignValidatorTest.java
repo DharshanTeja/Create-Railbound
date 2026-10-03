@@ -45,6 +45,12 @@ class DesignValidatorTest {
     }
 
     @Test
+    void rejectsBogeysCloserThanThree() {
+        assertProblem(TestDesigns.withBogeys(SAMPLE, List.of(
+                new BogeySpec(3, BogeySpec.DEFAULT_STYLE), new BogeySpec(5, BogeySpec.DEFAULT_STYLE))), "at least 3 blocks apart");
+    }
+
+    @Test
     void rejectsBogeysAtSamePosition() {
         assertProblem(TestDesigns.withBogeys(SAMPLE, List.of(
                 new BogeySpec(5, BogeySpec.DEFAULT_STYLE), new BogeySpec(5, BogeySpec.DEFAULT_STYLE))), "different positions");
@@ -57,7 +63,7 @@ class DesignValidatorTest {
 
     @Test
     void rejectsWrongLayerCount() {
-        assertProblem(TestDesigns.withSize(SAMPLE, new CarriageSize(16, 3, 4)), "3 layers, expected height 4");
+        assertProblem(TestDesigns.withSize(SAMPLE, new CarriageSize(16, 3, 5)), "4 layers, expected height 5");
     }
 
     @Test
@@ -100,7 +106,7 @@ class DesignValidatorTest {
     @Test
     void rejectsMissingAnchor() {
         List<List<String>> layers = copyLayers();
-        layers.get(2).set(8, "qtp");
+        layers.get(3).set(8, "qtp");
         assertProblem(TestDesigns.withLayout(SAMPLE, new LayoutSpec(SAMPLE.layout().palette(), layers)),
                 "exactly 1 anchor, found 0");
     }
@@ -108,7 +114,7 @@ class DesignValidatorTest {
     @Test
     void rejectsTwoAnchors() {
         List<List<String>> layers = copyLayers();
-        layers.get(2).set(3, "qAp");
+        layers.get(3).set(3, "qAp");
         assertProblem(TestDesigns.withLayout(SAMPLE, new LayoutSpec(SAMPLE.layout().palette(), layers)),
                 "exactly 1 anchor, found 2");
     }
@@ -122,6 +128,33 @@ class DesignValidatorTest {
     @Test
     void rejectsBlankName() {
         assertProblem(TestDesigns.withName(SAMPLE, " "), "name must not be empty");
+    }
+
+    @Test
+    void rejectsAPartInTheBogeysOwnCell() {
+        List<List<String>> layers = copyLayers();
+        layers.get(0).set(3, "l#r");
+        assertProblem(TestDesigns.withLayout(SAMPLE, new LayoutSpec(SAMPLE.layout().palette(), layers)),
+                "bogey z=3 needs layer 0 at x=0 to be air");
+    }
+
+    @Test
+    void rejectsABogeyWithNothingToHoldIt() {
+        TrainsetDesign loose = TestDesigns.parse("""
+                {"name":"n","category":"box_car","size":{"length":5,"width":1,"height":2},
+                 "bogeys":[{"z":0},{"z":4}],
+                 "layout":{"palette":{"A":"anchor","#":"frame:floor",".":"air"},
+                           "layers":[[".",".","#",".","."],[".","A","#","#","."]]}}""");
+        assertProblem(loose, "bogey z=0 is not next to any carriage part");
+    }
+
+    @Test
+    void rejectsDisconnectedCells() {
+        TrainsetDesign island = TestDesigns.parse("""
+                {"name":"n","category":"box_car","size":{"length":4,"width":1,"height":1},
+                 "bogeys":[{"z":0},{"z":3}],
+                 "layout":{"palette":{"A":"anchor","#":"frame:floor",".":"air"},"layers":[["#","A",".","#"]]}}""");
+        assertProblem(island, "not connected");
     }
 
     private static List<List<String>> copyLayers() {

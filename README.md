@@ -110,7 +110,7 @@ data/<namespace>/railbound/trainsets/<id>.json
 {
   "name": "trainset.mypack.observation_car",   // translation key
   "category": "passenger",                    // passenger · box_car · tank_car · locomotive · multiple_unit
-  "size": { "length": 16, "width": 3, "height": 3 },
+  "size": { "length": 16, "width": 3, "height": 4 },
   "bogeys": [ { "z": 3 }, { "z": 12 } ],      // always exactly two
   "power": "none",
   "layout": {
@@ -119,6 +119,8 @@ data/<namespace>/railbound/trainsets/<id>.json
   }
 }
 ```
+
+Layer 0 sits at bogey height and holds the floor, which people walk on level with the top of the bogeys. Leave the centre cell of layer 0 empty above each bogey position: the bogey itself goes there.
 
 Broken designs never crash the game — they are skipped with a log line that names the file and the exact problem, and every other design still loads. A complete working example ships with the mod: [`coach_standard.json`](Mod/src/main/resources/data/railbound/railbound/trainsets/coach_standard.json).
 

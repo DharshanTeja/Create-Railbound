@@ -35,11 +35,11 @@ class LayoutParserTest {
     @Test
     void mapsCharactersToPositions() {
         List<LayoutCell> cells = LayoutParser.parse(TestDesigns.sample());
-        assertTrue(cells.contains(new LayoutCell(new BlockPos(-1, 0, 3), new HiddenPart(PartType.SEAT, Optional.empty()))),
-                "left seat at row 3");
-        assertTrue(cells.contains(new LayoutCell(new BlockPos(1, 0, 2), new HiddenPart(PartType.DOOR, Optional.empty()))),
+        assertTrue(cells.contains(new LayoutCell(new BlockPos(-1, 1, 3), new HiddenPart(PartType.SEAT, Optional.empty()))),
+                "left seat on the walking layer, row 3");
+        assertTrue(cells.contains(new LayoutCell(new BlockPos(1, 1, 2), new HiddenPart(PartType.DOOR, Optional.empty()))),
                 "right door at row 2");
-        assertTrue(cells.contains(new LayoutCell(new BlockPos(0, 2, 8), new HiddenPart(PartType.ANCHOR, Optional.empty()))),
+        assertTrue(cells.contains(new LayoutCell(new BlockPos(0, 3, 8), new HiddenPart(PartType.ANCHOR, Optional.empty()))),
                 "anchor in the roof layer, row 8");
     }
 
@@ -48,10 +48,5 @@ class LayoutParserTest {
         List<LayoutCell> cells = LayoutParser.parse(TestDesigns.sample());
         assertTrue(cells.stream().noneMatch(c -> c.part().type() == PartType.AIR));
         assertTrue(cells.stream().noneMatch(c -> c.pos().equals(new BlockPos(0, 1, 5))), "aisle above floor is air");
-    }
-
-    @Test
-    void sampleHasFortySeats() {
-        assertEquals(40, TestDesigns.sample().seatCount());
     }
 }

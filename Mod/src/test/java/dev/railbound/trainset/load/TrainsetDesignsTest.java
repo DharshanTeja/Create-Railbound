@@ -1,6 +1,7 @@
 package dev.railbound.trainset.load;
 
 import dev.railbound.testutil.TestDesigns;
+import dev.railbound.trainset.design.ParsedDesign;
 import dev.railbound.trainset.design.TrainsetDesign;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.AfterEach;
@@ -25,8 +26,20 @@ class TrainsetDesignsTest {
         ResourceLocation id = ResourceLocation.fromNamespaceAndPath("railbound", "coach_standard");
         TrainsetDesign sample = TestDesigns.sample();
         TrainsetDesigns.replace(Map.of(id, sample));
-        assertEquals(Optional.of(sample), TrainsetDesigns.get(id));
+        assertEquals(Optional.of(sample), TrainsetDesigns.get(id).map(ParsedDesign::design));
         assertEquals(Optional.empty(), TrainsetDesigns.get(ResourceLocation.fromNamespaceAndPath("railbound", "missing")));
+    }
+
+    @Test
+    void getNullIsEmpty() {
+        assertEquals(Optional.empty(), TrainsetDesigns.get(null));
+    }
+
+    @Test
+    void rawDesignsReturnsTheOriginals() {
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("railbound", "coach_standard");
+        TrainsetDesigns.replace(Map.of(id, TestDesigns.sample()));
+        assertEquals(Map.of(id, TestDesigns.sample()), TrainsetDesigns.rawDesigns());
     }
 
     @Test
@@ -53,6 +66,6 @@ class TrainsetDesignsTest {
     void allIsUnmodifiable() {
         TrainsetDesigns.replace(Map.of());
         assertThrows(UnsupportedOperationException.class,
-                () -> TrainsetDesigns.all().put(ResourceLocation.fromNamespaceAndPath("x", "y"), TestDesigns.sample()));
+                () -> TrainsetDesigns.all().put(ResourceLocation.fromNamespaceAndPath("x", "y"), ParsedDesign.of(TestDesigns.sample())));
     }
 }

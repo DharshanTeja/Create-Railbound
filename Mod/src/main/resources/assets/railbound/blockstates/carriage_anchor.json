@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "railbound:block/carriage_anchor" },
+    "facing=east": { "model": "railbound:block/carriage_anchor", "y": 90 },
+    "facing=south": { "model": "railbound:block/carriage_anchor", "y": 180 },
+    "facing=west": { "model": "railbound:block/carriage_anchor", "y": 270 }
+  }
+}
