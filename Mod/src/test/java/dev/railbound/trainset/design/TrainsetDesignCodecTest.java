@@ -45,6 +45,18 @@ class TrainsetDesignCodecTest {
     }
 
     @Test
+    void readsWhichWayADoorSlides() {
+        TrainsetDesign d = TestDesigns.parse("""
+                {"name":"n","category":"box_car","size":{"length":2,"width":1,"height":1},
+                 "bogeys":[{"z":0},{"z":1}],
+                 "doors":[{"part":"door_end","pos":[0,0,0],"slide":"left"},{"part":"door_side","pos":[0,0,1]}],
+                 "layout":{"palette":{"A":"anchor","#":"frame:floor"},"layers":[["A","#"]]}}
+                """);
+        assertEquals(java.util.Optional.of(DoorSlideDirection.LEFT), d.doors().get(0).slide());
+        assertEquals(java.util.Optional.empty(), d.doors().get(1).slide());
+    }
+
+    @Test
     void roundTrips() {
         TrainsetDesign d = TestDesigns.sample();
         JsonElement encoded = TrainsetDesign.CODEC.encodeStart(JsonOps.INSTANCE, d).getOrThrow();

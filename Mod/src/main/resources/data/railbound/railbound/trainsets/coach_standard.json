@@ -7,11 +7,14 @@
     { "z": 11, "style": "railbound:coach" }
   ],
   "power": "none",
+  "coupler": { "height": -11, "gangway": { "half_width": 11.4, "bottom": -8.2, "top": 27.3 } },
   "doors": [
     { "part": "door_left_front",  "pos": [-1, 1, 2] },
     { "part": "door_right_front", "pos": [1, 1, 2] },
     { "part": "door_left_rear",   "pos": [-1, 1, 13] },
-    { "part": "door_right_rear",  "pos": [1, 1, 13] }
+    { "part": "door_right_rear",  "pos": [1, 1, 13] },
+    { "part": "door_end_front",   "pos": [0, 1, 0],  "slide": "left" },
+    { "part": "door_end_rear",    "pos": [0, 1, 15], "slide": "right" }
   ],
   "layout": {
     "palette": {
@@ -30,12 +33,13 @@
       "T": "step",
       "D": "door",
       "A": "anchor",
+      "X": "frame:full",
       ".": "air"
     },
     "layers": [
-      ["l#r", "l#r", "T#T", "S#S", "S.S", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "S.S", "S#S", "T#T", "l#r", "l#r"],
-      ["L.R", "L.R", "D.D", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "D.D", "L.R", "L.R"],
-      ["KcJ", "KcJ", "DcD", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "DcD", "KcJ", "KcJ"],
+      ["X#X", "X#X", "T#T", "S#S", "S.S", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "S.S", "S#S", "T#T", "X#X", "X#X"],
+      ["XDX", "X.X", "D.D", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "D.D", "X.X", "XDX"],
+      ["XDX", "XcX", "DcD", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "DcD", "XcX", "XDX"],
       ["qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qAp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp"]
     ]
   }

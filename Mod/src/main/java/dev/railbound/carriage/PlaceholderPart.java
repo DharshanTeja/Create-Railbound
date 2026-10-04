@@ -5,7 +5,7 @@ import net.minecraft.util.StringRepresentable;
 
 import java.util.Optional;
 
-/** Stand-ins for parts that later sub-phases implement (cab 1.4, cargo 1.5/1.6). */
+/** Stand-ins for parts that later sub-phases implement (loco cab parts 1.4, cargo 1.5/1.6). */
 public enum PlaceholderPart implements StringRepresentable {
     CAB("cab"),
     CARGO_ITEM("cargo_item"),
@@ -24,7 +24,7 @@ public enum PlaceholderPart implements StringRepresentable {
 
     public static Optional<PlaceholderPart> of(PartType type) {
         return switch (type) {
-            case CAB -> Optional.of(CAB);
+            case CONTROLS -> Optional.of(CAB);
             case CARGO_ITEM -> Optional.of(CARGO_ITEM);
             case CARGO_FLUID -> Optional.of(CARGO_FLUID);
             default -> Optional.empty();

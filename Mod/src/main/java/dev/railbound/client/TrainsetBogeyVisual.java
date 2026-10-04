@@ -18,8 +18,10 @@ public class TrainsetBogeyVisual implements BogeyVisual {
     private final TransformedInstance frame;
     private final TransformedInstance frontWheels;
     private final TransformedInstance rearWheels;
+    private final float axleOffset;
 
     public TrainsetBogeyVisual(VisualizationContext ctx, TrainsetBogeyModels models) {
+        axleOffset = models.axleOffset();
         // Create's own bogeys use smooth-lit models; plain ones come out black inside a moving train's light volume
         frame = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(models.frame())).createInstance();
         var wheels = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(models.wheels()));
@@ -35,11 +37,11 @@ public class TrainsetBogeyVisual implements BogeyVisual {
     public void update(CompoundTag bogeyData, float wheelAngle, PoseStack poseStack) {
         frame.setTransform(poseStack).setChanged();
         frontWheels.setTransform(poseStack)
-                .translate(0, TrainsetBogeyModels.AXLE_HEIGHT, -TrainsetBogeyModels.AXLE_OFFSET)
+                .translate(0, TrainsetBogeyModels.AXLE_HEIGHT, -axleOffset)
                 .rotateXDegrees(wheelAngle)
                 .setChanged();
         rearWheels.setTransform(poseStack)
-                .translate(0, TrainsetBogeyModels.AXLE_HEIGHT, TrainsetBogeyModels.AXLE_OFFSET)
+                .translate(0, TrainsetBogeyModels.AXLE_HEIGHT, axleOffset)
                 .rotateXDegrees(wheelAngle)
                 .setChanged();
     }

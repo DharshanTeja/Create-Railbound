@@ -95,6 +95,20 @@ public final class TrainsetConverter {
             }
         }
 
+        Set<String> modelDrive = new TreeSet<>();
+        partFaces.keySet().stream().filter(p -> p.startsWith("drive_")).forEach(modelDrive::add);
+        Set<String> designDrive = design.has("drive") ? driveParts(design.getAsJsonObject("drive")) : Set.of();
+        for (String part : designDrive) {
+            if (!modelDrive.contains(part)) {
+                problems.add("the design's drive needs a model group '" + part + "'");
+            }
+        }
+        for (String part : modelDrive) {
+            if (!designDrive.contains(part)) {
+                problems.add("the model has drive group '" + part + "' that the design's drive does not have");
+            }
+        }
+
         ModelSource.Texture texture = source.texture(texturesUsed, problems);
         if (!problems.isEmpty()) {
             throw new ConversionException(id + ": " + String.join("; ", problems));
@@ -130,5 +144,20 @@ public final class TrainsetConverter {
             }
         }
         return false;
+    }
+
+    /** The moving parts a design's drive names (the mod's DriveSpec.parts(): wheels per axle and side, then rods). */
+    static Set<String> driveParts(JsonObject drive) {
+        Set<String> parts = new TreeSet<>();
+        int axles = drive.has("axles") ? drive.getAsJsonArray("axles").size() : 0;
+        for (String side : List.of("right", "left")) {
+            for (int axle = 1; axle <= axles; axle++) {
+                parts.add("drive_wheels_" + axle + "_" + side);
+            }
+            for (String piece : List.of("coupling_rod", "connecting_rod", "crosshead")) {
+                parts.add("drive_" + piece + "_" + side);
+            }
+        }
+        return parts;
     }
 }

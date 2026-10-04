@@ -1,0 +1,76 @@
+{
+  "textures": {
+    "crane": "railbound:block/water_crane",
+    "particle": "railbound:block/water_crane"
+  },
+  "elements": [
+    {
+      "from": [
+        6,
+        -1,
+        6
+      ],
+      "to": [
+        10,
+        0,
+        10
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#crane"
+        },
+        "east": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#crane"
+        },
+        "south": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#crane"
+        },
+        "west": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#crane"
+        },
+        "up": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#crane"
+        },
+        "down": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#crane"
+        }
+      }
+    }
+  ]
+}

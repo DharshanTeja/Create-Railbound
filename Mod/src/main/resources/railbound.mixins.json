@@ -4,13 +4,16 @@
   "package": "dev.railbound.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "CarriageHitboxMixin",
     "ContraptionColliderStepMixin",
     "ContraptionSeatMixin",
     "LivingEntityStepMixin",
-    "SeatBlockMixin"
+    "SeatBlockMixin",
+    "TrainSteamMixin"
   ],
   "client": [
-    "AbstractContraptionEntityMixin"
+    "AbstractContraptionEntityMixin",
+    "CarriageCouplingRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,5 +1,7 @@
 package dev.railbound.carriage;
 
+import com.simibubi.create.AllBlocks;
+import com.simibubi.create.content.contraptions.actors.trainControls.ControlsBlock;
 import dev.railbound.registry.RailboundBlocks;
 import dev.railbound.trainset.design.HiddenPart;
 import dev.railbound.trainset.design.ParsedDesign;
@@ -23,12 +25,20 @@ public final class CarriageBlocks {
                     .setValue(SeatPartBlock.FACING, facing)
                     .setValue(SeatPartBlock.SIDE, PlaceholderSide.of(part.type(), local.getX()));
             case DOOR -> RailboundBlocks.DOOR.get().defaultBlockState()
-                    .setValue(DoorPartBlock.FACING, InteriorParts.outward(facing, local.getX()))
+                    .setValue(DoorPartBlock.FACING, InteriorParts.doorOutward(facing, local, design.length()))
+                    .setValue(DoorPartBlock.END, local.getX() == 0)
                     .setValue(DoorPartBlock.HALF, InteriorParts.doorHalf(design.partAt(local.below())
                             .map(below -> below.type() == PartType.DOOR).orElse(false)))
                     .setValue(DoorPartBlock.OPEN, false);
+            case CONTROLS -> AllBlocks.TRAIN_CONTROLS.getDefaultState()
+                    .setValue(ControlsBlock.FACING, InteriorParts.controlsFacing(facing, design.partAt(local.north())
+                            .map(ahead -> ahead.type() == PartType.SEAT).orElse(false)));
+            case BUNKER -> RailboundBlocks.BUNKER.get().defaultBlockState();
+            case WATER_TANK -> RailboundBlocks.WATER_TANK.get().defaultBlockState();
+            case FIREBOX -> RailboundBlocks.FIREBOX.get().defaultBlockState();
             case STEP -> RailboundBlocks.STEP.get().defaultBlockState()
-                    .setValue(StepPartBlock.FACING, InteriorParts.outward(facing, local.getX()));
+                    .setValue(StepPartBlock.FACING, InteriorParts.outward(facing, local.getX()))
+                    .setValue(StepPartBlock.HIGH, InteriorParts.stepIsHigh(design.partAt(local.offset(-Integer.signum(local.getX()), 0, 0))));
             case AIR -> throw new IllegalArgumentException("Air cells are never placed");
             default -> RailboundBlocks.PLACEHOLDER.get().defaultBlockState()
                     .setValue(PlaceholderPartBlock.PART, PlaceholderPart.of(part.type()).orElseThrow())

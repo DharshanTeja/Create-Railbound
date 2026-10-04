@@ -17,6 +17,9 @@ public final class CarriageBehaviours {
         MovingInteractionBehaviour.REGISTRY.register(RailboundBlocks.SEAT.get(), new SeatInteractionBehaviour());
         MovementBehaviour.REGISTRY.register(RailboundBlocks.SEAT.get(), new SeatMovementBehaviour());
         MovementBehaviour.REGISTRY.register(RailboundBlocks.DOOR.get(), new CarriageDoorMovementBehaviour());
+        MovementBehaviour.REGISTRY.register(RailboundBlocks.ANCHOR.get(), new AnchorMovementBehaviour());
+        MovingInteractionBehaviour.REGISTRY.register(RailboundBlocks.FIREBOX.get(), new dev.railbound.steam.FireboxMovingInteraction());
+        MovingInteractionBehaviour.REGISTRY.register(RailboundBlocks.WATER_TANK.get(), new dev.railbound.steam.WaterTankMovingInteraction());
         MovingInteractionBehaviour.REGISTRY.register(RailboundBlocks.DOOR.get(), new DoorPartMovingInteraction());
     }
 }

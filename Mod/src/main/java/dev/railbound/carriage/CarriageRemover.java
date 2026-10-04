@@ -1,6 +1,9 @@
 package dev.railbound.carriage;
 
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.trains.bogey.AbstractBogeyBlock;
+import dev.railbound.trainset.design.LayoutCell;
+import dev.railbound.trainset.design.PartType;
 import dev.railbound.trainset.design.ParsedDesign;
 import dev.railbound.trainset.load.TrainsetDesigns;
 import dev.railbound.util.BlockGraph;
@@ -121,6 +124,13 @@ public final class CarriageRemover {
                 for (BlockPos pos : CarriageFootprint.positions(found.design(), found.anchor(), found.facing())) {
                     if (CarriageFittings.is(level.getBlockState(pos))) {
                         level.destroyBlock(pos, true);
+                    }
+                }
+                // The design's Train Controls came with the trainset item: they go without dropping.
+                for (LayoutCell cell : found.design().cells()) {
+                    BlockPos pos = CarriageFootprint.worldPos(found.design(), found.anchor(), found.facing(), cell.pos());
+                    if (cell.part().type() == PartType.CONTROLS && AllBlocks.TRAIN_CONTROLS.has(level.getBlockState(pos))) {
+                        level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
                     }
                 }
             });

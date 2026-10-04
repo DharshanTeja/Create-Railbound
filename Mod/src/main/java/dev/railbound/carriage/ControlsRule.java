@@ -7,6 +7,6 @@ public final class ControlsRule {
     private ControlsRule() {}
 
     public static boolean allowsControls(TrainsetCategory category) {
-        return category == TrainsetCategory.LOCOMOTIVE || category == TrainsetCategory.MULTIPLE_UNIT;
+        return category.drivable();
     }
 }

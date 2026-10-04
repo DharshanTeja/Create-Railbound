@@ -19,7 +19,7 @@ public final class FrameShapes {
     /** The roof's top, at the bottom of the top layer (the model's roof tops out a quarter block into it). */
     private static final VoxelShape ROOF = Block.box(0, 0, 0, 16, 4, 16);
     /** The inside ceiling, at the top of the upper interior layer, where the model's ceiling is. */
-    private static final VoxelShape CEILING = Block.box(0, 11.5, 0, 16, 16, 16);
+    public static final VoxelShape CEILING = Block.box(0, 11.5, 0, 16, 16, 16);
     private static final VoxelShape PARTITION = Block.box(0, 0, 0, 16, 16, 2);
 
     private static final Map<FrameShape, Map<Direction, VoxelShape>> CACHE = new EnumMap<>(FrameShape.class);

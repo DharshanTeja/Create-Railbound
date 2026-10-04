@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
- * A carriage's bogeys are ordinary Create bogeys with their own loot (Railway Casing). Breaking one must
+ * A carriage's bogeys and a loco's Train Controls are ordinary Create blocks with their own loot. Breaking one must
  * remove the whole carriage for one trainset item instead, and explosions leave them to the carriage cascade.
  * Train Controls are kept off cars that are not driven.
  */
@@ -34,7 +34,8 @@ public final class CarriageProtection {
         }
         BlockPos pos = event.getPos();
         Optional<BlockPos> part = carriagePartBeside(level, pos);
-        if (part.isEmpty() || !(level.getBlockState(pos).getBlock() instanceof AbstractBogeyBlock<?>)) {
+        if (part.isEmpty() || !(level.getBlockState(pos).getBlock() instanceof AbstractBogeyBlock<?>
+                || CarriageControls.isDesignControls(level, pos))) {
             return;
         }
         event.setCanceled(true);
@@ -72,7 +73,8 @@ public final class CarriageProtection {
 
     public static void onDetonate(ExplosionEvent.Detonate event) {
         Level level = event.getLevel();
-        removeCarriageBogeys(event.getAffectedBlocks(), pos -> isCarriageBogey(level, pos));
+        removeCarriageBogeys(event.getAffectedBlocks(),
+                pos -> isCarriageBogey(level, pos) || CarriageControls.isDesignControls(level, pos));
     }
 
     /** Takes carriage bogeys out of an explosion; any part it hits removes them without loot. */

@@ -1,0 +1,44 @@
+{
+  "name": "trainset.railbound.loco_steam_tank",
+  "category": "locomotive",
+  "size": { "length": 16, "width": 3, "height": 4 },
+  "bogeys": [
+    { "z": 3, "style": "railbound:steam_truck" },
+    { "z": 12, "style": "railbound:steam_truck" }
+  ],
+  "power": "steam",
+  "coupler": { "height": -7.5 },
+  "performance": { "top_speed": 20, "curve_speed": 10, "acceleration": 2 },
+  "steam": { "water": 16000, "bunker_slots": 2, "chimney": [0, 50, -113], "cylinder": [19.5, -8, -118], "safety_valve": [0, 40, 28], "whistle": [0, 45, 36] },
+  "drive": {
+    "wheel_radius": 9.5,
+    "axle_y": -17,
+    "axles": [-40, -10, 20],
+    "main_axle": 1,
+    "crank_radius": 6,
+    "crosshead_y": -7,
+    "rod_length": 75
+  },
+  "layout": {
+    "palette": {
+      "X": "frame:full",
+      "L": "frame:wall_left",
+      "R": "frame:wall_right",
+      "t": "frame:roof",
+      "C": "controls",
+      "S": "seat",
+      "T": "step",
+      "B": "bunker",
+      "W": "water_tank",
+      "F": "firebox",
+      "A": "anchor",
+      ".": "air"
+    },
+    "layers": [
+      ["XXX", "XXX", "XXX", "X.X", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "X.X", "TXT", "XXX", "XXX"],
+      [".X.", ".X.", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "FFF", "LCR", "LSR", ".C.", "XXX", "XBX"],
+      [".X.", ".X.", "XXX", "WXW", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "L.R", "L.R", "...", "XXX", "XXX"],
+      [".t.", ".t.", ".t.", ".t.", ".t.", ".A.", ".t.", ".t.", ".t.", ".t.", "XXX", "XXX", "XXX", "XXX", "XXX", "ttt"]
+    ]
+  }
+}

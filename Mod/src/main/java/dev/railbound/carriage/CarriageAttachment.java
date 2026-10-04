@@ -2,7 +2,6 @@ package dev.railbound.carriage;
 
 import com.simibubi.create.api.contraption.BlockMovementChecks;
 import com.simibubi.create.api.contraption.BlockMovementChecks.CheckResult;
-import com.simibubi.create.content.trains.bogey.AbstractBogeyBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -10,8 +9,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import java.util.Optional;
 
 /**
- * Glues a carriage together for Create's assembly: parts stick to neighbouring parts, and parts and bogeys
- * stick to each other on every side (layer 0 sits beside the bogey). Create's bogeys are only sticky front/back.
+ * Glues a carriage together for Create's assembly: parts stick to neighbouring parts, and parts and held blocks
+ * (bogeys and Train Controls) stick to each other on every side (layer 0 sits beside the bogey). Create's bogeys
+ * are only sticky front/back.
  * Fittings (interfaces) stick to parts too, unless their front faces the part: that is a station-side interface.
  */
 public final class CarriageAttachment {
@@ -56,7 +56,7 @@ public final class CarriageAttachment {
     }
 
     private static Kind kindOf(BlockState state, Direction towardsOther) {
-        return kind(CarriagePart.is(state), state.getBlock() instanceof AbstractBogeyBlock<?>, CarriageFittings.is(state),
+        return kind(CarriagePart.is(state), CarriageControls.isHeld(state), CarriageFittings.is(state),
                 state.getOptionalValue(BlockStateProperties.FACING), towardsOther);
     }
 }

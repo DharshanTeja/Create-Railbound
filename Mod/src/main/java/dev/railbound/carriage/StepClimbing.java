@@ -14,12 +14,14 @@ public final class StepClimbing {
     static final double REACH = 0.1;
     /** The ladder runs from the bottom of the step block up to the floor. */
     static final double LADDER_TOP = 7 / 16.0;
+    /** A cab step's ladder runs up to its tread at the top of the cell. */
+    static final double CAB_LADDER_TOP = 15 / 16.0;
 
     private StepClimbing() {}
 
-    public static boolean touchesLadder(AABB entity, BlockPos step, Direction outward) {
+    public static boolean touchesLadder(AABB entity, BlockPos step, Direction outward, boolean high) {
         double x0 = step.getX(), y0 = step.getY(), z0 = step.getZ();
-        double x1 = x0 + 1, y1 = y0 + LADDER_TOP, z1 = z0 + 1;
+        double x1 = x0 + 1, y1 = y0 + (high ? CAB_LADDER_TOP : LADDER_TOP), z1 = z0 + 1;
         AABB face = switch (outward) {
             case EAST -> new AABB(x1, y0, z0, x1 + REACH, y1, z1);
             case WEST -> new AABB(x0 - REACH, y0, z0, x0, y1, z1);

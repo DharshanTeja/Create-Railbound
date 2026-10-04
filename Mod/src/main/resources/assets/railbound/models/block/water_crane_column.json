@@ -1,0 +1,144 @@
+{
+  "textures": {
+    "crane": "railbound:block/water_crane",
+    "particle": "railbound:block/water_crane"
+  },
+  "elements": [
+    {
+      "from": [
+        3,
+        0,
+        3
+      ],
+      "to": [
+        13,
+        16,
+        13
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#crane"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#crane"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#crane"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#crane"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#crane"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#crane"
+        }
+      }
+    },
+    {
+      "from": [
+        2.5,
+        10,
+        2.5
+      ],
+      "to": [
+        13.5,
+        11,
+        13.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#crane"
+        },
+        "east": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#crane"
+        },
+        "south": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#crane"
+        },
+        "west": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#crane"
+        },
+        "up": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#crane"
+        },
+        "down": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#crane"
+        }
+      }
+    }
+  ]
+}

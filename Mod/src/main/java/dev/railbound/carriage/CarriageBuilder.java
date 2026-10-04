@@ -1,5 +1,6 @@
 package dev.railbound.carriage;
 
+import dev.railbound.steam.BunkerBlockEntity;
 import com.simibubi.create.AllBogeyStyles;
 import com.simibubi.create.content.trains.bogey.AbstractBogeyBlock;
 import com.simibubi.create.content.trains.bogey.AbstractBogeyBlockEntity;
@@ -55,6 +56,11 @@ public final class CarriageBuilder {
         }
         if (level.getBlockEntity(plan.anchor()) instanceof AnchorBlockEntity anchor) {
             anchor.setDesignId(designId);
+        }
+        for (PlacedPart part : plan.parts()) {
+            if (level.getBlockEntity(part.pos()) instanceof BunkerBlockEntity bunker) {
+                bunker.setDesignId(designId);
+            }
         }
     }
 }

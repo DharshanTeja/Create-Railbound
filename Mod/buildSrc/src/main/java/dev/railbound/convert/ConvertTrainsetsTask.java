@@ -31,6 +31,10 @@ public abstract class ConvertTrainsetsTask extends DefaultTask {
     @PathSensitive(PathSensitivity.RELATIVE)
     public abstract DirectoryProperty getBogeyDir();
 
+    @InputDirectory
+    @PathSensitive(PathSensitivity.RELATIVE)
+    public abstract DirectoryProperty getCouplingDir();
+
     @OutputDirectory
     public abstract DirectoryProperty getOutputDir();
 
@@ -44,6 +48,8 @@ public abstract class ConvertTrainsetsTask extends DefaultTask {
             getLogger().lifecycle("Converted bogey styles: {}", BogeyConverter.convertUsed(getNamespace().get(),
                     getDesignDir().get().getAsFile().toPath(), getBogeyDir().get().getAsFile().toPath(),
                     getOutputDir().get().getAsFile().toPath()));
+            getLogger().lifecycle("Converted coupling styles: {}", CouplingConverter.convertAll(getNamespace().get(),
+                    getCouplingDir().get().getAsFile().toPath(), getOutputDir().get().getAsFile().toPath()));
             for (String id : result.withoutModel()) {
                 getLogger().warn("Trainset design '{}' has no model in art/trainsets/{}/; it will render as a grey box", id, id);
             }

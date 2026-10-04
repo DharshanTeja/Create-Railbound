@@ -3,8 +3,12 @@ package dev.railbound.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.railbound.Railbound;
+import com.mojang.math.Axis;
 import dev.railbound.carriage.DoorSlide;
+import dev.railbound.steam.DriveGear;
+import dev.railbound.trainset.design.DriveSpec;
 import dev.railbound.trainset.design.CarriageSize;
+import dev.railbound.trainset.design.DoorSlideDirection;
 import dev.railbound.trainset.design.DoorSpec;
 import dev.railbound.trainset.design.ParsedDesign;
 import net.minecraft.client.Minecraft;
@@ -21,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.ToDoubleFunction;
 
 /**
@@ -40,6 +45,16 @@ public final class CarriageDrawer {
 
     public static void draw(ResourceLocation id, ParsedDesign design, PoseStack pose, MultiBufferSource buffers,
                             int light, int overlay, ToDoubleFunction<DoorSpec> doorProgress) {
+        draw(id, design, pose, buffers, light, overlay, doorProgress, 0, 0);
+    }
+
+    /**
+     * As above, with a loco's driving wheels turned to driveAngle (radians, see {@link DriveGear}) and slid sideways
+     * to follow the rails on a curve of the given curvature (radians per block, + right).
+     */
+    public static void draw(ResourceLocation id, ParsedDesign design, PoseStack pose, MultiBufferSource buffers,
+                            int light, int overlay, ToDoubleFunction<DoorSpec> doorProgress, double driveAngle,
+                            double curvature) {
         VertexConsumer solid = buffers.getBuffer(SOLID);
         Optional<BakedModel> body = TrainsetModels.get(id, TrainsetModels.BODY);
         if (body.isPresent()) {
@@ -59,12 +74,72 @@ public final class CarriageDrawer {
             if (leaf.isEmpty()) {
                 continue;
             }
+            DoorSlideDirection slide = DoorSlide.of(door, length);
+            float distance = DoorSlide.distance((float) doorProgress.applyAsDouble(door));
             pose.pushPose();
-            pose.translate(0, 0, DoorSlide.direction(door.pos().getZ(), length)
-                    * DoorSlide.distance((float) doorProgress.applyAsDouble(door)));
+            pose.translate(slide.dx() * distance, 0, slide.dz() * distance);
             renderModel(pose, solid, leaf.get(), light, overlay, SOLID);
             pose.popPose();
         }
+        design.design().drive().ifPresent(drive -> drawDrive(id, design, drive, length, pose, solid, light, overlay,
+                driveAngle, curvature));
+    }
+
+    /**
+     * The motion, posed from the model's rest position (every crank pin up): wheels turn about their axles, the
+     * coupling rod rides the crank pins, the crosshead slides and the connecting rod swings about it. Model pixels
+     * map to design blocks as the converter's ModelSpace does: y / 16 + 1, (z + 8 * length) / 16.
+     */
+    private static void drawDrive(ResourceLocation id, ParsedDesign design, DriveSpec drive, int length, PoseStack pose,
+                                  VertexConsumer solid, int light, int overlay, double driveAngle, double curvature) {
+        DriveGear gear = new DriveGear(drive.axleY(), drive.axles().get(drive.mainAxle()), drive.crankRadius(),
+                drive.crossheadY(), drive.rodLength());
+        double bogeyA = design.design().bogeys().get(0).z() + 0.5, bogeyB = design.design().bogeys().get(1).z() + 0.5;
+        java.util.function.DoubleUnaryOperator shift = modelZ ->
+                DriveGear.curveShift(curvature, (modelZ + 8 * length) / 16, bogeyA, bogeyB);
+        double mainZ = drive.axles().get(drive.mainAxle());
+        double crossheadRest = gear.crossheadZ(0);
+        for (String side : DriveSpec.SIDES) {
+            double angle = DriveGear.sideAngle(driveAngle, side.equals("left"));
+            for (int i = 0; i < drive.axles().size(); i++) {
+                double axleZ = drive.axles().get(i);
+                drawPart(id, "drive_wheels_" + (i + 1) + "_" + side, pose, solid, light, overlay, p -> {
+                    p.translate(shift.applyAsDouble(axleZ), 0, 0);
+                    turnAbout(p, drive.axleY(), axleZ, length, angle);
+                });
+            }
+            double[] offset = gear.couplingRodOffset(angle);
+            drawPart(id, "drive_coupling_rod_" + side, pose, solid, light, overlay,
+                    p -> p.translate(shift.applyAsDouble(mainZ), offset[0] / 16, offset[1] / 16));
+            double slide = gear.crossheadOffset(angle);
+            drawPart(id, "drive_crosshead_" + side, pose, solid, light, overlay,
+                    p -> p.translate(shift.applyAsDouble(crossheadRest), 0, slide / 16));
+            double crossheadZ = gear.crossheadZ(0);
+            drawPart(id, "drive_connecting_rod_" + side, pose, solid, light, overlay, p -> {
+                p.translate(shift.applyAsDouble((crossheadRest + mainZ) / 2), 0, slide / 16);
+                turnAbout(p, drive.crossheadY(), crossheadZ, length, gear.rodTurn(angle));
+            });
+        }
+    }
+
+    /** Turns the pose about the x axis through a model-pixel point (y, z). */
+    private static void turnAbout(PoseStack pose, double y, double z, int length, double angle) {
+        double by = y / 16 + 1, bz = (z + 8 * length) / 16;
+        pose.translate(0, by, bz);
+        pose.mulPose(Axis.XP.rotation((float) angle));
+        pose.translate(0, -by, -bz);
+    }
+
+    private static void drawPart(ResourceLocation id, String part, PoseStack pose, VertexConsumer solid, int light,
+                                 int overlay, Consumer<PoseStack> transform) {
+        Optional<BakedModel> model = TrainsetModels.get(id, part);
+        if (model.isEmpty()) {
+            return;
+        }
+        pose.pushPose();
+        transform.accept(pose);
+        renderModel(pose, solid, model.get(), light, overlay, SOLID);
+        pose.popPose();
     }
 
     private static void renderModel(PoseStack pose, VertexConsumer consumer, BakedModel model, int light, int overlay,

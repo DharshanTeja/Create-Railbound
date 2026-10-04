@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "railbound:block/carriage_invisible" }
+  }
+}

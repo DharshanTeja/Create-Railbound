@@ -22,7 +22,7 @@ One item. One click. A real Create train — with walkable interiors, seats, doo
 <br>
 
 > [!IMPORTANT]
-> **Railbound is in early development.** Version 0.1 lays the foundation: trainset designs load from datapacks, are validated, sync to every player, and appear as items in their own creative tab. **Trains cannot be placed yet** — that arrives with the next milestone. Follow the [roadmap](#roadmap) for progress.
+> **Railbound is in early development.** The passenger coach and the steam tank locomotive can be placed, assembled and driven as real Create trains — with full 3D models, walkable interiors, working doors and a coal-and-water steam engine. Couplers are being built now; freight carriages come next. Follow the [roadmap](#roadmap) for progress.
 
 <br>
 
@@ -79,7 +79,7 @@ Railbound ships in four phases. Each phase is built in small sub-phases, and eve
 | Phase | Theme | What arrives |
 |:---:|---|---|
 | **1** | **First version** | Steam locomotive, passenger coach, items carriage, fluid carriage — fully working with Create's navigation and schedules |
-| **2** | **More carriages & crafting** | New carriage types, crafting recipes with dedicated components, Ponder scenes, bogeys, couplers and anti-climbers |
+| **2** | **More carriages & crafting** | New carriage types, crafting recipes with dedicated components, Ponder scenes, bogeys and anti-climbers |
 | **3** | **Fuel trains** | Diesel locomotives burning coal, wood or fuels from other mods, plus passenger and goods multiple units |
 | **4** | **Electric trains** | Catenary poles, wires and a power generator — compatible with Create: Power Grid and Create: New Age — plus electric locomotives, carriages and EMUs |
 
@@ -90,11 +90,12 @@ Railbound ships in four phases. Each phase is built in small sub-phases, and eve
 | ✅ | **1.0 Foundation** | Design format, validation, datapack loading, multiplayer sync, trainset item and creative tab |
 | ✅ | **1.1 Coach on rails** | Placing a carriage on track and assembling it into a real Create train |
 | ✅ | **1.2 Coach interior** | Right-click seating, doors that open at stations, interfaces that fit into the coach wall |
-| ⏳ | **1.3 Coach visuals** | Full 3D models in game, sliding doors, glowing lamps, Blockbench-to-game converter |
-| ○ | **1.4 Steam locomotive** | Driver's cab, conductor seat and automatic running on schedules |
-| ○ | **1.5 Items carriage** | 160-stack storage, scrolling GUI, Portable Storage Interface |
-| ○ | **1.6 Fluid carriage** | 144-bucket tank, fill-and-drain GUI, Portable Fluid Interface |
-| ○ | **1.7 Release** | Compatibility, performance and polish |
+| ✅ | **1.3 Coach visuals** | Full 3D models in game, sliding doors, glowing lamps, Blockbench-to-game converter |
+| ✅ | **1.4 Steam locomotive** | Steam tank engine with boiler pressure, coal and water, automatic firing, animated rods, synced smoke, chuff and whistle, cab gauges, and a trackside water crane |
+| ⏳ | **1.5 Couplers** | Knuckle couplers and coach gangways that follow curves, a coupler block for hand-built carriages, splitting and joining stopped trains |
+| ○ | **1.6 Items carriage** | 160-stack storage, scrolling GUI, Portable Storage Interface |
+| ○ | **1.7 Fluid carriage** | 144-bucket tank, fill-and-drain GUI, Portable Fluid Interface |
+| ○ | **1.8 Release** | Compatibility, performance and polish |
 
 <br>
 
