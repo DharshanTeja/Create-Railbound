@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Which exported part a cube belongs to, from its group path: `door_*` groups are sliding door leaves, `lamps`
- * renders full-bright, groups starting with `_` or `ref_` are previews and references (never exported), and
- * everything else is the body.
+ * Which exported part a cube belongs to, from its group path: `door_*` groups are sliding door leaves, `drive_*`
+ * groups are a steam loco's moving wheels and rods, `lamps` renders full-bright, groups starting with `_` or `ref_`
+ * are previews and references (never exported), and everything else is the body.
  */
 public final class Parts {
     public static final String BODY = "body";
@@ -20,7 +20,7 @@ public final class Parts {
             if (group.startsWith("_") || group.startsWith("ref_")) {
                 return Optional.empty();
             }
-            if (group.startsWith("door_") || group.equals(LAMPS)) {
+            if (group.startsWith("door_") || group.startsWith("drive_") || group.equals(LAMPS)) {
                 part = group;
             }
         }

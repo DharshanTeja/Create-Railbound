@@ -1,12 +1,18 @@
 package dev.railbound.carriage;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.junit.jupiter.api.Test;
 
+import dev.railbound.trainset.design.FrameShape;
+import dev.railbound.trainset.design.HiddenPart;
+import dev.railbound.trainset.design.PartType;
+
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,8 +42,31 @@ class InteriorPartsTest {
     }
 
     @Test
+    void sideDoorsFaceSidewaysAndEndDoorsFaceOutOfTheirEnd() {
+        assertEquals(Direction.EAST, InteriorParts.doorOutward(Direction.NORTH, new BlockPos(1, 1, 2), 16));
+        assertEquals(Direction.NORTH, InteriorParts.doorOutward(Direction.NORTH, new BlockPos(0, 1, 0), 16),
+                "local z 0 is the carriage front");
+        assertEquals(Direction.SOUTH, InteriorParts.doorOutward(Direction.NORTH, new BlockPos(0, 1, 15), 16));
+        assertEquals(Direction.WEST, InteriorParts.doorOutward(Direction.EAST, new BlockPos(0, 2, 15), 16));
+    }
+
+    @Test
+    void aCentreDoorAwayFromTheEndsHasNoOutside() {
+        assertThrows(IllegalArgumentException.class,
+                () -> InteriorParts.doorOutward(Direction.NORTH, new BlockPos(0, 1, 5), 16));
+    }
+
+    @Test
+    void controlsFaceTheirConductorSeat() {
+        // Create counts a seat as the conductor's when the controls next to it face back towards it
+        assertEquals(Direction.NORTH, InteriorParts.controlsFacing(Direction.NORTH, true), "seat ahead (towards the front)");
+        assertEquals(Direction.SOUTH, InteriorParts.controlsFacing(Direction.NORTH, false), "seat behind");
+        assertEquals(Direction.WEST, InteriorParts.controlsFacing(Direction.EAST, false));
+    }
+
+    @Test
     void closedDoorIsAPanelOnTheOutwardFace() {
-        List<AABB> boxes = InteriorParts.doorShape(Direction.EAST, false).toAabbs();
+        List<AABB> boxes = InteriorParts.doorShape(Direction.EAST, false, DoubleBlockHalf.LOWER).toAabbs();
         assertEquals(1, boxes.size());
         assertEquals(14 / 16d, boxes.get(0).minX, 1e-9);
         assertEquals(1, boxes.get(0).maxX, 1e-9);
@@ -46,7 +75,15 @@ class InteriorPartsTest {
 
     @Test
     void openDoorHasNoCollision() {
-        assertTrue(InteriorParts.doorShape(Direction.EAST, true).isEmpty());
+        assertTrue(InteriorParts.doorShape(Direction.EAST, true, DoubleBlockHalf.LOWER).isEmpty());
+    }
+
+    @Test
+    void theUpperHalfOfADoorKeepsTheCeilingSoYouCannotJumpIntoTheRoof() {
+        assertTrue(contains(InteriorParts.doorShape(Direction.EAST, true, DoubleBlockHalf.UPPER), 0.5, 0.8, 0.5));
+        assertTrue(contains(InteriorParts.doorShape(Direction.EAST, false, DoubleBlockHalf.UPPER), 0.5, 0.8, 0.5));
+        assertFalse(contains(InteriorParts.doorShape(Direction.EAST, true, DoubleBlockHalf.UPPER), 0.5, 0.4, 0.5),
+                "open below the ceiling");
     }
 
     @Test
@@ -72,10 +109,26 @@ class InteriorPartsTest {
     @Test
     void stepIsALadderOnTheOuterFaceBelowTheFloor() {
         // a step on the right of a north-facing carriage looks out east: the ladder is on its east (outer) face
-        VoxelShape step = InteriorParts.stepShape(Direction.EAST);
+        VoxelShape step = InteriorParts.stepShape(Direction.EAST, false);
         assertTrue(contains(step, 0.95, 0.2, 0.5), "ladder on the outer face, below the floor, to climb from outside");
         assertFalse(contains(step, 0.05, 0.2, 0.5), "nothing on the inner side");
         assertFalse(contains(step, 0.95, 0.7, 0.5), "open above the floor: the doorway");
+    }
+
+    @Test
+    void aCabStepClimbsAllTheWayToTheCabFloor() {
+        // a loco cab floor is a full block up: its step's ladder runs nearly the whole block and its tread is level with it
+        VoxelShape step = InteriorParts.stepShape(Direction.EAST, true);
+        assertTrue(contains(step, 0.95, 0.8, 0.5), "ladder high up the outer face");
+        assertTrue(contains(step, 0.5, 0.97, 0.5), "tread at the top, level with the cab floor");
+        assertFalse(contains(step, 0.5, 0.5, 0.5), "open below the tread inside");
+    }
+
+    @Test
+    void aStepIsHighBesideAFullHeightFloor() {
+        assertTrue(InteriorParts.stepIsHigh(Optional.of(new HiddenPart(PartType.FRAME, Optional.of(FrameShape.FULL)))));
+        assertFalse(InteriorParts.stepIsHigh(Optional.of(new HiddenPart(PartType.FRAME, Optional.of(FrameShape.FLOOR)))));
+        assertFalse(InteriorParts.stepIsHigh(Optional.empty()));
     }
 
     @Test
@@ -88,6 +141,6 @@ class InteriorPartsTest {
 
     @Test
     void theStepAlwaysHasFloorSoNobodyFallsThrough() {
-        assertTrue(contains(InteriorParts.stepShape(Direction.EAST), 0.5, 0.47, 0.5), "floor slab level with the coach floor");
+        assertTrue(contains(InteriorParts.stepShape(Direction.EAST, false), 0.5, 0.47, 0.5), "floor slab level with the coach floor");
     }
 }

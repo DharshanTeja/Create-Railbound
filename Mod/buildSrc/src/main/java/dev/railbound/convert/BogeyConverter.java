@@ -18,14 +18,14 @@ import java.util.stream.Stream;
 
 /**
  * Converts a bogey style's `.bbmodel` (centred on the bogey, carriage y coordinates) into a static `frame` part and
- * one `wheels` part centred on its axle. Groups named `wheels*` are wheelsets; their pivots must sit on Create's
- * axle positions (y -20, z ±16), because the renderer spins the wheels there.
+ * one `wheels` part centred on its axle. Groups named `wheels*` are wheelsets; their pivots must sit on axles at
+ * Create's axle height (y -20), evenly spaced either side of the centre (Create's own bogeys use z ±16), because the
+ * renderer spins the wheels there. The spacing must match the style's TrainsetBogeyModels in the mod.
  */
 public final class BogeyConverter {
     /** Create draws bogeys from the bottom of the track block, 2 blocks below the carriage floor. */
     private static final double RENDER_ORIGIN_Y = -32;
     private static final double AXLE_Y = -20;
-    private static final double AXLE_Z = 16;
     private static final double EPSILON = 1e-6;
 
     private BogeyConverter() {}
@@ -57,12 +57,14 @@ public final class BogeyConverter {
         if (wheelsets.isEmpty()) {
             problems.add("the bogey has no 'wheels' groups");
         }
-        for (String wheelset : wheelsets.keySet()) {
-            double[] pivot = source.originOf(wheelset).orElse(new double[] {Double.NaN, 0, 0});
-            if (Math.abs(pivot[0]) > EPSILON || Math.abs(pivot[1] - AXLE_Y) > EPSILON
-                    || Math.abs(Math.abs(pivot[2]) - AXLE_Z) > EPSILON) {
-                problems.add("group '" + wheelset + "' must pivot on an axle at (0, " + AXLE_Y + ", ±" + AXLE_Z + ")");
-            }
+        List<double[]> pivots = wheelsets.keySet().stream()
+                .map(w -> source.originOf(w).orElse(new double[] {Double.NaN, 0, 0})).toList();
+        double spacing = pivots.isEmpty() ? 0 : Math.abs(pivots.get(0)[2]);
+        boolean onAxles = spacing >= 1 && pivots.stream().allMatch(p -> Math.abs(p[0]) <= EPSILON
+                && Math.abs(p[1] - AXLE_Y) <= EPSILON && Math.abs(Math.abs(p[2]) - spacing) <= EPSILON);
+        if (!wheelsets.isEmpty() && !onAxles) {
+            problems.add("groups " + wheelsets.keySet() + " must pivot on axles at (0, " + AXLE_Y
+                    + ", ±z), every wheelset the same distance either side of the centre");
         }
         ModelSource.Texture texture = source.texture(texturesUsed, problems);
         if (!problems.isEmpty()) {

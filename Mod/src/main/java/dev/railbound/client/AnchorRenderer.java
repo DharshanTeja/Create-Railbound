@@ -49,7 +49,7 @@ public class AnchorRenderer implements BlockEntityRenderer<AnchorBlockEntity> {
             BlockPos doorPos = CarriageFootprint.worldPos(design, anchor.getBlockPos(), facing, door.pos());
             return level != null && level.getBlockEntity(doorPos) instanceof DoorPartBlockEntity state
                     ? state.progress(partialTick) : 0;
-        });
+        }, anchor.driveAngle(partialTick), anchor.curvature());
         pose.popPose();
     }
 

@@ -39,22 +39,22 @@ public final class TestDesigns {
     }
 
     public static TrainsetDesign withBogeys(TrainsetDesign d, List<BogeySpec> bogeys) {
-        return new TrainsetDesign(d.name(), d.category(), d.size(), bogeys, d.power(), d.cargo(), d.doors(), d.layout());
+        return new TrainsetDesign(d.name(), d.category(), d.size(), bogeys, d.power(), d.cargo(), d.doors(), d.layout(), d.performance(), d.steam(), d.drive());
     }
 
     public static TrainsetDesign withSize(TrainsetDesign d, CarriageSize size) {
-        return new TrainsetDesign(d.name(), d.category(), size, d.bogeys(), d.power(), d.cargo(), d.doors(), d.layout());
+        return new TrainsetDesign(d.name(), d.category(), size, d.bogeys(), d.power(), d.cargo(), d.doors(), d.layout(), d.performance(), d.steam(), d.drive());
     }
 
     public static TrainsetDesign withLayout(TrainsetDesign d, LayoutSpec layout) {
-        return new TrainsetDesign(d.name(), d.category(), d.size(), d.bogeys(), d.power(), d.cargo(), d.doors(), layout);
+        return new TrainsetDesign(d.name(), d.category(), d.size(), d.bogeys(), d.power(), d.cargo(), d.doors(), layout, d.performance(), d.steam(), d.drive());
     }
 
     public static TrainsetDesign withDoors(TrainsetDesign d, List<DoorSpec> doors) {
-        return new TrainsetDesign(d.name(), d.category(), d.size(), d.bogeys(), d.power(), d.cargo(), doors, d.layout());
+        return new TrainsetDesign(d.name(), d.category(), d.size(), d.bogeys(), d.power(), d.cargo(), doors, d.layout(), d.performance(), d.steam(), d.drive());
     }
 
     public static TrainsetDesign withName(TrainsetDesign d, String name) {
-        return new TrainsetDesign(name, d.category(), d.size(), d.bogeys(), d.power(), d.cargo(), d.doors(), d.layout());
+        return new TrainsetDesign(name, d.category(), d.size(), d.bogeys(), d.power(), d.cargo(), d.doors(), d.layout(), d.performance(), d.steam(), d.drive());
     }
 }

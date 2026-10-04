@@ -121,6 +121,7 @@ class TrainsetConverterTest {
         assertEquals(Optional.of("body"), Parts.partFor(List.of("coach", "roof")));
         assertEquals(Optional.of("lamps"), Parts.partFor(List.of("coach", "lamps")));
         assertEquals(Optional.of("door_left_front"), Parts.partFor(List.of("coach", "doors", "door_left_front")));
+        assertEquals(Optional.of("drive_wheels_1_right"), Parts.partFor(List.of("loco", "running_gear", "drive_wheels_1_right")));
         assertEquals(Optional.empty(), Parts.partFor(List.of("loco", "_preview_bogeys")));
         assertEquals(Optional.empty(), Parts.partFor(List.of("ref_bogey")));
     }
@@ -210,6 +211,31 @@ class TrainsetConverterTest {
         ConversionException e = assertThrows(ConversionException.class,
                 () -> TrainsetConverter.convert("railbound", "tiny", model(1024, 24, "door_right_front"), design("door_right_front")));
         assertTrue(e.getMessage().contains("512"), e.getMessage());
+    }
+
+    /** A design with a one-axle drive and the door whose group the model has. */
+    private static JsonObject designWithDrive(String doorPart) {
+        JsonObject design = design(doorPart);
+        design.add("drive", JsonParser.parseString("{\"wheel_radius\":9.5,\"axle_y\":-17,\"axles\":[0],\"main_axle\":0,"
+                + "\"crank_radius\":6,\"crosshead_y\":-7,\"rod_length\":75}"));
+        return design;
+    }
+
+    @Test
+    void exportsEachMovingPartOfTheDriveOnItsOwn() throws Exception {
+        // the model's only extra group here is one drive part; the rest are reported missing
+        ConversionException e = assertThrows(ConversionException.class,
+                () -> TrainsetConverter.convert("railbound", "tiny", model(64, 24, "drive_wheels_1_right"), designWithDrive("door_x")));
+        assertTrue(e.getMessage().contains("drive_wheels_1_left"), e.getMessage());
+        assertTrue(e.getMessage().contains("drive_crosshead_right"), e.getMessage());
+        assertFalse(e.getMessage().contains("'drive_wheels_1_right'"), "that one is in the model: " + e.getMessage());
+    }
+
+    @Test
+    void rejectsDriveGroupsWhenTheDesignHasNoDrive() throws Exception {
+        ConversionException e = assertThrows(ConversionException.class,
+                () -> TrainsetConverter.convert("railbound", "tiny", model(64, 24, "drive_spare"), design("door_right_front")));
+        assertTrue(e.getMessage().contains("drive_spare"), e.getMessage());
     }
 
     @Test

@@ -106,13 +106,21 @@ public final class DesignValidator {
                 .filter(c -> c.part().type() == PartType.DOOR)
                 .map(LayoutCell::pos)
                 .collect(Collectors.toSet());
+        int length = design.size().length();
         for (DoorSpec door : design.doors()) {
             if (!doorCells.contains(door.pos())) {
                 errors.add("door '" + door.part() + "' at " + door.pos().toShortString() + " is not a door cell");
             }
+            // A leaf slides into the wall beside its doorway: along the side wall, or across the end wall.
+            boolean endDoor = door.pos().getX() == 0;
+            if (endDoor && !door.slide().map(DoorSlideDirection::sideways).orElse(false)) {
+                errors.add("end door '" + door.part() + "' must slide left or right (\"slide\": \"left\" or \"right\")");
+            } else if (!endDoor && door.slide().map(DoorSlideDirection::sideways).orElse(false)) {
+                errors.add("side door '" + door.part() + "' must slide front or rear, not into the carriage");
+            }
         }
 
-        // Doors are two cells tall (lower and upper half) and open outwards, so they need a side column.
+        // Doors are two cells tall (lower and upper half) and open outwards: through a side, or through an end.
         for (BlockPos door : doorCells) {
             if (doorCells.contains(door.below())) {
                 continue;
@@ -124,15 +132,17 @@ public final class DesignValidator {
             if (height != 2) {
                 errors.add("door at " + door.toShortString() + " must be exactly two cells tall, found " + height);
             }
-            if (door.getX() == 0) {
-                errors.add("door at " + door.toShortString() + " must be on a side column, not the centre");
+            if (door.getX() == 0 && door.getZ() != 0 && door.getZ() != length - 1) {
+                errors.add("door at " + door.toShortString() + " must be on a side column, or on the centre column at a carriage end");
             }
         }
 
-        // Steps are the climbable cell you board through, so they only make sense under a door.
+        // Steps are the climbable cell you board through, so they only make sense under a door or an open doorway.
+        Set<BlockPos> allCells = cells.stream().map(LayoutCell::pos).collect(Collectors.toSet());
         cells.stream().filter(c -> c.part().type() == PartType.STEP).map(LayoutCell::pos)
-                .filter(step -> !doorCells.contains(step.above()))
-                .forEach(step -> errors.add("step at " + step.toShortString() + " needs a door directly above it"));
+                .filter(step -> !doorCells.contains(step.above()) && allCells.contains(step.above()))
+                .forEach(step -> errors.add("step at " + step.toShortString()
+                        + " needs a door or an open doorway (air) directly above it"));
 
         // Layer 0 sits at bogey height: the bogey fills its own cell, and something beside or above must hold it.
         Set<BlockPos> cellPositions = cells.stream().map(LayoutCell::pos).collect(Collectors.toSet());
@@ -148,6 +158,8 @@ public final class DesignValidator {
             }
         }
 
+        validateLoco(design, cells, errors);
+
         if (!cells.isEmpty()) {
             Set<BlockPos> reachable = BlockGraph.connected(cells.get(0).pos(), cellPositions::contains, cellPositions.size() + 1);
             int cutOff = cellPositions.size() - reachable.size();
@@ -155,5 +167,83 @@ public final class DesignValidator {
                 errors.add("layout cells are not connected: " + cutOff + " cell(s) are cut off from the rest");
             }
         }
+    }
+
+    /** Locos: speeds, the driver's controls with their conductor seat, and for steam the bunker and water tanks. */
+    private static void validateLoco(TrainsetDesign design, List<LayoutCell> cells, List<String> errors) {
+        boolean locomotive = design.category() == TrainsetCategory.LOCOMOTIVE;
+        if (locomotive && design.performance().isEmpty()) {
+            errors.add("a locomotive needs a \"performance\" section (top_speed, curve_speed, acceleration)");
+        }
+        design.performance().ifPresent(p -> {
+            if (p.topSpeed() <= 0) {
+                errors.add("performance top_speed must be above 0");
+            }
+            if (p.curveSpeed() <= 0) {
+                errors.add("performance curve_speed must be above 0");
+            } else if (p.curveSpeed() > p.topSpeed()) {
+                errors.add("performance curve_speed must not be above top_speed");
+            }
+            if (p.acceleration() <= 0) {
+                errors.add("performance acceleration must be above 0");
+            }
+        });
+
+        Set<BlockPos> seats = cells.stream().filter(c -> c.part().type() == PartType.SEAT)
+                .map(LayoutCell::pos).collect(Collectors.toSet());
+        List<BlockPos> controls = cells.stream().filter(c -> c.part().type() == PartType.CONTROLS)
+                .map(LayoutCell::pos).toList();
+        if (!controls.isEmpty() && !design.category().drivable()) {
+            errors.add("only locomotives and multiple units may carry Train Controls");
+        }
+        if (locomotive && controls.isEmpty()) {
+            errors.add("a locomotive needs Train Controls (a \"controls\" cell)");
+        }
+        // Create only lets a seated mob run a schedule when the controls are right in front of its seat.
+        for (BlockPos pos : controls) {
+            if (!seats.contains(pos.north()) && !seats.contains(pos.south())) {
+                errors.add("controls at " + pos.toShortString() + " needs a seat directly ahead or behind (the conductor seat)");
+            }
+        }
+
+        if (design.power() == PowerType.STEAM) {
+            if (design.steam().isEmpty()) {
+                errors.add("a steam locomotive needs a \"steam\" section (water, bunker_slots)");
+            }
+            long bunkers = cells.stream().filter(c -> c.part().type() == PartType.BUNKER).count();
+            if (bunkers != 1) {
+                errors.add("a steam locomotive needs exactly 1 coal bunker, found " + bunkers);
+            }
+            if (cells.stream().noneMatch(c -> c.part().type() == PartType.WATER_TANK)) {
+                errors.add("a steam locomotive needs at least 1 water tank");
+            }
+        }
+        design.drive().ifPresent(d -> {
+            if (d.axles().isEmpty()) {
+                errors.add("drive needs at least one axle");
+            } else if (d.mainAxle() < 0 || d.mainAxle() >= d.axles().size()) {
+                errors.add("drive main_axle must pick one of the " + d.axles().size() + " axles (0 to "
+                        + (d.axles().size() - 1) + "), got " + d.mainAxle());
+            }
+            if (d.wheelRadius() <= 0) {
+                errors.add("drive wheel_radius must be above 0");
+            }
+            if (d.crankRadius() <= 0) {
+                errors.add("drive crank_radius must be above 0");
+            } else if (d.rodLength() <= d.crankRadius() + Math.abs(d.crossheadY() - d.axleY())) {
+                errors.add("drive rod_length is too short to reach round the crank from the crosshead line");
+            }
+        });
+        if (design.power() != PowerType.STEAM && cells.stream().anyMatch(c -> c.part().type() == PartType.FIREBOX)) {
+            errors.add("firebox cells belong on a steam locomotive");
+        }
+        design.steam().ifPresent(s -> {
+            if (s.water() <= 0) {
+                errors.add("steam water must be above 0");
+            }
+            if (s.bunkerSlots() < 1 || s.bunkerSlots() > 9) {
+                errors.add("steam bunker_slots must be 1 to 9, got " + s.bunkerSlots());
+            }
+        });
     }
 }

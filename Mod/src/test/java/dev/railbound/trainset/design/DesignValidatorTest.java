@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -82,9 +83,9 @@ class DesignValidatorTest {
     @Test
     void rejectsCharacterMissingFromPalette() {
         List<List<String>> layers = copyLayers();
-        layers.get(0).set(5, "S#X");
+        layers.get(0).set(5, "S#Z");
         assertProblem(TestDesigns.withLayout(SAMPLE, new LayoutSpec(SAMPLE.layout().palette(), layers)),
-                "layer 0 row 5: character 'X' is not in the palette");
+                "layer 0 row 5: character 'Z' is not in the palette");
     }
 
     @Test
@@ -166,12 +167,53 @@ class DesignValidatorTest {
     }
 
     @Test
+    void acceptsAnEndDoorOnTheCentreColumnThatSlidesSideways() {
+        assertEquals(List.of(), DesignValidator.validate(withFrontEndDoor(Optional.of(DoorSlideDirection.LEFT))));
+    }
+
+    @Test
+    void rejectsAnEndDoorThatDoesNotSlideSideways() {
+        assertProblem(withFrontEndDoor(Optional.of(DoorSlideDirection.FRONT)), "must slide left or right");
+        assertProblem(withFrontEndDoor(Optional.empty()), "must slide left or right");
+    }
+
+    @Test
+    void rejectsASideDoorThatSlidesSideways() {
+        List<DoorSpec> doors = new ArrayList<>(SAMPLE.doors());
+        DoorSpec first = doors.get(0);
+        doors.set(0, new DoorSpec(first.part(), first.pos(), Optional.of(DoorSlideDirection.LEFT)));
+        assertProblem(TestDesigns.withDoors(SAMPLE, doors), "must slide front or rear");
+    }
+
+    /** The sample with a two-cell door in the centre of its front end row (z 0), sliding as given. */
+    private static TrainsetDesign withFrontEndDoor(Optional<DoorSlideDirection> slide) {
+        List<List<String>> layers = copyLayers();
+        layers.get(1).set(0, "LDR");
+        layers.get(2).set(0, "KDJ");
+        List<DoorSpec> doors = new ArrayList<>(SAMPLE.doors().stream()
+                .filter(d -> d.pos().getX() != 0 || d.pos().getZ() != 0).toList());
+        doors.add(new DoorSpec("door_end_test", new BlockPos(0, 1, 0), slide));
+        return TestDesigns.withDoors(TestDesigns.withLayout(SAMPLE, new LayoutSpec(SAMPLE.layout().palette(), layers)), doors);
+    }
+
+    @Test
+    void acceptsAStepUnderAnOpenDoorway() {
+        // a loco's cab side is open: the step below it is climbed the same way as a coach's
+        List<List<String>> layers = copyLayers();
+        layers.get(1).set(2, "..D");
+        layers.get(2).set(2, ".cD");
+        List<DoorSpec> doors = SAMPLE.doors().stream().filter(d -> !d.pos().equals(new BlockPos(-1, 1, 2))).toList();
+        TrainsetDesign open = TestDesigns.withDoors(TestDesigns.withLayout(SAMPLE, new LayoutSpec(SAMPLE.layout().palette(), layers)), doors);
+        assertEquals(List.of(), DesignValidator.validate(open));
+    }
+
+    @Test
     void rejectsAStepWithoutADoorAbove() {
         List<List<String>> layers = copyLayers();
         layers.get(0).set(5, "T#r");
         java.util.Map<String, String> palette = new java.util.HashMap<>(SAMPLE.layout().palette());
         palette.put("T", "step");
-        assertProblem(TestDesigns.withLayout(SAMPLE, new LayoutSpec(palette, layers)), "needs a door directly above");
+        assertProblem(TestDesigns.withLayout(SAMPLE, new LayoutSpec(palette, layers)), "needs a door or an open doorway");
     }
 
     @Test

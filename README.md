@@ -92,9 +92,10 @@ Railbound ships in four phases. Each phase is built in small sub-phases, and eve
 | ✅ | **1.2 Coach interior** | Right-click seating, doors that open at stations, interfaces that fit into the coach wall |
 | ⏳ | **1.3 Coach visuals** | Full 3D models in game, sliding doors, glowing lamps, Blockbench-to-game converter |
 | ○ | **1.4 Steam locomotive** | Driver's cab, conductor seat and automatic running on schedules |
-| ○ | **1.5 Items carriage** | 160-stack storage, scrolling GUI, Portable Storage Interface |
-| ○ | **1.6 Fluid carriage** | 144-bucket tank, fill-and-drain GUI, Portable Fluid Interface |
-| ○ | **1.7 Release** | Compatibility, performance and polish |
+| ○ | **1.5 Couplers** | Gangways and couplers that bend round curves, splitting and joining stopped trains |
+| ○ | **1.6 Items carriage** | 160-stack storage, scrolling GUI, Portable Storage Interface |
+| ○ | **1.7 Fluid carriage** | 144-bucket tank, fill-and-drain GUI, Portable Fluid Interface |
+| ○ | **1.8 Release** | Compatibility, performance and polish |
 
 <br>
 

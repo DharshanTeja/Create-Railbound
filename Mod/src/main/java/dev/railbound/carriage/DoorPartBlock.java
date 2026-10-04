@@ -32,12 +32,14 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * A carriage door half. It carries the vanilla door properties, which is all Create's sliding-door
- * movement behaviour needs to open it at stations. FACING points out of the carriage.
+ * movement behaviour needs to open it at stations. FACING points out of the carriage. END marks a door in a
+ * carriage end (into the gangway), which only opens when clicked, never at stations.
  */
 public class DoorPartBlock extends CarriagePartBlock implements EntityBlock {
     public static final DirectionProperty FACING = DoorBlock.FACING;
     public static final BooleanProperty OPEN = DoorBlock.OPEN;
     public static final EnumProperty<DoubleBlockHalf> HALF = DoorBlock.HALF;
+    public static final BooleanProperty END = BooleanProperty.create("end");
     /** Thin posts at both edges of the doorway, so an open door can still be clicked shut. */
     private static final VoxelShape OPEN_FRAME = Shapes.or(
             Block.box(0, 0, 0, 2, 16, 2), Block.box(14, 0, 0, 16, 16, 2));
@@ -47,12 +49,13 @@ public class DoorPartBlock extends CarriagePartBlock implements EntityBlock {
         registerDefaultState(stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
                 .setValue(OPEN, false)
-                .setValue(HALF, DoubleBlockHalf.LOWER));
+                .setValue(HALF, DoubleBlockHalf.LOWER)
+                .setValue(END, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, OPEN, HALF);
+        builder.add(FACING, OPEN, HALF, END);
     }
 
     @Override
@@ -60,12 +63,12 @@ public class DoorPartBlock extends CarriagePartBlock implements EntityBlock {
         if (state.getValue(OPEN)) {
             return FrameShapes.rotate(OPEN_FRAME, state.getValue(FACING));
         }
-        return InteriorParts.doorShape(state.getValue(FACING), false);
+        return InteriorParts.doorShape(state.getValue(FACING), false, state.getValue(HALF));
     }
 
     @Override
     protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return InteriorParts.doorShape(state.getValue(FACING), state.getValue(OPEN));
+        return InteriorParts.doorShape(state.getValue(FACING), state.getValue(OPEN), state.getValue(HALF));
     }
 
     /** Opens or closes both halves of a standing carriage's door. */

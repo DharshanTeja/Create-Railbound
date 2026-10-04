@@ -6,8 +6,19 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 
-/** Create's station door logic, plus the slide animation of our own door block entity. */
+/**
+ * Create's station door logic, plus the slide animation of our own door block entity. End doors (into the gangway)
+ * skip the station logic: they open and close only when clicked.
+ */
 public class CarriageDoorMovementBehaviour extends SlidingDoorMovementBehaviour {
+
+    @Override
+    protected void tickOpen(MovementContext context, boolean currentlyOpen) {
+        if (context.state.hasProperty(DoorPartBlock.END) && context.state.getValue(DoorPartBlock.END)) {
+            return;
+        }
+        super.tickOpen(context, currentlyOpen);
+    }
 
     @Override
     public void tick(MovementContext context) {

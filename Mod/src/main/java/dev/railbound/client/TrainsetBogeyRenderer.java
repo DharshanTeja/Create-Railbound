@@ -1,5 +1,6 @@
 package dev.railbound.client;
 
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -19,9 +20,12 @@ public record TrainsetBogeyRenderer(TrainsetBogeyModels models) implements Bogey
     @Override
     public void render(CompoundTag bogeyData, float wheelAngle, float partialTick, PoseStack poseStack,
                        MultiBufferSource buffers, int light, int overlay, boolean inContraption) {
+        // Create's carriage renderer hands its entity light over as "overlay"; a bad overlay turns the bogey black
+        // under shader packs (Flywheel switches off with shaders, so this renderer draws assembled bogeys then)
+        overlay = OverlayTexture.NO_OVERLAY;
         VertexConsumer consumer = buffers.getBuffer(TYPE);
         draw(poseStack, consumer, models.frame().get(), light, overlay);
-        for (float z : new float[] {-TrainsetBogeyModels.AXLE_OFFSET, TrainsetBogeyModels.AXLE_OFFSET}) {
+        for (float z : new float[] {-models.axleOffset(), models.axleOffset()}) {
             poseStack.pushPose();
             poseStack.translate(0, TrainsetBogeyModels.AXLE_HEIGHT, z);
             poseStack.mulPose(Axis.XP.rotationDegrees(wheelAngle));

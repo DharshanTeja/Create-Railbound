@@ -18,6 +18,11 @@ public enum TrainsetCategory implements StringRepresentable {
         this.id = id;
     }
 
+    /** Cars a crew drives, the only ones that may carry Train Controls. */
+    public boolean drivable() {
+        return this == LOCOMOTIVE || this == MULTIPLE_UNIT;
+    }
+
     @Override
     public String getSerializedName() {
         return id;

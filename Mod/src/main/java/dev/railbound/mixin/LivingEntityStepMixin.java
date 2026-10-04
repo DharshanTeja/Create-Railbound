@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -28,8 +29,9 @@ public abstract class LivingEntityStepMixin {
             for (Direction towardsStep : Direction.Plane.HORIZONTAL) {
                 BlockPos step = feet.above(dy).relative(towardsStep);
                 Direction outward = towardsStep.getOpposite();
-                if (StepPartBlock.faces(self.level().getBlockState(step), outward)
-                        && StepClimbing.touchesLadder(self.getBoundingBox(), step, outward)) {
+                BlockState state = self.level().getBlockState(step);
+                if (StepPartBlock.faces(state, outward)
+                        && StepClimbing.touchesLadder(self.getBoundingBox(), step, outward, state.getValue(StepPartBlock.HIGH))) {
                     return true;
                 }
             }

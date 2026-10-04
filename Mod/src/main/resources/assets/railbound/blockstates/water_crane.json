@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "railbound:block/water_crane"
+    },
+    "facing=west": {
+      "model": "railbound:block/water_crane",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "railbound:block/water_crane",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "railbound:block/water_crane",
+      "y": 270
+    }
+  }
+}

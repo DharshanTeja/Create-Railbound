@@ -1,5 +1,6 @@
 package dev.railbound.network;
 
+import dev.railbound.steam.LocoGaugeCache;
 import dev.railbound.Railbound;
 import dev.railbound.trainset.design.DesignValidator;
 import dev.railbound.trainset.design.TrainsetDesign;
@@ -22,7 +23,9 @@ public final class RailboundNetwork {
         event.registrar(PROTOCOL_VERSION).playToClient(
                 SyncTrainsetDesignsPayload.TYPE,
                 SyncTrainsetDesignsPayload.STREAM_CODEC,
-                (payload, context) -> TrainsetDesigns.replace(acceptValid(payload.designs())));
+                (payload, context) -> TrainsetDesigns.replace(acceptValid(payload.designs())))
+                .playToClient(LocoGaugesPayload.TYPE, LocoGaugesPayload.STREAM_CODEC,
+                        (payload, context) -> LocoGaugeCache.put(payload.entityId(), payload.gauges()));
     }
 
     /** Fires when a player joins and after /reload; sends the current designs to the affected players. */

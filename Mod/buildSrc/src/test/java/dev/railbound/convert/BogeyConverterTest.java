@@ -36,14 +36,18 @@ class BogeyConverterTest {
 
     /** A frame bar on top of the bogey block and two wheel groups pivoting on Create's axle positions. */
     private static JsonObject bogey(double frontPivotZ) throws IOException {
+        return bogey(frontPivotZ, 16);
+    }
+
+    private static JsonObject bogey(double frontPivotZ, double rearPivotZ) throws IOException {
         return JsonParser.parseString("{\"resolution\":{\"width\":64,\"height\":64},\"elements\":["
                 + cube("bar", new double[] {-16, -16, -8}, new double[] {16, -14, 8}) + ","
                 + cube("wheel_f", new double[] {14, -26, frontPivotZ - 6}, new double[] {16, -14, frontPivotZ + 6}) + ","
-                + cube("wheel_r", new double[] {14, -26, 10}, new double[] {16, -14, 22}) + ","
+                + cube("wheel_r", new double[] {14, -26, rearPivotZ - 6}, new double[] {16, -14, rearPivotZ + 6}) + ","
                 + cube("ghost", new double[] {0, 0, 0}, new double[] {1, 1, 1})
                 + "],\"outliner\":[{\"name\":\"bogey\",\"uuid\":\"g\",\"children\":[\"bar\","
                 + "{\"name\":\"wheels_front\",\"uuid\":\"w1\",\"origin\":[0,-20," + frontPivotZ + "],\"children\":[\"wheel_f\"]},"
-                + "{\"name\":\"wheels_rear\",\"uuid\":\"w2\",\"origin\":[0,-20,16],\"children\":[\"wheel_r\"]},"
+                + "{\"name\":\"wheels_rear\",\"uuid\":\"w2\",\"origin\":[0,-20," + rearPivotZ + "],\"children\":[\"wheel_r\"]},"
                 + "{\"name\":\"_preview\",\"uuid\":\"p\",\"children\":[\"ghost\"]}]}],"
                 + "\"textures\":[{\"id\":\"0\",\"uv_width\":64,\"uv_height\":64,\"source\":\"data:image/png;base64," + png() + "\"}]}")
                 .getAsJsonObject();
@@ -73,7 +77,13 @@ class BogeyConverterTest {
     }
 
     @Test
-    void rejectsWheelsOffCreatesAxlePositions() throws Exception {
+    void acceptsAxlesCloserThanCreatesOwnWhenEvenlySpaced() throws Exception {
+        // a steam loco's truck has its axles 14 px either side, clear of the driving wheels
+        assertEquals(Set.of("frame", "wheels"), BogeyConverter.convert("railbound", "steam_truck", bogey(-14, 14)).objects().keySet());
+    }
+
+    @Test
+    void rejectsWheelsetsNotEvenlySpacedAroundTheCentre() throws Exception {
         ConversionException e = assertThrows(ConversionException.class,
                 () -> BogeyConverter.convert("railbound", "coach", bogey(-14)));
         assertTrue(e.getMessage().contains("wheels_front"), e.getMessage());
