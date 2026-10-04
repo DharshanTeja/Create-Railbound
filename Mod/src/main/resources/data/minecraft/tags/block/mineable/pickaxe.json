@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "railbound:water_crane"
+    "railbound:water_crane",
+    "railbound:coupler"
   ]
 }

@@ -14,6 +14,7 @@ public final class RailboundItems {
             ITEMS.register("trainset", () -> new TrainsetItem(new Item.Properties().stacksTo(16)));
 
     public static final DeferredItem<BlockItem> WATER_CRANE = ITEMS.registerSimpleBlockItem(RailboundBlocks.WATER_CRANE);
+    public static final DeferredItem<BlockItem> COUPLER = ITEMS.registerSimpleBlockItem(RailboundBlocks.COUPLER);
 
     private RailboundItems() {}
 }

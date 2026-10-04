@@ -39,6 +39,7 @@
   "railbound.gauge.fire_out": "Fire out: no coal",
   "railbound.gauge.plug_melted": "Safety plug melted: refill the tank",
   "block.railbound.water_crane": "Water Crane",
+  "block.railbound.coupler": "Knuckle Coupler",
   "block.railbound.loco_firebox": "Firebox",
   "railbound.gauge.lumps": "%s lumps",
   "railbound.gauge.raising_steam": "Fire lit: raising steam",

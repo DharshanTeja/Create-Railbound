@@ -69,8 +69,15 @@ public record DriveGear(double axleY, double axleZ, double crankRadius, double c
     public static double curveShift(double curvature, double partZ, double bogeyA, double bogeyB) {
         double half = Math.abs(bogeyB - bogeyA) / 2;
         double fromMiddle = partZ - (bogeyA + bogeyB) / 2;
-        return -curvature * (half * half - fromMiddle * fromMiddle) / 2;
+        double shift = -curvature * (half * half - fromMiddle * fromMiddle) / 2;
+        return Math.max(-MAX_CURVE_SHIFT, Math.min(MAX_CURVE_SHIFT, shift));
     }
+
+    /**
+     * The furthest the wheels slide out (blocks): a real loco could not take Create's tightest curves, and wheels
+     * slid further than this look detached from the body.
+     */
+    public static final double MAX_CURVE_SHIFT = 1 / 3.0;
 
     /** Turn per block rolled (radians, + to the right) between two forward headings, over a distance along them. */
     public static double curvature(net.minecraft.world.phys.Vec3 before, net.minecraft.world.phys.Vec3 after, double distance) {

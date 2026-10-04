@@ -45,6 +45,9 @@ public final class RailboundBlockEntities {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<WaterCraneBlockEntity>> WATER_CRANE =
             BLOCK_ENTITIES.register("water_crane",
                     () -> BlockEntityType.Builder.of(WaterCraneBlockEntity::new, RailboundBlocks.WATER_CRANE.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<dev.railbound.carriage.CouplerBlockEntity>> COUPLER =
+            BLOCK_ENTITIES.register("coupler",
+                    () -> BlockEntityType.Builder.of(dev.railbound.carriage.CouplerBlockEntity::new, RailboundBlocks.COUPLER.get()).build(null));
 
     private RailboundBlockEntities() {}
 }

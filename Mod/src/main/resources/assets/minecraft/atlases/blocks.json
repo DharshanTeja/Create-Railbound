@@ -1,6 +1,7 @@
 {
   "sources": [
     { "type": "directory", "source": "trainset", "prefix": "trainset/" },
-    { "type": "directory", "source": "bogey", "prefix": "bogey/" }
+    { "type": "directory", "source": "bogey", "prefix": "bogey/" },
+    { "type": "directory", "source": "coupling", "prefix": "coupling/" }
   ]
 }

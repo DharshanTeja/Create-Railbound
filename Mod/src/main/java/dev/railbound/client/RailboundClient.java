@@ -28,10 +28,10 @@ public final class RailboundClient {
 
     public RailboundClient(IEventBus modBus, ModContainer container) {
         modBus.addListener(TrainsetModels::register);
-        modBus.addListener((net.neoforged.neoforge.client.event.ModelEvent.RegisterAdditional event) ->
-        {
-            event.register(WaterCraneRenderer.ARM);
-            event.register(WaterCraneRenderer.COLUMN);
+        modBus.addListener((net.neoforged.neoforge.client.event.ModelEvent.RegisterAdditional event) -> {
+            WaterCraneRenderer.MODELS.forEach(event::register);
+            CouplingRenderer.MODELS.forEach(event::register);
+            event.register(CouplerBlockRenderer.MODEL);
         });
         modBus.addListener(TrainsetItemModels::registerAdditional);
         modBus.addListener(TrainsetItemModels::wrap);
@@ -39,6 +39,7 @@ public final class RailboundClient {
         modBus.addListener(RailboundClient::onClientSetup);
         modBus.addListener(RailboundClient::onRegisterClientExtensions);
         modBus.addListener(RailboundClient::onRegisterParticles);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(CouplingRenderer::render);
         // entity ids are reused in the next world: forget the last one's loco gauges
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
                 (net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) ->
@@ -77,6 +78,7 @@ public final class RailboundClient {
         event.registerBlockEntityRenderer(RailboundBlockEntities.COACH_BOGEY.get(), BogeyBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(RailboundBlockEntities.STEAM_TRUCK_BOGEY.get(), BogeyBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(RailboundBlockEntities.WATER_CRANE.get(), WaterCraneRenderer::new);
+        event.registerBlockEntityRenderer(RailboundBlockEntities.COUPLER.get(), CouplerBlockRenderer::new);
     }
 
     /** Our bogey block entities draw like Create's own: their style's Flywheel visual, or the renderer without Flywheel. */

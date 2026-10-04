@@ -86,13 +86,20 @@ class DriveGearTest {
     @Test
     void onACurveTheWheelsFollowTheRailsAwayFromTheBodysStraightLine() {
         // the body runs straight between its trucks; the rails bow out from that line, most in the middle
-        double k = 1 / 7.0;   // turning right, radius 7
+        double k = 1 / 40.0;   // turning right, a gentle radius of 40
         double front = DriveGear.curveShift(k, 5.5, 3.5, 12.5);
         double middle = DriveGear.curveShift(k, 7.375, 3.5, 12.5);
         assertTrue(middle < front && front < 0, "a right turn bows the rails out to the left");
         assertEquals(-(4.5 * 4.5 - 0.625 * 0.625) / 2 * k, middle, 1e-9);
         assertEquals(0, DriveGear.curveShift(k, 3.5, 3.5, 12.5), 1e-9, "on the truck the wheels are on the rails");
         assertEquals(-front, DriveGear.curveShift(-k, 5.5, 3.5, 12.5), 1e-9, "a left turn mirrors it");
+    }
+
+    @Test
+    void onTightCurvesTheWheelsStayUnderTheBody() {
+        // a real loco could not take Create's tightest curves: past a third of a block the wheels stop sliding out
+        assertEquals(-DriveGear.MAX_CURVE_SHIFT, DriveGear.curveShift(1 / 7.0, 7.375, 3.5, 12.5), 1e-9);
+        assertEquals(DriveGear.MAX_CURVE_SHIFT, DriveGear.curveShift(-1 / 7.0, 7.375, 3.5, 12.5), 1e-9);
     }
 
     @Test

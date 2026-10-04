@@ -23,8 +23,9 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * A water crane: a pass-through for water into the loco under its hose, standing or stopped on a train. It holds
- * no water itself. Its arm swings out while it fills and back along the track a little after.
+ * A water crane: a pass-through for water into the loco whose tank filler is in reach, standing or stopped on a
+ * train. It holds no water itself. While it fills, its arm swings round and out over the filler and lowers the hose
+ * onto it; a little after, it swings back along the track.
  */
 public class WaterCraneBlockEntity extends BlockEntity {
     /** How long after the last fill the arm stays out (ticks), and how often the loco under it is looked for again. */
@@ -37,6 +38,9 @@ public class WaterCraneBlockEntity extends BlockEntity {
     private double prevSwing;
     private IFluidHandler target;
     private long targetFound = -1000;
+    /** The last filler reached for, from the base's bottom centre (zero: none yet), and the one clients last got. */
+    private Vec3 filler = Vec3.ZERO;
+    private Vec3 sentFiller = Vec3.ZERO;
 
     private final IFluidHandler handler = new IFluidHandler() {
         @Override
@@ -94,44 +98,70 @@ public class WaterCraneBlockEntity extends BlockEntity {
         return handler;
     }
 
-    /** The water of the loco whose tank filler hangs within reach of the hose: on a stopped train, or standing. */
+    private Vec3 base() {
+        return Vec3.atBottomCenterOf(worldPosition);
+    }
+
+    /** A loco's water and where its tank filler is (the top of a water tank cell). */
+    private record Filler(IFluidHandler water, Vec3 at) {}
+
+    /** The water of the loco with a tank filler in reach, nearest first: on a stopped train, or standing. */
     private IFluidHandler locoUnderHose() {
         long now = level.getGameTime();
         if (now - targetFound < RESCAN) {
             return target;
         }
         targetFound = now;
-        Vec3 spout = WaterCrane.spout(worldPosition, getBlockState().getValue(WaterCraneBlock.FACING));
-        target = trainUnder(spout).or(() -> standingUnder(spout)).orElse(null);
+        Optional<Filler> found = trainFiller().or(this::standingFiller);
+        target = found.map(Filler::water).orElse(null);
+        found.ifPresent(f -> filler = f.at().subtract(base()));
         return target;
     }
 
-    private Optional<IFluidHandler> trainUnder(Vec3 spout) {
+    private Optional<Filler> trainFiller() {
+        Filler best = null;
         for (CarriageContraptionEntity entity : level.getEntitiesOfClass(CarriageContraptionEntity.class,
-                new AABB(spout, spout).inflate(WaterCrane.REACH + 1))) {
+                new AABB(worldPosition).inflate(WaterCrane.MAX_REACH + 1, WaterCrane.ARM_HEIGHT, WaterCrane.MAX_REACH + 1))) {
             Carriage carriage = entity.getCarriage();
             Contraption contraption = entity.getContraption();
             if (carriage == null || carriage.train == null || contraption == null || Math.abs(carriage.train.speed) > 1e-3) {
                 continue;
             }
+            Optional<IFluidHandler> water = LocoAccess.tankOn(contraption).map(tank -> tank);
+            if (water.isEmpty()) {
+                continue;
+            }
             for (Map.Entry<BlockPos, StructureBlockInfo> block : contraption.getBlocks().entrySet()) {
-                if (block.getValue().state().getBlock() instanceof WaterTankBlock
-                        && WaterCrane.inReach(spout, entity.toGlobalVector(Vec3.atCenterOf(block.getKey()), 1))) {
-                    return LocoAccess.tankOn(contraption).map(tank -> tank);
+                if (block.getValue().state().getBlock() instanceof WaterTankBlock) {
+                    Vec3 at = entity.toGlobalVector(Vec3.atCenterOf(block.getKey()).add(0, 0.5, 0), 1);
+                    best = nearer(best, new Filler(water.get(), at));
                 }
             }
         }
-        return Optional.empty();
+        return Optional.ofNullable(best);
     }
 
-    private Optional<IFluidHandler> standingUnder(Vec3 spout) {
-        BlockPos centre = BlockPos.containing(spout);
-        for (BlockPos pos : BlockPos.betweenClosed(centre.offset(-2, -2, -2), centre.offset(2, 2, 2))) {
-            if (level.getBlockState(pos).getBlock() instanceof WaterTankBlock && WaterCrane.inReach(spout, Vec3.atCenterOf(pos))) {
-                return LocoAccess.bunkerOf(level, pos.immutable()).map(BunkerBlockEntity::waterIn);
+    private Optional<Filler> standingFiller() {
+        Filler best = null;
+        int reach = (int) Math.ceil(WaterCrane.MAX_REACH);
+        for (BlockPos pos : BlockPos.betweenClosed(worldPosition.offset(-reach, -1, -reach),
+                worldPosition.offset(reach, (int) WaterCrane.ARM_HEIGHT, reach))) {
+            if (level.getBlockState(pos).getBlock() instanceof WaterTankBlock) {
+                Optional<IFluidHandler> water = LocoAccess.bunkerOf(level, pos.immutable()).map(BunkerBlockEntity::waterIn);
+                if (water.isPresent()) {
+                    best = nearer(best, new Filler(water.get(), Vec3.atCenterOf(pos).add(0, 0.5, 0)));
+                }
             }
         }
-        return Optional.empty();
+        return Optional.ofNullable(best);
+    }
+
+    /** The nearer in-reach filler of the two. */
+    private Filler nearer(Filler best, Filler candidate) {
+        if (!WaterCrane.inReach(base(), candidate.at())) {
+            return best;
+        }
+        return best == null || candidate.at().distanceToSqr(base()) < best.at().distanceToSqr(base()) ? candidate : best;
     }
 
     /** Both sides: the server decides whether the arm is out, clients swing it. */
@@ -141,8 +171,9 @@ public class WaterCraneBlockEntity extends BlockEntity {
         }
         if (!level.isClientSide) {
             boolean now = level.getGameTime() - lastFill < FILL_HOLD;
-            if (now != filling) {
+            if (now != filling || (now && !filler.equals(sentFiller))) {
                 filling = now;
+                sentFiller = filler;
                 setChanged();
                 level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
             }
@@ -151,28 +182,37 @@ public class WaterCraneBlockEntity extends BlockEntity {
         prevSwing = swing;
         swing = WaterCrane.swingTowards(swing, filling);
         if (filling && swing >= 1) {
-            Vec3 spout = WaterCrane.spout(worldPosition, getBlockState().getValue(WaterCraneBlock.FACING));
+            Vec3 nozzle = WaterCrane.nozzle(base(), facing(), aim(1));
             level.addParticle(net.minecraft.core.particles.ParticleTypes.FALLING_WATER,
-                    spout.x + (level.random.nextDouble() - 0.5) * 0.15, spout.y, spout.z + (level.random.nextDouble() - 0.5) * 0.15,
+                    nozzle.x + (level.random.nextDouble() - 0.5) * 0.15, nozzle.y, nozzle.z + (level.random.nextDouble() - 0.5) * 0.15,
                     0, 0, 0);
         }
     }
 
-    /** Client: the arm's angle from straight out over the track, in degrees. */
-    public double armAngle(float partialTick) {
-        return WaterCrane.armAngle(prevSwing + (swing - prevSwing) * partialTick);
+    private net.minecraft.core.Direction facing() {
+        return getBlockState().getValue(WaterCraneBlock.FACING);
+    }
+
+    /** Client: the arm's pose between parked and on the last filler it reached for. */
+    public WaterCrane.Aim aim(float partialTick) {
+        WaterCrane.Aim target = filler.equals(Vec3.ZERO) ? WaterCrane.PARKED : WaterCrane.aim(base(), facing(), base().add(filler));
+        return WaterCrane.swung(target, prevSwing + (swing - prevSwing) * partialTick);
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putBoolean("Filling", filling);
+        tag.putDouble("FillerX", filler.x);
+        tag.putDouble("FillerY", filler.y);
+        tag.putDouble("FillerZ", filler.z);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         filling = tag.getBoolean("Filling");
+        filler = new Vec3(tag.getDouble("FillerX"), tag.getDouble("FillerY"), tag.getDouble("FillerZ"));
     }
 
     @Override

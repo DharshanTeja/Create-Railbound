@@ -7,6 +7,7 @@
     { "z": 11, "style": "railbound:coach" }
   ],
   "power": "none",
+  "coupler": { "height": -11, "gangway": { "half_width": 11.4, "bottom": -8.2, "top": 27.3 } },
   "doors": [
     { "part": "door_left_front",  "pos": [-1, 1, 2] },
     { "part": "door_right_front", "pos": [1, 1, 2] },

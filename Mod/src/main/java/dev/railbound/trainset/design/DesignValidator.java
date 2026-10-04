@@ -159,6 +159,14 @@ public final class DesignValidator {
         }
 
         validateLoco(design, cells, errors);
+        design.coupler().flatMap(CouplerSpec::gangway).ifPresent(g -> {
+            if (g.top() <= g.bottom()) {
+                errors.add("gangway top must be above its bottom");
+            }
+            if (g.halfWidth() <= 0 || g.halfWidth() > 8 * design.size().width()) {
+                errors.add("gangway must fit within the carriage width (half_width up to " + 8 * design.size().width() + ")");
+            }
+        });
 
         if (!cells.isEmpty()) {
             Set<BlockPos> reachable = BlockGraph.connected(cells.get(0).pos(), cellPositions::contains, cellPositions.size() + 1);

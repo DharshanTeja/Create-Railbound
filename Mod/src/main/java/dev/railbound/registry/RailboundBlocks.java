@@ -53,7 +53,12 @@ public final class RailboundBlocks {
     /** Not a carriage part: the trackside crane that fills a stopped steam loco's tank. */
     public static final DeferredBlock<WaterCraneBlock> WATER_CRANE =
             BLOCKS.register("water_crane", () -> new WaterCraneBlock(BlockBehaviour.Properties.of()
-                    .mapColor(MapColor.METAL).strength(3.5f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
+                    .mapColor(MapColor.METAL).strength(3.5f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
+    /** Not a carriage part: a knuckle coupler players put on the ends of carriages built from Create blocks. */
+    public static final DeferredBlock<dev.railbound.carriage.CouplerBlock> COUPLER =
+            BLOCKS.register("coupler", () -> new dev.railbound.carriage.CouplerBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL).strength(2.5f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
 
     private RailboundBlocks() {}
 }

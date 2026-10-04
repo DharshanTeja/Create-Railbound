@@ -1,22 +1,17 @@
 package dev.railbound.client;
 
-import com.simibubi.create.api.contraption.storage.fluid.MountedFluidStorage;
-import com.simibubi.create.api.contraption.storage.item.MountedItemStorage;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.actors.trainControls.ControlsHandler;
 import dev.railbound.steam.BunkerBlockEntity;
-import dev.railbound.steam.BunkerFluidStorage;
 import dev.railbound.steam.WaterTankBlock;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import dev.railbound.steam.BunkerItemStorage;
 import dev.railbound.steam.SteamGauges;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 
-import java.util.Map;
 import java.util.Optional;
 
 /** The cab gauges, shown while driving or riding a steam loco, or looking at one (its firebox or tank when it stands). */
@@ -63,18 +58,15 @@ public final class SteamHud {
         SteamGaugeDrawing.draw(graphics, mc.font, x, y, gauges, SteamGaugeDrawing.HUD_BAR);
     }
 
+    /** Which contraptions are steam locos (they carry a bunker), found once each. */
+    private static final java.util.Map<com.simibubi.create.content.contraptions.Contraption, Boolean> LOCOS =
+            new java.util.WeakHashMap<>();
+
     private static Optional<SteamGauges> gaugesOf(AbstractContraptionEntity entity) {
-        Optional<SteamGauges> sent = dev.railbound.steam.LocoGaugeCache.get(entity.getId());
-        if (sent.isPresent()) {
-            return sent;
-        }
-        var storage = entity.getContraption().getStorage();
-        for (Map.Entry<BlockPos, MountedItemStorage> entry : storage.getAllItemStorages().entrySet()) {
-            MountedFluidStorage fluid = storage.getFluids().storages.get(entry.getKey());
-            if (entry.getValue() instanceof BunkerItemStorage bunker && fluid instanceof BunkerFluidStorage tank) {
-                return Optional.of(SteamGauges.of(bunker, tank));
-            }
-        }
-        return Optional.empty();
+        // only for a carriage that is itself a steam loco, and only what the server sent for it: Create's client copy
+        // of train storage is shared between trains, so reading that would show a loco's gauges on other trains
+        boolean loco = LOCOS.computeIfAbsent(entity.getContraption(), contraption -> contraption.getBlocks().values().stream()
+                .anyMatch(info -> info.state().getBlock() instanceof dev.railbound.steam.BunkerBlock));
+        return loco ? dev.railbound.steam.LocoGaugeCache.get(entity.getId()) : Optional.empty();
     }
 }

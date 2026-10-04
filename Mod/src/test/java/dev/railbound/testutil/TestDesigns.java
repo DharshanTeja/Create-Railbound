@@ -1,5 +1,6 @@
 package dev.railbound.testutil;
 
+import dev.railbound.trainset.design.CouplerSpec;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
@@ -16,6 +17,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public final class TestDesigns {
     public static final String SAMPLE_PATH = "/data/railbound/railbound/trainsets/coach_standard.json";
@@ -39,22 +41,27 @@ public final class TestDesigns {
     }
 
     public static TrainsetDesign withBogeys(TrainsetDesign d, List<BogeySpec> bogeys) {
-        return new TrainsetDesign(d.name(), d.category(), d.size(), bogeys, d.power(), d.cargo(), d.doors(), d.layout(), d.performance(), d.steam(), d.drive());
+        return new TrainsetDesign(d.name(), d.category(), d.size(), bogeys, d.power(), d.cargo(), d.doors(), d.layout(), d.performance(), d.steam(), d.drive(), d.coupler());
     }
 
     public static TrainsetDesign withSize(TrainsetDesign d, CarriageSize size) {
-        return new TrainsetDesign(d.name(), d.category(), size, d.bogeys(), d.power(), d.cargo(), d.doors(), d.layout(), d.performance(), d.steam(), d.drive());
+        return new TrainsetDesign(d.name(), d.category(), size, d.bogeys(), d.power(), d.cargo(), d.doors(), d.layout(), d.performance(), d.steam(), d.drive(), d.coupler());
     }
 
     public static TrainsetDesign withLayout(TrainsetDesign d, LayoutSpec layout) {
-        return new TrainsetDesign(d.name(), d.category(), d.size(), d.bogeys(), d.power(), d.cargo(), d.doors(), layout, d.performance(), d.steam(), d.drive());
+        return new TrainsetDesign(d.name(), d.category(), d.size(), d.bogeys(), d.power(), d.cargo(), d.doors(), layout, d.performance(), d.steam(), d.drive(), d.coupler());
     }
 
     public static TrainsetDesign withDoors(TrainsetDesign d, List<DoorSpec> doors) {
-        return new TrainsetDesign(d.name(), d.category(), d.size(), d.bogeys(), d.power(), d.cargo(), doors, d.layout(), d.performance(), d.steam(), d.drive());
+        return new TrainsetDesign(d.name(), d.category(), d.size(), d.bogeys(), d.power(), d.cargo(), doors, d.layout(), d.performance(), d.steam(), d.drive(), d.coupler());
+    }
+
+    public static TrainsetDesign withCoupler(TrainsetDesign d, Optional<CouplerSpec> coupler) {
+        return new TrainsetDesign(d.name(), d.category(), d.size(), d.bogeys(), d.power(), d.cargo(), d.doors(), d.layout(),
+                d.performance(), d.steam(), d.drive(), coupler);
     }
 
     public static TrainsetDesign withName(TrainsetDesign d, String name) {
-        return new TrainsetDesign(name, d.category(), d.size(), d.bogeys(), d.power(), d.cargo(), d.doors(), d.layout(), d.performance(), d.steam(), d.drive());
+        return new TrainsetDesign(name, d.category(), d.size(), d.bogeys(), d.power(), d.cargo(), d.doors(), d.layout(), d.performance(), d.steam(), d.drive(), d.coupler());
     }
 }

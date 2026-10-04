@@ -23,7 +23,8 @@ import java.util.Optional;
 
 /**
  * Draws the whole carriage from its anchor, turned to the carriage's facing. The same renderer runs for a parked
- * carriage and inside Create's moving train, where the door block entities are the contraption's copies.
+ * carriage and inside Create's moving train, where the door block entities are the contraption's copies. A parked
+ * carriage also shows its couplers (and a coach its half of the gangway bellows) at both ends.
  */
 public class AnchorRenderer implements BlockEntityRenderer<AnchorBlockEntity> {
 
@@ -50,6 +51,10 @@ public class AnchorRenderer implements BlockEntityRenderer<AnchorBlockEntity> {
             return level != null && level.getBlockEntity(doorPos) instanceof DoorPartBlockEntity state
                     ? state.progress(partialTick) : 0;
         }, anchor.driveAngle(partialTick), anchor.curvature());
+        if (level == net.minecraft.client.Minecraft.getInstance().level) {
+            // parked: its couplers rest straight out (on a train the coupling renderer draws them, joined up)
+            CouplingRenderer.drawParked(pose, buffers.getBuffer(CouplingRenderer.TYPE), design, light);
+        }
         pose.popPose();
     }
 

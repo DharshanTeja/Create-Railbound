@@ -27,6 +27,7 @@ public final class RailboundTabs {
                     {
                         TrainsetDesigns.all().keySet().forEach(id -> output.accept(TrainsetItem.of(id)));
                         output.accept(RailboundItems.WATER_CRANE.get());
+                        output.accept(RailboundItems.COUPLER.get());
                     })
                     .build());
 

@@ -17,7 +17,8 @@ public record TrainsetDesign(
         LayoutSpec layout,
         Optional<PerformanceSpec> performance,
         Optional<SteamSpec> steam,
-        Optional<DriveSpec> drive) {
+        Optional<DriveSpec> drive,
+        Optional<CouplerSpec> coupler) {
 
     public static final Codec<TrainsetDesign> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.STRING.fieldOf("name").forGetter(TrainsetDesign::name),
@@ -30,7 +31,8 @@ public record TrainsetDesign(
             LayoutSpec.CODEC.fieldOf("layout").forGetter(TrainsetDesign::layout),
             PerformanceSpec.CODEC.optionalFieldOf("performance").forGetter(TrainsetDesign::performance),
             SteamSpec.CODEC.optionalFieldOf("steam").forGetter(TrainsetDesign::steam),
-            DriveSpec.CODEC.optionalFieldOf("drive").forGetter(TrainsetDesign::drive)
+            DriveSpec.CODEC.optionalFieldOf("drive").forGetter(TrainsetDesign::drive),
+            CouplerSpec.CODEC.optionalFieldOf("coupler").forGetter(TrainsetDesign::coupler)
     ).apply(i, TrainsetDesign::new));
 
     public static final int SEATS_PER_BLOCK = 1;

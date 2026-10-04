@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class AnchorBlockEntity extends BlockEntity {
-    private static final String DESIGN_KEY = "Design";
+    private static final String DESIGN_KEY = AnchorDesign.KEY;
     @Nullable
     private ResourceLocation designId;
 
@@ -49,7 +49,7 @@ public class AnchorBlockEntity extends BlockEntity {
     public void noteHeading(net.minecraft.world.phys.Vec3 forward, double distance) {
         if (lastForward != null && Math.abs(distance) > 0.02) {
             double measured = Math.max(-0.5, Math.min(0.5, DriveGear.curvature(lastForward, forward, distance)));
-            curvature += (measured - curvature) * 0.25;
+            curvature += (measured - curvature) * 0.1;
         }
         lastForward = forward;
     }
@@ -142,6 +142,6 @@ public class AnchorBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        designId = tag.contains(DESIGN_KEY) ? ResourceLocation.tryParse(tag.getString(DESIGN_KEY)) : null;
+        designId = AnchorDesign.of(tag).orElse(null);
     }
 }

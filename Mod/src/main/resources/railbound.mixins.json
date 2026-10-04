@@ -12,7 +12,8 @@
     "TrainSteamMixin"
   ],
   "client": [
-    "AbstractContraptionEntityMixin"
+    "AbstractContraptionEntityMixin",
+    "CarriageCouplingRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

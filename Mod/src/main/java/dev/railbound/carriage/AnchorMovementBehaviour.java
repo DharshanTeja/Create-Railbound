@@ -2,6 +2,7 @@ package dev.railbound.carriage;
 
 import com.simibubi.create.api.behaviour.movement.MovementBehaviour;
 import com.simibubi.create.content.contraptions.behaviour.MovementContext;
+import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
 import dev.railbound.registry.RailboundParticles;
 import dev.railbound.steam.LocoGaugeCache;
 import dev.railbound.steam.SteamGauges;
@@ -53,7 +54,21 @@ public class AnchorMovementBehaviour implements MovementBehaviour {
         double pressure = gauges.map(SteamGauges::pressure).orElse(0.0);
         Exhaust exhaust = Exhaust.of(chuffs, fireLit, distance, accelerating, context.world.getGameTime(),
                 anchor.ticksStopped(), pressure);
-        design.design().steam().ifPresent(steam -> blow(context, design, facing, steam, exhaust, fired, anchor.ticksStopped()));
+        boolean whistling = context.contraption.entity instanceof CarriageContraptionEntity cce && cce.getCarriage() != null
+                && cce.getCarriage().train != null && cce.getCarriage().train.honkTicks > 0;
+        design.design().steam().ifPresent(steam -> {
+            blow(context, design, facing, steam, exhaust, fired, anchor.ticksStopped());
+            if (whistling) {
+                // a white plume from the whistle for as long as the horn sounds
+                Vec3 whistle = world(context, design, facing, steam.whistle(), 1);
+                Vec3 up = context.rotation.apply(new Vec3(0, 1, 0));
+                RandomSource random = context.world.random;
+                for (int i = 0; i < 2; i++) {
+                    context.world.addParticle(RailboundParticles.LOCO_STEAM, whistle.x, whistle.y, whistle.z,
+                            up.x * 0.25 + random.nextGaussian() * 0.02, up.y * 0.25, up.z * 0.25 + random.nextGaussian() * 0.02);
+                }
+            }
+        });
     }
 
     private static void blow(MovementContext context, ParsedDesign design, Direction facing, SteamSpec steam,

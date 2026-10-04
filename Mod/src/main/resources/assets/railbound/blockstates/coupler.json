@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=south": { "model": "railbound:block/coupler" },
+    "facing=west": { "model": "railbound:block/coupler", "y": 90 },
+    "facing=north": { "model": "railbound:block/coupler", "y": 180 },
+    "facing=east": { "model": "railbound:block/coupler", "y": 270 }
+  }
+}
