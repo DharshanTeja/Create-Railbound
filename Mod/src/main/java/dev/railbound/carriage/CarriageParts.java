@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import org.jetbrains.annotations.Nullable;
@@ -32,7 +33,9 @@ public final class CarriageParts {
                 .noOcclusion()
                 .isViewBlocking((state, level, pos) -> false)
                 .isSuffocating((state, level, pos) -> false)
-                .isRedstoneConductor((state, level, pos) -> false);
+                .isRedstoneConductor((state, level, pos) -> false)
+                // a pushed part would leave a hole and a stray hidden block; Create still moves them (CarriageAttachment)
+                .pushReaction(PushReaction.BLOCK);
     }
 
     /** Sneak + wrench: pick the whole carriage up as its trainset item. */

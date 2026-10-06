@@ -14,6 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -21,7 +22,10 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-/** A steam loco's coal bunker, which also holds its boiler and water. A solid block inside the loco body. */
+/**
+ * A steam loco's coal bunker, which also holds its boiler and water. A solid block inside the loco body. If the loco
+ * is broken or picked up, its coal spills out rather than vanish.
+ */
 public class BunkerBlock extends CarriagePartBlock implements EntityBlock {
 
     public BunkerBlock(Properties properties) {
@@ -31,6 +35,16 @@ public class BunkerBlock extends CarriagePartBlock implements EntityBlock {
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return Shapes.block();
+    }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!level.isClientSide && !movedByPiston && !newState.is(this) && level.getBlockEntity(pos) instanceof BunkerBlockEntity bunker) {
+            for (int slot = 0; slot < bunker.coal().getSlots(); slot++) {
+                Block.popResource(level, pos, bunker.coal().getStackInSlot(slot).copy());
+            }
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     /** Coal in hand goes straight into the firebox's bunker. */

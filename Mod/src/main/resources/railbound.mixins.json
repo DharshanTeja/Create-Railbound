@@ -14,13 +14,11 @@
     "CarriageDriverMixin",
     "CarriageHitboxMixin",
     "CarriageReversalMixin",
-    "CarriageSoundsMixin",
     "ContraptionColliderStepMixin",
     "ContraptionSeatMixin",
     "LivingEntityStepMixin",
     "SeatBlockMixin",
     "StationBlockEntityAccessor",
-    "StationScreenMixin",
     "TrainAccessor",
     "TrainDisassemblyMixin",
     "TrainReversalMixin",
@@ -28,7 +26,10 @@
   ],
   "client": [
     "AbstractContraptionEntityMixin",
-    "CarriageCouplingRendererMixin"
+    "CarriageCouplingRendererMixin",
+    "CarriageSoundsMixin",
+    "ContraptionClickMixin",
+    "StationScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

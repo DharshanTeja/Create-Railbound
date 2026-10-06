@@ -112,7 +112,8 @@ public final class CargoAccess {
         parkedHold(level, event.getPos()).ifPresent(hold -> {
             Vec3 centre = Vec3.atCenterOf(hold.getBlockPos());
             Component title = hold.getBlockState().getBlock().getName();
-            openParked((ServerPlayer) player, hold, p -> !hold.isRemoved() && p.distanceToSqr(centre) < 12 * 12, title);
+            openParked((ServerPlayer) player, hold,
+                    p -> !hold.isRemoved() && p.distanceToSqr(centre) < CargoRules.REACH * CargoRules.REACH, title);
             event.setCanceled(true);
             event.setCancellationResult(InteractionResult.SUCCESS);
         });
@@ -130,7 +131,8 @@ public final class CargoAccess {
             return;
         }
         Vec3 local = Vec3.atCenterOf(holdPos);
-        Predicate<Player> stillValid = p -> entity.isAlive() && p.distanceToSqr(entity.toGlobalVector(local, 0)) < 12 * 12;
+        Predicate<Player> stillValid = p -> CargoRules.stillOpenOnTrain(entity.isAlive(), trainSpeed(entity),
+                p.distanceToSqr(entity.toGlobalVector(local, 0)));
         StructureBlockInfo info = contraption.getBlocks().get(holdPos);
         Component title = info == null ? Component.empty() : info.state().getBlock().getName();
         if (contraption.getStorage().getAllItemStorages().get(holdPos) instanceof HoldItemStorage items) {
@@ -138,6 +140,12 @@ public final class CargoAccess {
         } else if (contraption.getStorage().getFluids().storages.get(holdPos) instanceof TankFluidStorage tank) {
             openTank(player, tank.load(), stillValid, title);
         }
+    }
+
+    /** The speed of the train a carriage is in (0 for a contraption that is not a train carriage). */
+    private static double trainSpeed(AbstractContraptionEntity entity) {
+        return entity instanceof CarriageContraptionEntity carriage && carriage.getCarriage() != null
+                && carriage.getCarriage().train != null ? carriage.getCarriage().train.speed : 0;
     }
 
     // --- refusing to pick up a loaded wagon ---

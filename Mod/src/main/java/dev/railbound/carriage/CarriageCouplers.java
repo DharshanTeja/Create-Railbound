@@ -27,10 +27,11 @@ import java.util.WeakHashMap;
 public final class CarriageCouplers {
     /**
      * A coupler's length, carriage end to coupling face (blocks): our trainsets are placed a block apart, so two of
-     * theirs lock halfway; a coupler block reaches through its own block and half a block more.
+     * theirs lock halfway; a coupler block's knuckle stays inside its own block, as long as the block standing in the
+     * world, so two coupler blocks touching lock at their faces (wider gaps slide the knuckles out, as on curves).
      */
     public static final double TRAINSET_REACH = 0.5;
-    public static final double BLOCK_REACH = 1.5;
+    public static final double BLOCK_REACH = 1.0;
     /** Server and client contraptions are looked up from their own threads. */
     private static final Map<Contraption, List<Local>> FOUND = Collections.synchronizedMap(new WeakHashMap<>());
 

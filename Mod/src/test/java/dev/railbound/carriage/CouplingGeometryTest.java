@@ -146,4 +146,12 @@ class CouplingGeometryTest {
         assertVec(new Vec3(3, 1.5, 5.5), CouplingGeometry.blockEnd(new BlockPos(3, 1, 5), Direction.EAST));
         assertVec(new Vec3(3.5, 1.5, 5), CouplingGeometry.blockEnd(new BlockPos(3, 1, 5), Direction.SOUTH));
     }
+
+    @Test
+    void aFreeCouplerBlocksKnuckleStaysInsideItsOwnBlock() {
+        // its coupling face rests on the block's outer face, as long as the block standing in the world
+        CouplingGeometry.End end = new CouplingGeometry.End(CouplingGeometry.blockEnd(new BlockPos(3, 1, 5), Direction.EAST),
+                new Vec3(1, 0, 0), new Vec3(0, 0, 1), UP);
+        assertVec(new Vec3(4, 1.5, 5.5), CouplingGeometry.rest(end, CarriageCouplers.BLOCK_REACH));
+    }
 }

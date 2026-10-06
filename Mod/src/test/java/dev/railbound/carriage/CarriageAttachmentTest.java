@@ -24,6 +24,22 @@ class CarriageAttachmentTest {
     }
 
     @Test
+    void createMayMoveCarriagePartsThoughPistonsMayNot() {
+        // parts refuse pistons (PushReaction.BLOCK), which Create would also read as "not movable" without this
+        assertEquals(SUCCESS, CarriageAttachment.movementAllowed(true));
+        assertEquals(PASS, CarriageAttachment.movementAllowed(false));
+    }
+
+    @Test
+    void pistonsCannotPushCarriageParts() throws ReflectiveOperationException {
+        // a pushed part leaves a hole in the carriage and a stray hidden block: removal ignores piston moves
+        java.lang.reflect.Field field = net.minecraft.world.level.block.state.BlockBehaviour.Properties.class
+                .getDeclaredField("pushReaction");
+        field.setAccessible(true);
+        assertEquals(net.minecraft.world.level.material.PushReaction.BLOCK, field.get(CarriageParts.properties()));
+    }
+
+    @Test
     void partDoesNotStickToOrdinaryBlocks() {
         assertEquals(PASS, CarriageAttachment.evaluate(Kind.PART, Kind.OTHER));
     }

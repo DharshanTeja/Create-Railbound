@@ -12,7 +12,7 @@ One item. One click. A real Create train — with walkable interiors, seats, doo
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1-5A8F3E?style=for-the-badge)](https://www.minecraft.net)
 [![NeoForge](https://img.shields.io/badge/NeoForge-21.1-D7742F?style=for-the-badge)](https://neoforged.net)
 [![Create](https://img.shields.io/badge/Create-6.0.10%2B-D9A441?style=for-the-badge)](https://github.com/Creators-of-Create/Create)
-[![Status](https://img.shields.io/badge/Status-Early%20development-2E5E57?style=for-the-badge)](#roadmap)
+[![Status](https://img.shields.io/badge/Status-Release%201.0-2E5E57?style=for-the-badge)](#roadmap)
 [![License](https://img.shields.io/badge/License-MIT%20%C2%B7%20ARR%20assets-4A4D52?style=for-the-badge)](LICENSE.md)
 
 [Features](#features) &nbsp;·&nbsp; [How it works](#how-it-works) &nbsp;·&nbsp; [Roadmap](#roadmap) &nbsp;·&nbsp; [Custom trainsets](#make-your-own-trainsets) &nbsp;·&nbsp; [Building](#building-from-source) &nbsp;·&nbsp; [License](#license)
@@ -22,7 +22,7 @@ One item. One click. A real Create train — with walkable interiors, seats, doo
 <br>
 
 > [!IMPORTANT]
-> **Railbound is in early development.** The passenger coach and the steam tank locomotive can be placed, assembled and driven as real Create trains — with full 3D models, walkable interiors, working doors and a coal-and-water steam engine. Couplers are being built now; freight carriages come next. Follow the [roadmap](#roadmap) for progress.
+> **Railbound 1.0 is released.** Phase 1 is complete and fully tested, in single player and on a dedicated server: a steam tank locomotive, a passenger coach, a Box Van and a Tank Wagon, all running as real Create trains. They have knuckle couplers that follow curves, and stopped trains can be split and joined. Trainsets come from the creative menu for now; crafting recipes arrive in Phase 2. Back up your world before trying it, and please report bugs on the [issue tracker](https://github.com/DharshanTeja/Create-Railbound/issues).
 
 <br>
 
@@ -30,28 +30,48 @@ One item. One click. A real Create train — with walkable interiors, seats, doo
 
 Building a good-looking train in Create takes hours of block-by-block work. Railbound gives you complete, detailed rolling stock in a single item — and it is still a genuine Create train underneath, so schedules, stations and signals work exactly as you expect.
 
-<sub>Everything below is the 1.0 goal. See the <a href="#roadmap">roadmap</a> for what is already done.</sub>
-
 | | |
 |---|---|
 | **Single-item trainsets** | Every locomotive and carriage is one item rendering a full, detailed model — no block-by-block building. |
 | **Real Create trains** | Placed with Create's own station assembly. Schedules, signals, stations and other train addons see an ordinary Create train. |
-| **Walkable interiors** | Step inside, walk the aisle and right-click a seat to sit. Passenger cars seat two abreast — a window seat each side of a centre aisle. |
+| **A real steam engine** | Coal heats water into steam pressure, and pressure sets the pull. Fill it from the bunker, a bucket, pipes, Portable Interfaces or the trackside Water Crane. Chuffs and smoke follow the driving wheels. |
+| **Walkable interiors** | Step inside, walk the aisle and right-click a seat to sit. In the loco cab, sitting in the driver's seat is all it takes to drive. |
 | **Doors that work** | Doors open automatically when the train stops at a station, using Create's train-door behaviour. |
-| **Freight that works** | The items carriage holds 160 stacks and the fluid carriage 144 buckets. Open them by hand, or load and unload through Create's Portable Storage and Portable Fluid Interfaces. |
-| **Mix and match** | Couple trainset cars with your own hand-built carriages in the same train. |
+| **Freight that works** | The Box Van holds 160 stacks and the Tank Wagon 144 buckets. Sneak-click to open them, or load and unload through Create's Portable Storage and Portable Fluid Interfaces. |
+| **Couplers that bend** | Knuckle couplers and gangway bellows follow the track, even on tight curves. Wrench a coupler to split a stopped train; back in slowly to join. |
+| **Mix and match** | The Knuckle Coupler block lets your own hand-built carriages couple to Railbound cars in the same train. |
 | **Data-driven** | Every design is a datapack + resource pack. Modpacks can add their own trains without writing code. |
 
 <div align="center">
+<img src="art/previews/loco_steam_tank.png" alt="The Steam Tank Engine, seen from the front" width="49%">
+<img src="art/previews/loco_steam_tank_rear.png" alt="The Steam Tank Engine's cab and coal bunker, seen from the rear" width="49%"><br>
+<img src="art/previews/wagon_box_van.png" alt="The Box Van, a covered goods wagon" width="49%">
+<img src="art/previews/wagon_tank.png" alt="The Tank Wagon, with walkways, handrails and a dome" width="49%"><br>
+<sub><i>The Steam Tank Engine, the Box Van and the Tank Wagon. In game they ride on Railbound's own bogeys.</i></sub>
+</div>
+
+<div align="center">
 <img src="art/previews/coach_standard_interior.png" alt="Interior of the Standard Passenger Coach: two-plus-two seating, luggage racks and a lit ceiling" width="640"><br>
-<sub><i>Inside the Standard Passenger Coach — prototype model. The final coach seats 20, one window seat each side of the aisle.</i></sub>
+<sub><i>Inside the Standard Passenger Coach.</i></sub>
+</div>
+
+### In game
+
+<div align="center">
+<img src="art/screenshots/steam_tank_engine.jpg" alt="The Steam Tank Engine in game, in steam with smoke from its chimney and safety valve" width="780"><br>
+<sub><i>The Steam Tank Engine in steam.</i></sub><br><br>
+<img src="art/screenshots/passenger_coach.jpg" alt="The Standard Passenger Coach standing on Create track" width="49%">
+<img src="art/screenshots/box_van.jpg" alt="The Box Van on its freight trucks" width="49%"><br>
+<img src="art/screenshots/tank_wagon.jpg" alt="The Tank Wagon on its freight trucks" width="49%">
+<img src="art/screenshots/water_crane.jpg" alt="The Water Crane, which fills a steam engine's tank from Create pipes" width="49%"><br>
+<sub><i>The passenger coach, the Box Van, the Tank Wagon and the Water Crane, in game.</i></sub>
 </div>
 
 ### Planned rolling stock
 
 | Phase | Locomotives | Carriages |
 |:---:|---|---|
-| 1 | Steam | Passenger coach · Items carriage · Fluid carriage |
+| 1 ✅ | Steam tank engine | Passenger coach · Box Van · Tank Wagon |
 | 2 | — | More carriage types |
 | 3 | 2 × Diesel | Passenger and goods multiple units |
 | 4 | 2 × Electric | 2 carriages per type · 2 EMUs |
@@ -63,7 +83,7 @@ Building a good-looking train in Create takes hours of block-by-block work. Rail
 Railbound plugs into the train assembly you already know from Create:
 
 1. **Build a station** beside straight track and switch it to **assembly mode**.
-2. **Right-click the track** with a trainset item — the carriage appears, already on its bogeys.
+2. Take a trainset from the **Railbound** creative tab and **right-click the track** with it — the carriage appears, already on its bogeys.
 3. Add more cars (sneak-click to place one facing backwards, for the rear cab of a multiple unit).
 4. Press **Assemble Train**. Drive it yourself, or seat a conductor at the controls and hand them a schedule — it is a Create train.
 5. Back at a station, disassemble and **shift + right-click with a wrench** to pick a carriage up again.
@@ -92,10 +112,12 @@ Railbound ships in four phases. Each phase is built in small sub-phases, and eve
 | ✅ | **1.2 Coach interior** | Right-click seating, doors that open at stations, interfaces that fit into the coach wall |
 | ✅ | **1.3 Coach visuals** | Full 3D models in game, sliding doors, glowing lamps, Blockbench-to-game converter |
 | ✅ | **1.4 Steam locomotive** | Steam tank engine with boiler pressure, coal and water, automatic firing, animated rods, synced smoke, chuff and whistle, cab gauges, and a trackside water crane |
-| ⏳ | **1.5 Couplers** | Knuckle couplers and coach gangways that follow curves, a coupler block for hand-built carriages, splitting and joining stopped trains |
-| ○ | **1.6 Items carriage** | 160-stack storage, scrolling GUI, Portable Storage Interface |
-| ○ | **1.7 Fluid carriage** | 144-bucket tank, fill-and-drain GUI, Portable Fluid Interface |
-| ○ | **1.8 Release** | Compatibility, performance and polish |
+| ✅ | **1.5 Couplers** | Knuckle couplers and coach gangways that follow curves, a coupler block for hand-built carriages, splitting and joining stopped trains, disassembling a train whose tail is on a curve |
+| ✅ | **1.6 Items carriage** | Box Van: 160-stack storage, scrolling GUI, Portable Storage Interface, Railbound freight trucks |
+| ✅ | **1.7 Fluid carriage** | Tank Wagon: 144-bucket tank, fill-and-drain GUI, Portable Fluid Interface |
+| ✅ | **1.8 Release** | Release 1.0 — fixes from beta feedback, a full bug hunt, every in-game test passed, and checked on a dedicated server |
+
+All Phase 1 tests are done: the automated test suite (335 tests) passes on every build, and every in-game check, in single player and multiplayer, has passed.
 
 <br>
 
@@ -162,13 +184,19 @@ Create-Railbound/
 ├── Mod/                    the NeoForge mod (Gradle project)
 │   └── src/
 │       ├── main/java/dev/railbound/
-│       │   ├── trainset/design/   design records, layout parser, validator
-│       │   ├── trainset/load/     datapack loading and the live design registry
-│       │   ├── trainset/item/     the trainset item, names and tooltips
-│       │   ├── network/           design sync to clients
-│       │   └── registry/          items, data components, creative tab
+│       │   ├── trainset/          design format, validation, datapack loading, the trainset item, placement
+│       │   ├── carriage/          the blocks a carriage is built from: floor, seats, doors, cab controls
+│       │   ├── steam/             boiler, firing, smoke, chuff and whistle, water crane
+│       │   ├── coupling/          splitting, joining and partial disassembly of trains
+│       │   ├── cargo/             Box Van and Tank Wagon storage and screens
+│       │   ├── bogey/             Railbound bogey styles
+│       │   ├── client/            renderers, screens, HUD and particles
+│       │   ├── mixin/             hooks into Create's train code
+│       │   ├── network/           design sync and train packets
+│       │   └── registry/          blocks, items, menus, creative tab
 │       └── test/                  unit tests
-└── art/                    Blockbench source models and preview renders
+├── Mod/buildSrc/           Blockbench-to-game model converter (runs during the build)
+└── art/                    Blockbench source models, preview renders and in-game screenshots
 ```
 
 </details>
@@ -185,8 +213,8 @@ Issues and ideas are welcome. Before opening a pull request, please open an issu
 
 | | License |
 |---|---|
-| **Code** | [MIT](LICENSE.md#2-code--mit-license) — use, fork and build on it freely |
-| **Art & assets** — models, textures, renders | [All Rights Reserved](LICENSE.md#1-art--assets--all-rights-reserved) |
+| **Code** | [MIT](LICENSE.md#3-code-mit-license) — use, fork and build on it freely |
+| **Art & assets** — models, textures, renders, screenshots | [All Rights Reserved](LICENSE.md#2-art--assets-all-rights-reserved) |
 
 This mirrors the licensing of Create itself. Modpacks are always welcome to include the official release. See [LICENSE.md](LICENSE.md) for the full terms.
 
