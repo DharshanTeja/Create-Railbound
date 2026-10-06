@@ -17,6 +17,17 @@ public final class CargoRules {
         return Math.abs(speed) < 1e-3;
     }
 
+    /** How far from a wagon's hold (blocks) its screen stays open. */
+    public static final double REACH = 12;
+
+    /**
+     * Whether a hold or tank opened on a train may stay open: its carriage is there, the player in reach, and the train
+     * still standing (a passenger riding beside the wagon stays in reach, so it closes when the train moves off).
+     */
+    public static boolean stillOpenOnTrain(boolean carriageAlive, double speed, double distanceSqr) {
+        return carriageAlive && canOpenOnTrain(speed) && distanceSqr < REACH * REACH;
+    }
+
     public static int[] split(int amount) {
         return new int[] {amount % HALF, amount / HALF};
     }

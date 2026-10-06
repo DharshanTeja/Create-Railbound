@@ -20,6 +20,20 @@ class CargoRulesTest {
     }
 
     @Test
+    void aHoldOpenedOnATrainClosesWhenTheTrainMovesOff() {
+        // a passenger riding beside the wagon stays in reach, so reach alone would keep it open all trip
+        assertTrue(CargoRules.stillOpenOnTrain(true, 0, 4));
+        assertFalse(CargoRules.stillOpenOnTrain(true, 0.3, 4));
+        assertFalse(CargoRules.stillOpenOnTrain(true, -0.3, 4));
+    }
+
+    @Test
+    void aHoldOpenedOnATrainClosesOutOfReachOrWhenTheCarriageIsGone() {
+        assertFalse(CargoRules.stillOpenOnTrain(true, 0, 13 * 13));
+        assertFalse(CargoRules.stillOpenOnTrain(false, 0, 4));
+    }
+
+    @Test
     void tankAmountsBeyondAShortReachTheScreenWhole() {
         // Minecraft sends menu data as shorts; 144 buckets is 144000 millibuckets
         for (int amount : new int[] {0, 1, 32767, 32768, 144_000, 1_000_000}) {

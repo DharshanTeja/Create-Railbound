@@ -25,6 +25,15 @@ public final class CarriageAttachment {
             return evaluate(kindOf(state, direction), kindOf(neighbour, direction.getOpposite()));
         });
         BlockMovementChecks.registerMovementNecessaryCheck((state, level, pos) -> movementNecessary(CarriagePart.is(state)));
+        BlockMovementChecks.registerMovementAllowedCheck((state, level, pos) -> movementAllowed(CarriagePart.is(state)));
+    }
+
+    /**
+     * Parts refuse vanilla pistons ({@code PushReaction.BLOCK}), which Create's own check would also read as "not
+     * movable": Create may still move them, so trains assemble and disassemble.
+     */
+    public static CheckResult movementAllowed(boolean isPart) {
+        return isPart ? CheckResult.SUCCESS : CheckResult.PASS;
     }
 
     /** Create skips blocks without collision (upper door placeholders); every part must travel with the carriage. */

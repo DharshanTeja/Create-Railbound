@@ -36,6 +36,10 @@ public class TrainsetItem extends Item {
 
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+        // adventure mode builds nothing: vanilla's own check runs after this hook, so refuse here as block items do
+        if (context.getPlayer() != null && !context.getPlayer().mayBuild()) {
+            return InteractionResult.PASS;
+        }
         if (context.getLevel().isClientSide) {
             // Claim track clicks so the client does not also use the off-hand item; the server decides.
             return context.getLevel().getBlockState(context.getClickedPos()).getBlock() instanceof ITrackBlock

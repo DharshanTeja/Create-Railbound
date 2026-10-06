@@ -12,7 +12,7 @@ One item. One click. A real Create train — with walkable interiors, seats, doo
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1-5A8F3E?style=for-the-badge)](https://www.minecraft.net)
 [![NeoForge](https://img.shields.io/badge/NeoForge-21.1-D7742F?style=for-the-badge)](https://neoforged.net)
 [![Create](https://img.shields.io/badge/Create-6.0.10%2B-D9A441?style=for-the-badge)](https://github.com/Creators-of-Create/Create)
-[![Status](https://img.shields.io/badge/Status-Beta%201.0-2E5E57?style=for-the-badge)](#roadmap)
+[![Status](https://img.shields.io/badge/Status-Release%201.0-2E5E57?style=for-the-badge)](#roadmap)
 [![License](https://img.shields.io/badge/License-MIT%20%C2%B7%20ARR%20assets-4A4D52?style=for-the-badge)](LICENSE.md)
 
 [Features](#features) &nbsp;·&nbsp; [How it works](#how-it-works) &nbsp;·&nbsp; [Roadmap](#roadmap) &nbsp;·&nbsp; [Custom trainsets](#make-your-own-trainsets) &nbsp;·&nbsp; [Building](#building-from-source) &nbsp;·&nbsp; [License](#license)
@@ -22,7 +22,7 @@ One item. One click. A real Create train — with walkable interiors, seats, doo
 <br>
 
 > [!IMPORTANT]
-> **Railbound is in beta (1.0).** Phase 1 is complete: a steam tank locomotive, a passenger coach, a Box Van and a Tank Wagon, all running as real Create trains. They have knuckle couplers that follow curves, and stopped trains can be split and joined. Trainsets come from the creative menu for now; crafting recipes arrive in Phase 2. Back up your world before trying it, and please report bugs on the [issue tracker](https://github.com/DharshanTeja/Create-Railbound/issues).
+> **Railbound 1.0 is released.** Phase 1 is complete and fully tested, in single player and on a dedicated server: a steam tank locomotive, a passenger coach, a Box Van and a Tank Wagon, all running as real Create trains. They have knuckle couplers that follow curves, and stopped trains can be split and joined. Trainsets come from the creative menu for now; crafting recipes arrive in Phase 2. Back up your world before trying it, and please report bugs on the [issue tracker](https://github.com/DharshanTeja/Create-Railbound/issues).
 
 <br>
 
@@ -53,6 +53,18 @@ Building a good-looking train in Create takes hours of block-by-block work. Rail
 <div align="center">
 <img src="art/previews/coach_standard_interior.png" alt="Interior of the Standard Passenger Coach: two-plus-two seating, luggage racks and a lit ceiling" width="640"><br>
 <sub><i>Inside the Standard Passenger Coach.</i></sub>
+</div>
+
+### In game
+
+<div align="center">
+<img src="art/screenshots/steam_tank_engine.jpg" alt="The Steam Tank Engine in game, in steam with smoke from its chimney and safety valve" width="780"><br>
+<sub><i>The Steam Tank Engine in steam.</i></sub><br><br>
+<img src="art/screenshots/passenger_coach.jpg" alt="The Standard Passenger Coach standing on Create track" width="49%">
+<img src="art/screenshots/box_van.jpg" alt="The Box Van on its freight trucks" width="49%"><br>
+<img src="art/screenshots/tank_wagon.jpg" alt="The Tank Wagon on its freight trucks" width="49%">
+<img src="art/screenshots/water_crane.jpg" alt="The Water Crane, which fills a steam engine's tank from Create pipes" width="49%"><br>
+<sub><i>The passenger coach, the Box Van, the Tank Wagon and the Water Crane, in game.</i></sub>
 </div>
 
 ### Planned rolling stock
@@ -103,7 +115,9 @@ Railbound ships in four phases. Each phase is built in small sub-phases, and eve
 | ✅ | **1.5 Couplers** | Knuckle couplers and coach gangways that follow curves, a coupler block for hand-built carriages, splitting and joining stopped trains, disassembling a train whose tail is on a curve |
 | ✅ | **1.6 Items carriage** | Box Van: 160-stack storage, scrolling GUI, Portable Storage Interface, Railbound freight trucks |
 | ✅ | **1.7 Fluid carriage** | Tank Wagon: 144-bucket tank, fill-and-drain GUI, Portable Fluid Interface |
-| ⏳ | **1.8 Release** | Beta 1.0 — compatibility, performance and polish from player feedback |
+| ✅ | **1.8 Release** | Release 1.0 — fixes from beta feedback, a full bug hunt, every in-game test passed, and checked on a dedicated server |
+
+All Phase 1 tests are done: the automated test suite (335 tests) passes on every build, and every in-game check, in single player and multiplayer, has passed.
 
 <br>
 
@@ -182,7 +196,7 @@ Create-Railbound/
 │       │   └── registry/          blocks, items, menus, creative tab
 │       └── test/                  unit tests
 ├── Mod/buildSrc/           Blockbench-to-game model converter (runs during the build)
-└── art/                    Blockbench source models and preview renders
+└── art/                    Blockbench source models, preview renders and in-game screenshots
 ```
 
 </details>
