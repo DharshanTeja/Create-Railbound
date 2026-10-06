@@ -40,16 +40,25 @@ public final class RailboundClient {
         modBus.addListener(RailboundClient::onRegisterClientExtensions);
         modBus.addListener(RailboundClient::onRegisterParticles);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(CouplingRenderer::render);
+        // before Create's controls handler, which holds Shift while you drive
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGH, CabDriving::tick);
+        // before Create looks for a contraption block under the cursor
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGH,
+                CouplerWrench::onInteract);
         // entity ids are reused in the next world: forget the last one's loco gauges
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
-                (net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) ->
-                        dev.railbound.steam.LocoGaugeCache.clear());
+                (net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) -> {
+                    dev.railbound.steam.LocoGaugeCache.clear();
+                    dev.railbound.steam.LocoVoices.clear();
+                });
         modBus.addListener(RailboundClient::onRegisterScreens);
         modBus.addListener(RailboundClient::onRegisterGuiLayers);
     }
 
     private static void onRegisterScreens(RegisterMenuScreensEvent event) {
         event.register(RailboundMenus.BUNKER.get(), BunkerScreen::new);
+        event.register(RailboundMenus.CARGO_HOLD.get(), HoldScreen::new);
+        event.register(RailboundMenus.CARGO_TANK.get(), TankScreen::new);
     }
 
     private static void onRegisterGuiLayers(RegisterGuiLayersEvent event) {
@@ -58,8 +67,7 @@ public final class RailboundClient {
 
     private static void onRegisterParticles(RegisterParticleProvidersEvent event) {
         event.registerSpecial(RailboundParticles.NONE, (type, level, x, y, z, dx, dy, dz) -> null);
-        event.registerSpriteSet(RailboundParticles.LOCO_SMOKE, sprites -> new LocoPuffParticle.Provider(sprites, 0.2f, 90, 0.6f, 3.2f));
-        event.registerSpriteSet(RailboundParticles.LOCO_SMOKE_DARK, sprites -> new LocoPuffParticle.Provider(sprites, 0.08f, 110, 0.7f, 3.6f));
+        event.registerSpriteSet(RailboundParticles.LOCO_PLUME, LocoPuffParticle.PlumeProvider::new);
         event.registerSpriteSet(RailboundParticles.LOCO_STEAM, sprites -> new LocoPuffParticle.Provider(sprites, 1.0f, 30, 0.5f, 2.0f));
     }
 
@@ -77,6 +85,7 @@ public final class RailboundClient {
         event.registerBlockEntityRenderer(RailboundBlockEntities.ANCHOR.get(), AnchorRenderer::new);
         event.registerBlockEntityRenderer(RailboundBlockEntities.COACH_BOGEY.get(), BogeyBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(RailboundBlockEntities.STEAM_TRUCK_BOGEY.get(), BogeyBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(RailboundBlockEntities.FREIGHT_BOGEY.get(), BogeyBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(RailboundBlockEntities.WATER_CRANE.get(), WaterCraneRenderer::new);
         event.registerBlockEntityRenderer(RailboundBlockEntities.COUPLER.get(), CouplerBlockRenderer::new);
     }
@@ -88,6 +97,10 @@ public final class RailboundClient {
                 .skipVanillaRender(be -> true)
                 .apply();
         SimpleBlockEntityVisualizer.builder(RailboundBlockEntities.STEAM_TRUCK_BOGEY.get())
+                .factory(BogeyBlockEntityVisual::new)
+                .skipVanillaRender(be -> true)
+                .apply();
+        SimpleBlockEntityVisualizer.builder(RailboundBlockEntities.FREIGHT_BOGEY.get())
                 .factory(BogeyBlockEntityVisual::new)
                 .skipVanillaRender(be -> true)
                 .apply();

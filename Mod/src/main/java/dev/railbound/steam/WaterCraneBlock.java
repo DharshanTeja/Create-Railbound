@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -134,6 +135,23 @@ public class WaterCraneBlock extends HorizontalDirectionalBlock implements Entit
             IWrenchable.playRotateSound(level, base);
         }
         return InteractionResult.SUCCESS;
+    }
+
+    /**
+     * Sneak + wrench on any block picks the whole crane up: it is taken by its base, the only block that drops the
+     * crane, and the column falls with it.
+     */
+    @Override
+    public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
+        int section = state.getValue(SECTION);
+        BlockPos base = context.getClickedPos().below(section);
+        BlockState baseState = context.getLevel().getBlockState(base);
+        if (section == 0 || context.getPlayer() == null || !isSection(baseState, 0)) {
+            return IWrenchable.super.onSneakWrenched(state, context);
+        }
+        UseOnContext atBase = new UseOnContext(context.getPlayer(), context.getHand(),
+                new BlockHitResult(context.getClickLocation(), context.getClickedFace(), base, context.isInside()));
+        return IWrenchable.super.onSneakWrenched(baseState, atBase);
     }
 
     /** Only the base is drawn as a block; its renderer draws the rest of the crane. */

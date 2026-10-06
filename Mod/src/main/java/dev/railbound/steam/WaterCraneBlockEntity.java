@@ -179,14 +179,9 @@ public class WaterCraneBlockEntity extends BlockEntity {
             }
             return;
         }
+        // no drips from the nozzle: particles only stop on real blocks, so on a train they fell through the loco
         prevSwing = swing;
         swing = WaterCrane.swingTowards(swing, filling);
-        if (filling && swing >= 1) {
-            Vec3 nozzle = WaterCrane.nozzle(base(), facing(), aim(1));
-            level.addParticle(net.minecraft.core.particles.ParticleTypes.FALLING_WATER,
-                    nozzle.x + (level.random.nextDouble() - 0.5) * 0.15, nozzle.y, nozzle.z + (level.random.nextDouble() - 0.5) * 0.15,
-                    0, 0, 0);
-        }
     }
 
     private net.minecraft.core.Direction facing() {

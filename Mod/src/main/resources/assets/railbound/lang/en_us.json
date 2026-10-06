@@ -43,5 +43,20 @@
   "block.railbound.loco_firebox": "Firebox",
   "railbound.gauge.lumps": "%s lumps",
   "railbound.gauge.raising_steam": "Fire lit: raising steam",
-  "railbound.gauge.ready": "Fire lit: ready to move"
+  "railbound.gauge.ready": "Fire lit: ready to move",
+  "railbound.coupling.stop_first": "Stop the train before uncoupling it",
+  "block.railbound.cargo_hold": "Cargo Hold",
+  "block.railbound.cargo_tank": "Cargo Tank",
+  "trainset.railbound.wagon_box_van": "Box Van",
+  "trainset.railbound.wagon_tank": "Tank Wagon",
+  "railbound.cargo.stop_first": "Stop the train to open the wagon",
+  "railbound.cargo.not_empty": "Empty the wagon before picking it up",
+  "railbound.cargo.pour": "Pour in",
+  "railbound.cargo.fill": "Fill",
+  "railbound.cargo.empty": "Empty",
+  "railbound.cargo.amount": "%s / %s buckets",
+  "block.railbound.cab_controls": "Cab Controls",
+  "railbound.station.partial": "Only %s of %s carriages fit the straight here: the rest stay behind as their own train",
+  "block.railbound.freight_bogey": "Freight Truck",
+  "railbound.bogey.style.freight": "Railbound Freight Truck"
 }

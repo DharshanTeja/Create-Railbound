@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Where the knuckle couplers between neighbouring carriages go, in world space, from the carriage ends. Each knuckle
- * keeps its own length and swivels at its carriage end to point at the middle of the gap: on straight track the two
- * heads lock together there; where a tight curve swings the ends further apart, a gap shows between them.
+ * Where the knuckle couplers between neighbouring carriages go, in world space, from the carriage ends. The two heads
+ * always lock together in the middle of the gap; each knuckle swivels at its carriage end to point there, and where a
+ * tight curve swings the ends further apart than the knuckles reach, it slides out of its draft gear.
  */
 public final class CouplingGeometry {
     private CouplingGeometry() {}
@@ -27,30 +27,12 @@ public final class CouplingGeometry {
         return a.centre().add(b.centre()).scale(0.5);
     }
 
-    /** Degrees a knuckle can swivel either way from straight out, as far as a draft gear lets a real one. */
-    public static final double MAX_SWIVEL = 30;
-
     /**
-     * Where a knuckle's coupling face is: its length from the end, towards the meeting point but never past it, and
-     * turned no more than {@link #MAX_SWIVEL} from straight out.
+     * How far a knuckle slides out of its draft gear (blocks) to keep its head on the meeting point: nothing while the
+     * meeting point is within its own length (straight track), the rest on curves that swing the ends apart.
      */
-    public static Vec3 head(End end, Vec3 meet, double reach) {
-        Vec3 along = meet.subtract(end.centre());
-        double length = along.length();
-        if (length < 1e-9) {
-            return meet;
-        }
-        Vec3 direction = along.scale(1 / length);
-        double cos = direction.dot(end.outward());
-        double limit = Math.cos(Math.toRadians(MAX_SWIVEL));
-        if (cos < limit) {
-            // keep the sideways lean, cut back to the limit: outward cos + sideways sin
-            Vec3 sideways = direction.subtract(end.outward().scale(cos));
-            sideways = sideways.lengthSqr() < 1e-12 ? end.right() : sideways.normalize();
-            direction = end.outward().scale(limit).add(sideways.scale(Math.sin(Math.toRadians(MAX_SWIVEL))));
-            return end.centre().add(direction.scale(reach));
-        }
-        return length <= reach ? meet : end.centre().add(direction.scale(reach));
+    public static double slide(End end, Vec3 meet, double reach) {
+        return Math.max(0, meet.distanceTo(end.centre()) - reach);
     }
 
     /**
@@ -73,6 +55,20 @@ public final class CouplingGeometry {
 
     private static Vec3 lerp(Vec3 from, Vec3 to, double t) {
         return from.add(to.subtract(from).scale(t));
+    }
+
+    /**
+     * Whether two ends facing each other on the same track are close enough for their knuckles (reaching together
+     * {@code reach}) to meet, or already pushed past that by a train moving fast.
+     */
+    public static boolean touching(End a, End b, double reach) {
+        if (a.outward().dot(b.outward()) > -0.5) {
+            return false;
+        }
+        Vec3 between = b.centre().subtract(a.centre());
+        double along = between.dot(a.outward());
+        double aside = between.subtract(a.outward().scale(along)).length();
+        return aside < 0.75 && along <= reach + 0.1 && along > -3;
     }
 
     /** Where a knuckle's coupling face is at a train's free end: straight out. */

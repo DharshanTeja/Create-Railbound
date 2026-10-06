@@ -16,10 +16,15 @@ public final class CarriageBehaviours {
     public static void register() {
         MovingInteractionBehaviour.REGISTRY.register(RailboundBlocks.SEAT.get(), new SeatInteractionBehaviour());
         MovementBehaviour.REGISTRY.register(RailboundBlocks.SEAT.get(), new SeatMovementBehaviour());
+        MovingInteractionBehaviour.REGISTRY.register(RailboundBlocks.CAB_CONTROLS.get(),
+                new com.simibubi.create.content.contraptions.actors.trainControls.ControlsInteractionBehaviour());
+        MovementBehaviour.REGISTRY.register(RailboundBlocks.CAB_CONTROLS.get(), new CabControlsMovementBehaviour());
         MovementBehaviour.REGISTRY.register(RailboundBlocks.DOOR.get(), new CarriageDoorMovementBehaviour());
         MovementBehaviour.REGISTRY.register(RailboundBlocks.ANCHOR.get(), new AnchorMovementBehaviour());
         MovingInteractionBehaviour.REGISTRY.register(RailboundBlocks.FIREBOX.get(), new dev.railbound.steam.FireboxMovingInteraction());
         MovingInteractionBehaviour.REGISTRY.register(RailboundBlocks.WATER_TANK.get(), new dev.railbound.steam.WaterTankMovingInteraction());
         MovingInteractionBehaviour.REGISTRY.register(RailboundBlocks.DOOR.get(), new DoorPartMovingInteraction());
+        MovingInteractionBehaviour.REGISTRY.register(RailboundBlocks.CARGO_HOLD.get(), new dev.railbound.cargo.CargoMovingInteraction());
+        MovingInteractionBehaviour.REGISTRY.register(RailboundBlocks.CARGO_TANK.get(), new dev.railbound.cargo.CargoMovingInteraction());
     }
 }

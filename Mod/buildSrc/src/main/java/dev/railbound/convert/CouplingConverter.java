@@ -45,12 +45,8 @@ public final class CouplingConverter {
                 continue;
             }
             List<CubeFace> faces = parts.computeIfAbsent(part, k -> new ArrayList<>());
-            for (String direction : Element.DIRECTIONS) {
-                element.face(direction).ifPresent(face -> {
-                    faces.add(face);
-                    texturesUsed.add(face.texture());
-                });
-            }
+            element.problem().ifPresent(problems::add);
+            faces.addAll(element.faces());
         }
         if (!unknown.isEmpty()) {
             problems.add("cubes in " + unknown + " belong to no part; parts are head, shank, bellows and flap");
@@ -60,7 +56,9 @@ public final class CouplingConverter {
                 problems.add("the coupling has no '" + required + "' group");
             }
         }
-        ModelSource.Texture texture = source.texture(texturesUsed, problems);
+        List<CubeFace> allFaces = new ArrayList<>();
+        parts.values().forEach(allFaces::addAll);
+        ModelSource.Texture texture = allFaces.isEmpty() ? null : source.texture(allFaces, problems);
         if (!problems.isEmpty()) {
             throw new ConversionException("coupling " + style + ": " + String.join("; ", problems));
         }

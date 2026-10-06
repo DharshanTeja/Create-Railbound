@@ -3,21 +3,14 @@ package dev.railbound.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.CreateClient;
-import com.simibubi.create.content.contraptions.Contraption;
 import com.simibubi.create.content.trains.entity.Carriage;
 import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
 import com.simibubi.create.content.trains.entity.Train;
 import dev.railbound.Railbound;
-import dev.railbound.carriage.AnchorBlock;
-import dev.railbound.carriage.AnchorBlockEntity;
-import dev.railbound.carriage.AnchorDesign;
-import dev.railbound.carriage.CarriageTransform;
-import dev.railbound.carriage.CouplerBlock;
+import dev.railbound.carriage.CarriageCouplers;
 import dev.railbound.carriage.CouplingGeometry;
-import dev.railbound.trainset.design.CouplerSpec;
 import dev.railbound.trainset.design.GangwaySpec;
 import dev.railbound.trainset.design.ParsedDesign;
-import dev.railbound.trainset.load.TrainsetDesigns;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -25,10 +18,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.model.data.ModelData;
@@ -38,15 +29,14 @@ import org.joml.Quaternionf;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.WeakHashMap;
+import java.util.UUID;
 
 /**
  * Knuckle couplers on trains, drawn instead of Create's chain: at both ends of our trainsets, and on Create-built
- * carriages at their coupler blocks. Each knuckle keeps its own length and swivels (a little) at its carriage end to
- * point at the middle of the gap, so on straight track the two heads lock together there and on very tight curves
- * they part. Between two coaches the gangway bellows and floor flaps bend from one end door to the other; at a free
+ * carriages at their coupler blocks. The two heads always lock together in the middle of the gap; each knuckle
+ * swivels at its carriage end to point there and, on curves tight enough to swing the ends apart, slides out of its
+ * draft gear on a slimmer bar. Between two coaches the gangway bellows and floor flaps bend from one end door to the other; at a free
  * coach end its half of the bellows stands out. Parked carriages show the same through {@link #drawParked}. The parts
  * are Blockbench art (art/couplings/coupling_knuckle.bbmodel), each looking along +z away from its carriage.
  */
@@ -59,12 +49,8 @@ public final class CouplingRenderer {
     public static final List<ModelResourceLocation> MODELS = List.of(SHANK, HEAD, BELLOWS, FLAP);
     /** How far the knuckle head reaches back from its coupling face (blocks): the shank runs up to it. */
     private static final double HEAD_BACK = 7.6 / 16;
-    /**
-     * A coupler's length, carriage end to coupling face (blocks): our trainsets are placed a block apart, so two of
-     * theirs lock halfway; a coupler block reaches through its own block and half a block more.
-     */
-    private static final double TRAINSET_REACH = 0.5;
-    private static final double BLOCK_REACH = 1.5;
+    /** The bar a knuckle slides out on, as thick as this share of its shank. */
+    private static final float SLIDE_THICKNESS = 0.7f;
     /** The art's sizes (blocks): a fold 4 px deep, the bellows' opening. Half the bellows stands out of a free end. */
     private static final double FOLD = 4 / 16.0;
     private static final double BELLOWS_HALF_WIDTH = 11.5 / 16;
@@ -73,18 +59,18 @@ public final class CouplingRenderer {
     /** Folds overlap a little so the outside of a curve shows no gaps; each flap reaches past the middle. */
     private static final double FOLD_OVERLAP = 1.2;
     private static final double FLAP_REACH = 0.55;
-    /** Each carriage's couplers in its own coordinates, found once per contraption. */
-    private static final Map<Contraption, List<LocalCoupler>> COUPLERS = new WeakHashMap<>();
-
-    /** A coupler on a carriage: where its knuckle starts, which way it points out, how long it is, and any gangway. */
-    private record LocalCoupler(Vec3 start, Direction out, double reach, double height, Optional<GangwaySpec> gangway) {}
+    /** How far from the meeting point a wrench still finds a joined coupler (blocks). */
+    private static final double PICK_SIZE = 0.4;
 
     /** A coupler in the world this frame. */
-    private record Coupler(CouplingGeometry.End end, LocalCoupler local) {}
+    private record Coupler(CouplingGeometry.End end, CarriageCouplers.Local local) {}
+
+    /** A joined coupler a wrench points at: its train, the gap behind carriage {@code gap}, and how far away. */
+    public record Pick(UUID train, int gap, double distance) {}
 
     /** A carriage's couplers this frame and its middle (which way is towards it). */
-    private record CarriageCouplers(List<Coupler> couplers, Vec3 middle) {
-        static final CarriageCouplers NONE = new CarriageCouplers(List.of(), Vec3.ZERO);
+    private record CarriageEnds(List<Coupler> couplers, Vec3 middle) {
+        static final CarriageEnds NONE = new CarriageEnds(List.of(), Vec3.ZERO);
     }
 
     private CouplingRenderer() {}
@@ -98,9 +84,33 @@ public final class CouplingRenderer {
         return level != null && joined(couplers(entityOf(level, a), 1), couplers(entityOf(level, b), 1)).isPresent();
     }
 
-    private static Optional<int[]> joined(CarriageCouplers a, CarriageCouplers b) {
+    private static Optional<int[]> joined(CarriageEnds a, CarriageEnds b) {
         return CouplingGeometry.facing(a.couplers().stream().map(Coupler::end).toList(), a.middle(),
                 b.couplers().stream().map(Coupler::end).toList(), b.middle());
+    }
+
+    /** The nearest joined coupler on the line from one point to another, as drawn at partialTick. */
+    public static Optional<Pick> pick(Level level, Vec3 from, Vec3 to, float partialTick) {
+        Pick best = null;
+        for (Train train : CreateClient.RAILWAYS.trains.values()) {
+            CarriageEnds previous = null;
+            for (int i = 0; i < train.carriages.size(); i++) {
+                CarriageEnds current = couplers(entityOf(level, train.carriages.get(i)), partialTick);
+                if (previous != null) {
+                    Optional<int[]> pair = joined(previous, current);
+                    if (pair.isPresent()) {
+                        Vec3 meet = CouplingGeometry.meet(previous.couplers().get(pair.get()[0]).end(),
+                                current.couplers().get(pair.get()[1]).end());
+                        Optional<Vec3> hit = new AABB(meet, meet).inflate(PICK_SIZE).clip(from, to);
+                        if (hit.isPresent() && (best == null || hit.get().distanceTo(from) < best.distance())) {
+                            best = new Pick(train.id, i - 1, hit.get().distanceTo(from));
+                        }
+                    }
+                }
+                previous = current;
+            }
+        }
+        return Optional.ofNullable(best);
     }
 
     public static void render(RenderLevelStageEvent event) {
@@ -121,15 +131,15 @@ public final class CouplingRenderer {
         pose.pushPose();
         pose.translate(-camera.x, -camera.y, -camera.z);
         for (Train train : CreateClient.RAILWAYS.trains.values()) {
-            List<CarriageCouplers> carriages = new ArrayList<>();
+            List<CarriageEnds> carriages = new ArrayList<>();
             List<boolean[]> used = new ArrayList<>();
             for (Carriage carriage : train.carriages) {
-                CarriageCouplers couplers = couplers(entityOf(level, carriage), partialTick);
+                CarriageEnds couplers = couplers(entityOf(level, carriage), partialTick);
                 carriages.add(couplers);
                 used.add(new boolean[couplers.couplers().size()]);
             }
             for (int i = 0; i < carriages.size() - 1; i++) {
-                CarriageCouplers a = carriages.get(i), b = carriages.get(i + 1);
+                CarriageEnds a = carriages.get(i), b = carriages.get(i + 1);
                 Optional<int[]> pair = joined(a, b);
                 if (pair.isEmpty()) {
                     continue;
@@ -142,8 +152,8 @@ public final class CouplingRenderer {
                     continue;
                 }
                 int light = LevelRenderer.getLightColor(level, BlockPos.containing(meet));
-                drawKnuckle(pose, consumer, ca.end(), CouplingGeometry.head(ca.end(), meet, ca.local().reach()), light);
-                drawKnuckle(pose, consumer, cb.end(), CouplingGeometry.head(cb.end(), meet, cb.local().reach()), light);
+                drawKnuckle(pose, consumer, ca.end(), meet, ca.local().reach(), light);
+                drawKnuckle(pose, consumer, cb.end(), meet, cb.local().reach(), light);
                 if (ca.local().gangway().isPresent() && cb.local().gangway().isPresent()) {
                     drawGangway(pose, consumer, ca.end(), cb.end(), ca.local().gangway().get(), ca.local().height(),
                             cb.local().gangway().get(), cb.local().height(), true, light);
@@ -176,14 +186,14 @@ public final class CouplingRenderer {
             CouplingGeometry.End front = new CouplingGeometry.End(new Vec3(0.5, y, 0), new Vec3(0, 0, -1), new Vec3(-1, 0, 0), up);
             CouplingGeometry.End back = new CouplingGeometry.End(new Vec3(0.5, y, design.length()), new Vec3(0, 0, 1), new Vec3(1, 0, 0), up);
             for (CouplingGeometry.End end : new CouplingGeometry.End[] {front, back}) {
-                drawFreeEnd(pose, consumer, end, TRAINSET_REACH, coupler.height(), coupler.gangway(), light);
+                drawFreeEnd(pose, consumer, end, CarriageCouplers.TRAINSET_REACH, coupler.height(), coupler.gangway(), light);
             }
         });
     }
 
     private static void drawFreeEnd(PoseStack pose, VertexConsumer consumer, CouplingGeometry.End end, double reach, double height,
                                     Optional<GangwaySpec> gangway, int light) {
-        drawKnuckle(pose, consumer, end, CouplingGeometry.rest(end, reach), light);
+        drawKnuckle(pose, consumer, end, CouplingGeometry.rest(end, reach), reach, light);
         gangway.ifPresent(g -> {
             CouplingGeometry.End out = new CouplingGeometry.End(CouplingGeometry.rest(end, HALF_BELLOWS), end.outward().scale(-1),
                     end.right().scale(-1), end.up());
@@ -198,89 +208,38 @@ public final class CouplingRenderer {
     }
 
     /** A carriage's couplers in the world this frame (none for a carriage without any), and its middle. */
-    private static CarriageCouplers couplers(@Nullable CarriageContraptionEntity entity, float partialTick) {
+    private static CarriageEnds couplers(@Nullable CarriageContraptionEntity entity, float partialTick) {
         if (entity == null || entity.getContraption() == null) {
-            return CarriageCouplers.NONE;
+            return CarriageEnds.NONE;
         }
         List<Coupler> out = new ArrayList<>();
-        for (LocalCoupler local : localCouplers(entity.getContraption())) {
-            out.add(new Coupler(end(entity, local, partialTick), local));
+        for (CarriageCouplers.Local local : CarriageCouplers.of(entity.getContraption())) {
+            out.add(new Coupler(CarriageCouplers.end(entity, local, partialTick), local));
         }
-        return new CarriageCouplers(out, entity.getBoundingBox().getCenter());
+        return new CarriageEnds(out, entity.getBoundingBox().getCenter());
     }
 
     /**
-     * Our trainset's two ends (from its design: the design comes from the anchor's data, which travels with the
-     * carriage), or a Create-built carriage's coupler blocks. Only firm answers are remembered, so a trainset seen
-     * before its data or designs arrive is looked at again.
+     * One knuckle coupler with its head at the given point: its shank from the carriage end, swivelled to point at the
+     * head, and where the head is further out than the knuckle's own length, a slimmer bar slid out of the draft gear.
      */
-    private static List<LocalCoupler> localCouplers(Contraption contraption) {
-        List<LocalCoupler> known = COUPLERS.get(contraption);
-        if (known != null) {
-            return known;
-        }
-        List<LocalCoupler> found = new ArrayList<>();
-        for (Map.Entry<BlockPos, StructureBlockInfo> block : contraption.getBlocks().entrySet()) {
-            BlockPos pos = block.getKey();
-            if (block.getValue().state().getBlock() instanceof AnchorBlock) {
-                Optional<ResourceLocation> id = AnchorDesign.of(block.getValue().nbt());
-                if (id.isEmpty() && contraption.getBlockEntityClientSide(pos) instanceof AnchorBlockEntity anchor) {
-                    id = Optional.ofNullable(anchor.designId());
-                }
-                Optional<ParsedDesign> design = id.flatMap(TrainsetDesigns::get);
-                if (design.isEmpty()) {
-                    return List.of();
-                }
-                Direction facing = block.getValue().state().getValue(AnchorBlock.FACING);
-                design.get().design().coupler().ifPresent(coupler -> {
-                    found.add(trainsetEnd(pos, design.get(), coupler, facing, 0, facing));
-                    found.add(trainsetEnd(pos, design.get(), coupler, facing, design.get().length(), facing.getOpposite()));
-                });
-            } else if (block.getValue().state().getBlock() instanceof CouplerBlock) {
-                Direction out = block.getValue().state().getValue(CouplerBlock.FACING);
-                found.add(new LocalCoupler(CouplingGeometry.blockEnd(pos, out), out, BLOCK_REACH, 0, Optional.empty()));
-            }
-        }
-        COUPLERS.put(contraption, found);
-        return found;
-    }
-
-    private static LocalCoupler trainsetEnd(BlockPos anchor, ParsedDesign design, CouplerSpec coupler, Direction facing, double z,
-                                            Direction out) {
-        Vec3 start = Vec3.atLowerCornerOf(anchor)
-                .add(CarriageTransform.toAnchorRelative(design, facing, 0.5, coupler.height() / 16 + 1, z));
-        return new LocalCoupler(start, out, TRAINSET_REACH, coupler.height(), coupler.gangway());
-    }
-
-    private static CouplingGeometry.End end(CarriageContraptionEntity entity, LocalCoupler local, float partialTick) {
-        Vec3 centre = global(entity, local.start(), partialTick);
-        Vec3 outward = global(entity, local.start().add(Vec3.atLowerCornerOf(local.out().getNormal())), partialTick).subtract(centre);
-        Vec3 right = global(entity, local.start().add(Vec3.atLowerCornerOf(local.out().getClockWise().getNormal())), partialTick)
-                .subtract(centre);
-        Vec3 up = global(entity, local.start().add(0, 1, 0), partialTick).subtract(centre);
-        return new CouplingGeometry.End(centre, outward.normalize(), right.normalize(), up.normalize());
-    }
-
-    /**
-     * A point on a carriage in the world, where the carriage is drawn this frame. Create's toGlobalVector turns by the
-     * in-between rotation but adds this tick's position, a tick ahead of the drawn body at speed; use the in-between
-     * position too.
-     */
-    private static Vec3 global(CarriageContraptionEntity entity, Vec3 local, float partialTick) {
-        return entity.toGlobalVector(local, partialTick).subtract(entity.position()).add(entity.getPosition(partialTick));
-    }
-
-    /** One knuckle coupler: its shank from the carriage end, swivelled to point at its head, and the head itself. */
-    static void drawKnuckle(PoseStack pose, VertexConsumer consumer, CouplingGeometry.End end, Vec3 head, int light) {
+    static void drawKnuckle(PoseStack pose, VertexConsumer consumer, CouplingGeometry.End end, Vec3 head, double reach, int light) {
         Vec3 along = head.subtract(end.centre());
         if (along.lengthSqr() < 1e-6) {
             along = end.outward().scale(1e-3);
         }
-        double shank = along.length() - HEAD_BACK;
+        double shank = Math.min(along.length(), reach) - HEAD_BACK;
         if (shank > 1e-3) {
             pose.pushPose();
             place(pose, end.centre(), along, end.up());
             pose.scale(1, 1, (float) shank);
+            draw(pose, consumer, SHANK, light);
+            pose.popPose();
+        }
+        if (CouplingGeometry.slide(end, head, reach) > 1e-3) {
+            pose.pushPose();
+            place(pose, end.centre(), along, end.up());
+            pose.scale(SLIDE_THICKNESS, SLIDE_THICKNESS, (float) (along.length() - HEAD_BACK));
             draw(pose, consumer, SHANK, light);
             pose.popPose();
         }

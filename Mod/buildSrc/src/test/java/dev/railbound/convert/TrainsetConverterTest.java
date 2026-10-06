@@ -207,10 +207,12 @@ class TrainsetConverterTest {
     }
 
     @Test
-    void rejectsATextureLargerThan512() throws Exception {
-        ConversionException e = assertThrows(ConversionException.class,
-                () -> TrainsetConverter.convert("railbound", "tiny", model(1024, 24, "door_right_front"), design("door_right_front")));
-        assertTrue(e.getMessage().contains("512"), e.getMessage());
+    void scalesATextureLargerThan512DownToFit() throws Exception {
+        // a glTF import's 1024 px texture is halved rather than refused; the uvs keep their place on it
+        ConvertedTrainset out = TrainsetConverter.convert("railbound", "tiny", model(1024, 24, "door_right_front"), design("door_right_front"));
+        BufferedImage texture = ImageIO.read(new java.io.ByteArrayInputStream(out.texturePng()));
+        assertEquals(512, texture.getWidth());
+        assertTrue(out.objects().get("body").contains("vt 0.003906 0.003906\n"), "uv 4 of 1024 stays 4/1024 of the way across");
     }
 
     /** A design with a one-axle drive and the door whose group the model has. */

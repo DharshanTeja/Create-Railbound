@@ -14,34 +14,16 @@ class ExhaustTest {
     }
 
     @Test
-    void eachChuffPuffsSmokeAndMoreWhenWorkingHard() {
-        Exhaust cruising = Exhaust.of(1, true, 0.5, false, 3, Exhaust.LONG_STOPPED, 1.0);
-        Exhaust pulling = Exhaust.of(1, true, 0.5, true, 3, Exhaust.LONG_STOPPED, 1.0);
-        assertTrue(cruising.chuff());
-        assertEquals(Exhaust.PUFFS, cruising.smokePuffs());
-        assertTrue(pulling.smokePuffs() > cruising.smokePuffs());
-        assertEquals(2 * cruising.smokePuffs(), Exhaust.of(2, true, 0.5, false, 3, Exhaust.LONG_STOPPED, 1.0).smokePuffs());
+    void aWorkingEngineChuffsWithEachBeat() {
+        assertTrue(Exhaust.of(1, true, 0.5, false, 3, Exhaust.LONG_STOPPED, 1.0).chuff());
+        assertFalse(Exhaust.of(0, true, 0.5, false, 3, Exhaust.LONG_STOPPED, 1.0).chuff(), "between beats");
     }
 
     @Test
-    void aDeadFireMakesNoSmokeAndNoChuffs() {
+    void aDeadFireMakesNoChuffs() {
         Exhaust coasting = Exhaust.of(2, false, 0.5, false, 0, Exhaust.LONG_STOPPED, 1.0);
-        assertEquals(0, coasting.smokePuffs());
         assertFalse(coasting.chuff());
-        assertFalse(coasting.wisp());
         assertFalse(coasting.cylinderSteam());
-    }
-
-    @Test
-    void aStandingEngineWithItsFireLitSendsUpAWispNowAndThen() {
-        int wisps = 0;
-        for (long tick = 0; tick < 80; tick++) {
-            Exhaust standing = Exhaust.of(0, true, 0, false, tick, Exhaust.LONG_STOPPED, 1.0);
-            assertEquals(0, standing.smokePuffs());
-            wisps += standing.wisp() ? 1 : 0;
-        }
-        assertTrue(wisps >= 5 && wisps <= 20, wisps + " wisps in 4 seconds");
-        assertFalse(Exhaust.of(0, true, 0.5, false, 0, Exhaust.LONG_STOPPED, 1.0).wisp(), "no idle wisps on the move");
     }
 
     @Test

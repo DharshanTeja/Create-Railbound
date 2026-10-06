@@ -134,9 +134,9 @@ class DesignValidatorTest {
     @Test
     void rejectsAPartInTheBogeysOwnCell() {
         List<List<String>> layers = copyLayers();
-        layers.get(0).set(4, "l#r");
+        layers.get(0).set(3, "l#r");
         assertProblem(TestDesigns.withLayout(SAMPLE, new LayoutSpec(SAMPLE.layout().palette(), layers)),
-                "bogey z=4 needs layer 0 at x=0 to be air");
+                "bogey z=3 needs layer 0 at x=0 to be air");
     }
 
     @Test

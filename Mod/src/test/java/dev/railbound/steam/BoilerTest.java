@@ -110,24 +110,39 @@ class BoilerTest {
     }
 
     @Test
-    void aFullLoadLastsAboutOneDayAndTheWaterRunsOutFirst() {
+    void aFullTankLastsAboutOneDayAndTheCoalOutlastsIt() {
         Boiler boiler = full();
         Bunker bunker = new Bunker(128);
-        int waterGone = -1, coalGone = -1;
-        for (int t = 1; t <= 3 * TICKS_PER_DAY && (waterGone < 0 || coalGone < 0); t++) {
+        int waterGone = -1;
+        for (int t = 1; t <= 2 * TICKS_PER_DAY && waterGone < 0; t++) {
             boiler.tick(0.6, bunker);
-            if (waterGone < 0 && boiler.plugMelted()) {
+            if (boiler.plugMelted()) {
                 waterGone = t;
-                boiler.addWater(TANK);   // the crew refills the tank and carries on
-            }
-            if (coalGone < 0 && bunker.coal == 0 && !boiler.fireLit()) {
-                coalGone = t;
             }
         }
         assertTrue(waterGone > 0.75 * TICKS_PER_DAY && waterGone < TICKS_PER_DAY,
                 "water lasted " + waterGone / (double) TICKS_PER_DAY + " days");
-        assertTrue(coalGone > waterGone, "coal outlasts the water");
-        assertTrue(coalGone < 1.4 * TICKS_PER_DAY, "coal lasted " + coalGone / (double) TICKS_PER_DAY + " days");
+        assertTrue(bunker.coal > 100, "most of the coal is left: " + bunker.coal);
+    }
+
+    @Test
+    void oneCoalBurnsForEightySecondsFlatOutLikeInAFurnace() {
+        Boiler boiler = full();
+        Bunker bunker = new Bunker(100);
+        for (int t = 0; t < 10 * 80 * 20; t++) {
+            boiler.tick(1, bunker);
+        }
+        assertEquals(10, bunker.taken);
+    }
+
+    @Test
+    void idlingOneCoalLastsFourTimesAsLong() {
+        Boiler boiler = full();
+        Bunker bunker = new Bunker(100);
+        for (int t = 0; t < 2 * 4 * 80 * 20; t++) {
+            boiler.tick(0, bunker);
+        }
+        assertEquals(2, bunker.taken);
     }
 
     @Test
@@ -189,20 +204,23 @@ class BoilerTest {
     }
 
     @Test
-    void withoutCoalItCoastsToAStopWithinHalfAMinute() {
+    void withoutCoalItCoastsToAStopWithinHalfAMinuteOfTheFireGoingOut() {
         Boiler boiler = full();
         Bunker bunker = new Bunker(64);
         for (int t = 0; t < 4000; t++) {
             boiler.tick(0, bunker);
         }
         bunker.coal = 0;
+        while (boiler.fireLit()) {
+            boiler.tick(1, bunker);   // the last lump in the firebox burns out
+        }
         int t = 0;
         while (boiler.pull() > 0 && t < 20 * 120) {
             boiler.tick(1, bunker);
             t++;
         }
         assertEquals(0, boiler.pull());
-        assertTrue(t <= 45 * 20, "kept pulling for " + t / 20.0 + " s after the last coal");
+        assertTrue(t <= 45 * 20, "kept pulling for " + t / 20.0 + " s after the fire went out");
     }
 
     @Test

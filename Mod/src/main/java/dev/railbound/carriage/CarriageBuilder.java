@@ -60,6 +60,10 @@ public final class CarriageBuilder {
         for (PlacedPart part : plan.parts()) {
             if (level.getBlockEntity(part.pos()) instanceof BunkerBlockEntity bunker) {
                 bunker.setDesignId(designId);
+            } else if (level.getBlockEntity(part.pos()) instanceof dev.railbound.cargo.CargoHoldBlockEntity hold) {
+                hold.setDesignId(designId);
+            } else if (level.getBlockEntity(part.pos()) instanceof dev.railbound.cargo.CargoTankBlockEntity tank) {
+                tank.setDesignId(designId);
             }
         }
     }

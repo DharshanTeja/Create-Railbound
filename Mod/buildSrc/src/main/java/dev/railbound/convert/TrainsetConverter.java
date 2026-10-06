@@ -51,24 +51,23 @@ public final class TrainsetConverter {
             if (part.isEmpty()) {
                 continue;
             }
+            element.problem().ifPresent(problems::add);
             List<CubeFace> faces = partFaces.computeIfAbsent(part.get(), p -> new ArrayList<>());
+            String kind = element.isMesh() ? "mesh" : "cube";
             boolean outside = false;
-            for (String direction : Element.DIRECTIONS) {
-                Optional<CubeFace> face = element.face(direction);
-                if (face.isEmpty()) {
-                    continue;
-                }
-                faces.add(face.get());
-                texturesUsed.add(face.get().texture());
-                for (double[] corner : face.get().corners()) {
+            boolean flush = false;
+            for (CubeFace face : element.faces()) {
+                faces.add(face);
+                for (double[] corner : face.corners()) {
                     outside |= Math.abs(corner[0]) > HALF_WIDTH + EPSILON || Math.abs(corner[2]) > 8 * length + END_OVERHANG + EPSILON;
                 }
+                flush |= facesUp(face) && flushWithBogeyTop(face, bogeyZones);
             }
             if (outside) {
-                problems.add("cube '" + element.name() + "' sticks out past the 3-block width (x within ±24) or the carriage ends");
+                problems.add(kind + " '" + element.name() + "' sticks out past the 3-block width (x within ±24) or the carriage ends");
             }
-            if (element.face("up").filter(face -> flushWithBogeyTop(face, bogeyZones)).isPresent()) {
-                problems.add("cube '" + element.name() + "' has its top at y 0 over a bogey; raise it to y "
+            if (flush) {
+                problems.add(kind + " '" + element.name() + "' has its top at y 0 over a bogey; raise it to y "
                         + BOGEY_CLEARANCE + " or more so Create's bogey top does not flicker through it");
             }
         }
@@ -109,7 +108,9 @@ public final class TrainsetConverter {
             }
         }
 
-        ModelSource.Texture texture = source.texture(texturesUsed, problems);
+        List<CubeFace> allFaces = new ArrayList<>();
+        partFaces.values().forEach(allFaces::addAll);
+        ModelSource.Texture texture = allFaces.isEmpty() ? null : source.texture(allFaces, problems);
         if (!problems.isEmpty()) {
             throw new ConversionException(id + ": " + String.join("; ", problems));
         }
@@ -121,6 +122,11 @@ public final class TrainsetConverter {
             modelJsons.put(part.getKey(), ModelSource.loaderJson(namespace, "trainset", id, part.getKey()));
         }
         return new ConvertedTrainset(namespace, id, objects, modelJsons, ModelSource.MATERIAL, texture.png());
+    }
+
+    /** A cube's top, or a mesh face pointing straight up. */
+    private static boolean facesUp(CubeFace face) {
+        return face.direction().equals("up") || face.direction().equals("mesh") && ModelSource.normal(face.corners())[1] > 0.99;
     }
 
     /** An upward face within BOGEY_CLEARANCE of y 0, over the bogey's width, inside a bogey's cell. */

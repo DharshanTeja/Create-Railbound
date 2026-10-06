@@ -3,6 +3,7 @@ package dev.railbound.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.simibubi.create.content.trains.entity.Train;
 import dev.railbound.steam.LocoSteam;
+import dev.railbound.steam.LocoWhistle;
 import dev.railbound.steam.SteamTrain;
 import dev.railbound.steam.TrainPower;
 import net.minecraft.world.level.Level;
@@ -40,6 +41,7 @@ public abstract class TrainSteamMixin implements SteamTrain {
     private void railbound$tickBoilers(Level level, CallbackInfo ci) {
         if (!level.isClientSide) {
             LocoSteam.tick((Train) (Object) this, level.getGameTime());
+            LocoWhistle.tick((Train) (Object) this, level);
         }
     }
 

@@ -4,7 +4,7 @@
   "size": { "length": 16, "width": 3, "height": 4 },
   "bogeys": [
     { "z": 3, "style": "railbound:steam_truck" },
-    { "z": 12, "style": "railbound:steam_truck" }
+    { "z": 13, "style": "railbound:steam_truck" }
   ],
   "power": "steam",
   "coupler": { "height": -7.5 },
@@ -35,8 +35,8 @@
       ".": "air"
     },
     "layers": [
-      ["XXX", "XXX", "XXX", "X.X", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "X.X", "TXT", "XXX", "XXX"],
-      [".X.", ".X.", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "FFF", "LCR", "LSR", ".C.", "XXX", "XBX"],
+      ["XXX", "XXX", "XXX", "X.X", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "T.T", "XXX", "XXX"],
+      [".X.", ".X.", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "FFF", "C.R", "S.S", "...", "XXC", "XBX"],
       [".X.", ".X.", "XXX", "WXW", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "L.R", "L.R", "...", "XXX", "XXX"],
       [".t.", ".t.", ".t.", ".t.", ".t.", ".A.", ".t.", ".t.", ".t.", ".t.", "XXX", "XXX", "XXX", "XXX", "XXX", "ttt"]
     ]

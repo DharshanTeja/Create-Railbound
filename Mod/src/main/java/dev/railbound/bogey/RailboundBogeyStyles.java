@@ -17,6 +17,7 @@ import net.minecraft.network.chat.Component;
 public final class RailboundBogeyStyles {
     public static BogeyStyle COACH;
     public static BogeyStyle STEAM_TRUCK;
+    public static BogeyStyle FREIGHT;
 
     private RailboundBogeyStyles() {}
 
@@ -37,6 +38,14 @@ public final class RailboundBogeyStyles {
                 .size(BogeySizes.SMALL, RailboundBlocks.STEAM_TRUCK_BOGEY, () -> () -> new BogeyStyle.SizeRenderer(
                         new TrainsetBogeyRenderer(TrainsetBogeyModels.STEAM_TRUCK),
                         (ctx, partialTick, inContraption) -> new TrainsetBogeyVisual(ctx, TrainsetBogeyModels.STEAM_TRUCK)))
+                .build();
+        FREIGHT = new BogeyStyle.Builder(Railbound.rl("freight"), Railbound.rl("railbound"))
+                .displayName(Component.translatable("railbound.bogey.style.freight"))
+                // no steam puffs from goods wagon trucks either
+                .smokeParticle(RailboundParticles.NONE)
+                .size(BogeySizes.SMALL, RailboundBlocks.FREIGHT_BOGEY, () -> () -> new BogeyStyle.SizeRenderer(
+                        new TrainsetBogeyRenderer(TrainsetBogeyModels.FREIGHT),
+                        (ctx, partialTick, inContraption) -> new TrainsetBogeyVisual(ctx, TrainsetBogeyModels.FREIGHT)))
                 .build();
     }
 }

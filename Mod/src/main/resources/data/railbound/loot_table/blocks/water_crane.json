@@ -11,6 +11,13 @@
       ],
       "conditions": [
         {
+          "condition": "minecraft:block_state_property",
+          "block": "railbound:water_crane",
+          "properties": {
+            "section": "0"
+          }
+        },
+        {
           "condition": "minecraft:survives_explosion"
         }
       ]

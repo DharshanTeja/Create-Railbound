@@ -13,6 +13,7 @@ import dev.railbound.carriage.CarriageAttachment;
 import dev.railbound.carriage.CarriageBehaviours;
 import dev.railbound.carriage.CarriageFittings;
 import dev.railbound.carriage.CarriageProtection;
+import dev.railbound.coupling.TrainCoupling;
 import dev.railbound.network.RailboundNetwork;
 import dev.railbound.registry.RailboundBlockEntities;
 import dev.railbound.registry.RailboundBlocks;
@@ -57,6 +58,10 @@ public final class Railbound {
         NeoForge.EVENT_BUS.addListener(CarriageProtection::onPlace);
         NeoForge.EVENT_BUS.addListener(CarriageFittings::onRightClick);
         NeoForge.EVENT_BUS.addListener(CarriageFittings::onBreak);
+        NeoForge.EVENT_BUS.addListener(TrainCoupling::tick);
+        // before the carriage's own break handling, which would remove it
+        NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGH, dev.railbound.cargo.CargoAccess::onBreak);
+        NeoForge.EVENT_BUS.addListener(dev.railbound.cargo.CargoAccess::onRightClick);
     }
 
     public static ResourceLocation rl(String path) {
@@ -80,6 +85,7 @@ public final class Railbound {
         event.registerBlock(Capabilities.FluidHandler.BLOCK,
                 (level, pos, state, be, side) -> WaterTankBlock.bunkerOf(level, pos).map(BunkerBlockEntity::waterIn).orElse(null),
                 RailboundBlocks.WATER_TANK.get());
+        dev.railbound.cargo.CargoAccess.registerCapabilities(event);
     }
 
     private static void onAddReloadListeners(AddReloadListenerEvent event) {
