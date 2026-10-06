@@ -68,6 +68,33 @@ public final class InteriorParts {
         return seatAhead ? facing : facing.getOpposite();
     }
 
+    /**
+     * Seats face the carriage front, but a conductor seat with its controls only behind it faces back at them: a cab's
+     * position for driving bunker-first.
+     */
+    public static Direction seatFacing(Direction facing, boolean controlsAhead, boolean controlsBehind) {
+        return controlsBehind && !controlsAhead ? facing.getOpposite() : facing;
+    }
+
+    /** A seat's side is counted from its own facing, so one facing back has the carriage side on its other hand. */
+    public static PlaceholderSide seatSide(PlaceholderSide side, boolean facingBack) {
+        return facingBack ? side.mirrored() : side;
+    }
+
+    /**
+     * A cab's control stand: the carriage's outer wall, and a slim stand against it right in front of the driver's seat
+     * (which it faces), leaving the aisle clear and the far side of the cell free (it may be the cab's back wall). Its
+     * side is counted from its own facing, as a seat's is.
+     */
+    public static VoxelShape cabControlsShape(Direction facing, PlaceholderSide side) {
+        VoxelShape north = switch (side) {
+            case LEFT -> Shapes.or(WALL_LEFT, Block.box(2, 0, 0, 12, 16, 6));
+            case RIGHT -> Shapes.or(WALL_RIGHT, Block.box(4, 0, 0, 14, 16, 6));
+            case NONE -> Block.box(3, 0, 0, 13, 16, 6);
+        };
+        return FrameShapes.rotate(north.optimize(), facing);
+    }
+
     /** The carriage side a side-column seat backs onto (where its outer wall is), or empty for a centre seat. */
     public static Optional<Direction> seatOutward(Direction facing, PlaceholderSide side) {
         return switch (side) {

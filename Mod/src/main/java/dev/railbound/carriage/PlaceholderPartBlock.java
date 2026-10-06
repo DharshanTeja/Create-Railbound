@@ -18,7 +18,6 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class PlaceholderPartBlock extends CarriagePartBlock {
-    public static final EnumProperty<PlaceholderPart> PART = EnumProperty.create("part", PlaceholderPart.class);
     /** True on the floor layer: the cell has a walkable floor. */
     public static final BooleanProperty FLOOR = BooleanProperty.create("floor");
     /** The outer wall a side-column part carries, so the carriage side stays closed. */
@@ -29,7 +28,6 @@ public class PlaceholderPartBlock extends CarriagePartBlock {
     public PlaceholderPartBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any()
-                .setValue(PART, PlaceholderPart.CAB)
                 .setValue(FLOOR, true)
                 .setValue(SIDE, PlaceholderSide.NONE)
                 .setValue(FACING, Direction.NORTH));
@@ -37,7 +35,7 @@ public class PlaceholderPartBlock extends CarriagePartBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(PART, FLOOR, SIDE, FACING);
+        builder.add(FLOOR, SIDE, FACING);
     }
 
     /** Floor slab (floor layer) plus the outer wall (side columns). */

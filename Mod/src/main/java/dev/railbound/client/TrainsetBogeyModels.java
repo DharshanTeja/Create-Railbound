@@ -15,6 +15,8 @@ public record TrainsetBogeyModels(PartialModel frame, PartialModel wheels, float
     public static final TrainsetBogeyModels COACH = of("coach", 1);
     /** Axles 14 px either side, clear of the loco's driving wheels; must match the art (the converter checks it is even). */
     public static final TrainsetBogeyModels STEAM_TRUCK = of("steam_truck", 14 / 16f);
+    /** Goods wagons' diamond-frame truck: axles one block either side, as Create's own bogeys. */
+    public static final TrainsetBogeyModels FREIGHT = of("freight", 1);
 
     private static TrainsetBogeyModels of(String style, float axleOffset) {
         return new TrainsetBogeyModels(PartialModel.of(Railbound.rl("bogey/" + style + "/frame")),

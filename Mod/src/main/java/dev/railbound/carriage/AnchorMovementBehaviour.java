@@ -1,12 +1,16 @@
 package dev.railbound.carriage;
 
+import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.api.behaviour.movement.MovementBehaviour;
 import com.simibubi.create.content.contraptions.behaviour.MovementContext;
 import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
 import dev.railbound.registry.RailboundParticles;
 import dev.railbound.steam.LocoGaugeCache;
+import dev.railbound.steam.LocoVoices;
 import dev.railbound.steam.SteamGauges;
 import dev.railbound.steam.Exhaust;
+import dev.railbound.steam.Plume;
+import dev.railbound.registry.PlumeOptions;
 import dev.railbound.steam.TrainPower;
 import dev.railbound.trainset.design.ParsedDesign;
 import dev.railbound.trainset.design.SteamSpec;
@@ -24,7 +28,7 @@ import java.util.Optional;
 /**
  * On a moving train, rolls a loco's driving wheels by how far the carriage moved along its own length this tick, so
  * the motion turns in step with the train in either direction, and makes the exhaust: a chuff and a puff of smoke
- * from the chimney on every beat, idle wisps, and cylinder steam when starting off. Client side only.
+ * from the chimney (a steady plume, bigger on every beat), and cylinder steam when starting off. Client side only.
  */
 public class AnchorMovementBehaviour implements MovementBehaviour {
     @Override
@@ -57,10 +61,13 @@ public class AnchorMovementBehaviour implements MovementBehaviour {
         boolean whistling = context.contraption.entity instanceof CarriageContraptionEntity cce && cce.getCarriage() != null
                 && cce.getCarriage().train != null && cce.getCarriage().train.honkTicks > 0;
         design.design().steam().ifPresent(steam -> {
-            blow(context, design, facing, steam, exhaust, fired, anchor.ticksStopped());
+            blow(context, design, facing, steam, exhaust, fireLit, accelerating, fired, anchor.ticksStopped());
+            Vec3 whistle = world(context, design, facing, steam.whistle(), 1);
+            if (context.contraption.entity instanceof CarriageContraptionEntity loco && loco.trainId != null) {
+                LocoVoices.heard(loco.trainId, loco.getId(), whistle, context.world.getGameTime());
+            }
             if (whistling) {
                 // a white plume from the whistle for as long as the horn sounds
-                Vec3 whistle = world(context, design, facing, steam.whistle(), 1);
                 Vec3 up = context.rotation.apply(new Vec3(0, 1, 0));
                 RandomSource random = context.world.random;
                 for (int i = 0; i < 2; i++) {
@@ -72,25 +79,27 @@ public class AnchorMovementBehaviour implements MovementBehaviour {
     }
 
     private static void blow(MovementContext context, ParsedDesign design, Direction facing, SteamSpec steam,
-                             Exhaust exhaust, boolean justFired, int ticksStopped) {
+                             Exhaust exhaust, boolean fireLit, boolean accelerating, boolean justFired, int ticksStopped) {
         Level level = context.world;
         RandomSource random = level.random;
         Vec3 up = context.rotation.apply(new Vec3(0, 1, 0));
         Vec3 right = context.rotation.apply(Vec3.atLowerCornerOf(facing.getClockWise().getNormal()));
-        if (exhaust.smokePuffs() > 0 || exhaust.wisp()) {
-            // coal smoke: dark, and darker still just after the fireman has put coal on
+        // coal smoke: a steady stream with a bigger puff on each beat, carried along with the moving engine
+        double speed = context.motion.length();
+        double effort = accelerating ? 1 : speed > 0.01 ? 0.5 : 0;
+        Plume.of(fireLit, exhaust.chuff(), effort, speed, justFired).ifPresent(puff -> {
             Vec3 chimney = world(context, design, facing, steam.chimney(), 1);
-            int puffs = exhaust.wisp() ? 1 : exhaust.smokePuffs();
-            double speed = exhaust.wisp() ? 0.06 : 0.28;
-            for (int i = 0; i < puffs; i++) {
-                level.addParticle(justFired ? RailboundParticles.LOCO_SMOKE_DARK : RailboundParticles.LOCO_SMOKE,
-                        chimney.x + random.nextGaussian() * 0.06, chimney.y, chimney.z + random.nextGaussian() * 0.06,
-                        up.x * speed + random.nextGaussian() * 0.025, up.y * speed * (0.8 + random.nextFloat() * 0.4),
-                        up.z * speed + random.nextGaussian() * 0.025);
-            }
-        }
+            level.addParticle(PlumeOptions.of(puff),
+                    chimney.x + random.nextGaussian() * 0.04, chimney.y, chimney.z + random.nextGaussian() * 0.04,
+                    context.motion.x + up.x * puff.rise() + random.nextGaussian() * 0.015,
+                    context.motion.y + up.y * puff.rise() * (0.9 + random.nextFloat() * 0.2),
+                    context.motion.z + up.z * puff.rise() + random.nextGaussian() * 0.015);
+        });
         if (exhaust.chuff()) {
+            // each loco chuffs from its own chimney, heard about as far as a block sound, so a loco at the other end
+            // of the train is out of earshot (Create's own chuffing, from the first carriage only, is muted for us)
             Vec3 chimney = world(context, design, facing, steam.chimney(), 1);
+            AllSoundEvents.STEAM.playAt(level, chimney, accelerating ? 0.7f : 0.45f, 0.8f + random.nextFloat() * 0.1f, false);
             level.playLocalSound(chimney.x, chimney.y, chimney.z, SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL,
                     0.25f, 0.45f + random.nextFloat() * 0.1f, false);
         }

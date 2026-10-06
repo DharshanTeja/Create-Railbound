@@ -1,7 +1,9 @@
 package dev.railbound.network;
 
+import dev.railbound.coupling.TrainCoupling;
 import dev.railbound.steam.LocoGaugeCache;
 import dev.railbound.Railbound;
+import net.minecraft.server.level.ServerPlayer;
 import dev.railbound.trainset.design.DesignValidator;
 import dev.railbound.trainset.design.TrainsetDesign;
 import dev.railbound.trainset.load.TrainsetDesigns;
@@ -25,7 +27,17 @@ public final class RailboundNetwork {
                 SyncTrainsetDesignsPayload.STREAM_CODEC,
                 (payload, context) -> TrainsetDesigns.replace(acceptValid(payload.designs())))
                 .playToClient(LocoGaugesPayload.TYPE, LocoGaugesPayload.STREAM_CODEC,
-                        (payload, context) -> LocoGaugeCache.put(payload.entityId(), payload.gauges()));
+                        (payload, context) -> LocoGaugeCache.put(payload.entityId(), payload.gauges()))
+                .playToClient(TrainSplitPayload.TYPE, TrainSplitPayload.STREAM_CODEC,
+                        (payload, context) -> TrainCoupling.mirrorSplit(context.player().level(), payload))
+                .playToClient(TrainJoinPayload.TYPE, TrainJoinPayload.STREAM_CODEC,
+                        (payload, context) -> TrainCoupling.mirrorJoin(context.player().level(), payload))
+                .playToServer(UncouplePayload.TYPE, UncouplePayload.STREAM_CODEC,
+                        (payload, context) -> {
+                            if (context.player() instanceof ServerPlayer player) {
+                                TrainCoupling.uncouple(player, payload.train(), payload.gap());
+                            }
+                        });
     }
 
     /** Fires when a player joins and after /reload; sends the current designs to the affected players. */

@@ -1,0 +1,27 @@
+{
+  "name": "trainset.railbound.wagon_tank",
+  "category": "tank_car",
+  "size": { "length": 12, "width": 3, "height": 4 },
+  "bogeys": [
+    { "z": 2, "style": "railbound:freight" },
+    { "z": 9, "style": "railbound:freight" }
+  ],
+  "power": "none",
+  "coupler": { "height": -5 },
+  "cargo": { "fluid_mb": 144000 },
+  "layout": {
+    "palette": {
+      "X": "frame:full",
+      "t": "frame:roof",
+      "T": "cargo_fluid",
+      "A": "anchor",
+      ".": "air"
+    },
+    "layers": [
+      ["XXX", "XXX", "X.X", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "X.X", "XXX", "XXX"],
+      ["XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XTX", "XXX", "XXX", "XXX", "XXX", "XXX"],
+      ["XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX", "XXX"],
+      ["ttt", "ttt", "ttt", "ttt", "ttt", "ttt", "tAt", "ttt", "ttt", "ttt", "ttt", "ttt"]
+    ]
+  }
+}

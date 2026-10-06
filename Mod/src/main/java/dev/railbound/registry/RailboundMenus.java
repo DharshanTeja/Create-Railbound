@@ -14,5 +14,10 @@ public final class RailboundMenus {
     public static final DeferredHolder<MenuType<?>, MenuType<BunkerMenu>> BUNKER =
             MENUS.register("loco_bunker", () -> IMenuTypeExtension.create(BunkerMenu::new));
 
+    public static final DeferredHolder<MenuType<?>, MenuType<dev.railbound.cargo.HoldMenu>> CARGO_HOLD =
+            MENUS.register("cargo_hold", () -> IMenuTypeExtension.create(dev.railbound.cargo.HoldMenu::new));
+    public static final DeferredHolder<MenuType<?>, MenuType<dev.railbound.cargo.TankMenu>> CARGO_TANK =
+            MENUS.register("cargo_tank", () -> IMenuTypeExtension.create(dev.railbound.cargo.TankMenu::new));
+
     private RailboundMenus() {}
 }

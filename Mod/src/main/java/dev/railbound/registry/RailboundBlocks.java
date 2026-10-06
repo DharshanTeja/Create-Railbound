@@ -41,6 +41,12 @@ public final class RailboundBlocks {
     /** Not a carriage part: the truck a Railbound steam loco stands on. */
     public static final DeferredBlock<SteamTruckBogeyBlock> STEAM_TRUCK_BOGEY =
             BLOCKS.register("steam_truck_bogey", () -> new SteamTruckBogeyBlock(BlockBehaviour.Properties.ofFullCopy(AllBlocks.SMALL_BOGEY.get())));
+    /** A loco cab's control stand, which Create treats as Train Controls. */
+    public static final DeferredBlock<dev.railbound.carriage.CabControlsBlock> CAB_CONTROLS =
+            BLOCKS.register("cab_controls", () -> new dev.railbound.carriage.CabControlsBlock(CarriagePartBlock.partProperties()));
+    /** Not a carriage part: the diamond-frame truck Railbound goods wagons stand on. */
+    public static final DeferredBlock<dev.railbound.bogey.FreightBogeyBlock> FREIGHT_BOGEY =
+            BLOCKS.register("freight_bogey", () -> new dev.railbound.bogey.FreightBogeyBlock(BlockBehaviour.Properties.ofFullCopy(AllBlocks.SMALL_BOGEY.get())));
     public static final DeferredBlock<StepPartBlock> STEP =
             BLOCKS.register("carriage_step", () -> new StepPartBlock(CarriagePartBlock.partProperties()));
 
@@ -48,6 +54,11 @@ public final class RailboundBlocks {
             BLOCKS.register("loco_bunker", () -> new BunkerBlock(CarriagePartBlock.partProperties()));
     public static final DeferredBlock<WaterTankBlock> WATER_TANK =
             BLOCKS.register("loco_water_tank", () -> new WaterTankBlock(CarriagePartBlock.partProperties()));
+    /** A goods wagon's hold (items) and tank (fluid), hidden inside its body. */
+    public static final DeferredBlock<dev.railbound.cargo.CargoHoldBlock> CARGO_HOLD =
+            BLOCKS.register("cargo_hold", () -> new dev.railbound.cargo.CargoHoldBlock(CarriagePartBlock.partProperties()));
+    public static final DeferredBlock<dev.railbound.cargo.CargoTankBlock> CARGO_TANK =
+            BLOCKS.register("cargo_tank", () -> new dev.railbound.cargo.CargoTankBlock(CarriagePartBlock.partProperties()));
     public static final DeferredBlock<FireboxBlock> FIREBOX =
             BLOCKS.register("loco_firebox", () -> new FireboxBlock(CarriagePartBlock.partProperties()));
     /** Not a carriage part: the trackside crane that fills a stopped steam loco's tank. */

@@ -43,12 +43,8 @@ public final class BogeyConverter {
             }
             Optional<String> wheelset = path.stream().filter(g -> g.startsWith("wheels")).findFirst();
             List<CubeFace> faces = wheelset.map(w -> wheelsets.computeIfAbsent(w, k -> new ArrayList<>())).orElse(frame);
-            for (String direction : Element.DIRECTIONS) {
-                element.face(direction).ifPresent(face -> {
-                    faces.add(face);
-                    texturesUsed.add(face.texture());
-                });
-            }
+            element.problem().ifPresent(problems::add);
+            faces.addAll(element.faces());
         }
 
         if (frame.isEmpty()) {
@@ -66,7 +62,9 @@ public final class BogeyConverter {
             problems.add("groups " + wheelsets.keySet() + " must pivot on axles at (0, " + AXLE_Y
                     + ", ±z), every wheelset the same distance either side of the centre");
         }
-        ModelSource.Texture texture = source.texture(texturesUsed, problems);
+        List<CubeFace> allFaces = new ArrayList<>(frame);
+        wheelsets.values().forEach(allFaces::addAll);
+        ModelSource.Texture texture = allFaces.isEmpty() ? null : source.texture(allFaces, problems);
         if (!problems.isEmpty()) {
             throw new ConversionException("bogey " + style + ": " + String.join("; ", problems));
         }

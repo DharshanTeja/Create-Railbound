@@ -24,6 +24,33 @@ class CouplingGeometryTest {
     }
 
     @Test
+    void endsWhoseKnucklesReachEachOtherTouch() {
+        // a block apart, two half-block knuckles: their heads meet
+        assertTrue(CouplingGeometry.touching(A, B, 1.0));
+    }
+
+    @Test
+    void endsFurtherApartThanTheirKnucklesReachDoNotTouch() {
+        CouplingGeometry.End away = new CouplingGeometry.End(new Vec3(11.3, 64, 0), new Vec3(-1, 0, 0), new Vec3(0, 0, -1), UP);
+        assertFalse(CouplingGeometry.touching(A, away, 1.0));
+    }
+
+    @Test
+    void endsPushedPastEachOtherStillTouch() {
+        // a fast train overshoots in one tick: its end is already beyond the other's knuckle
+        CouplingGeometry.End past = new CouplingGeometry.End(new Vec3(10.2, 64, 0), new Vec3(-1, 0, 0), new Vec3(0, 0, -1), UP);
+        assertTrue(CouplingGeometry.touching(A, past, 1.0));
+    }
+
+    @Test
+    void endsFacingTheSameWayOrOnAnotherTrackDoNotTouch() {
+        CouplingGeometry.End sameWay = new CouplingGeometry.End(new Vec3(11, 64, 0), new Vec3(1, 0, 0), new Vec3(0, 0, 1), UP);
+        assertFalse(CouplingGeometry.touching(A, sameWay, 1.0));
+        CouplingGeometry.End nextTrack = new CouplingGeometry.End(new Vec3(11, 64, 3), new Vec3(-1, 0, 0), new Vec3(0, 0, -1), UP);
+        assertFalse(CouplingGeometry.touching(A, nextTrack, 1.0));
+    }
+
+    @Test
     void theKnucklesMeetHalfwayBetweenTheEnds() {
         assertVec(new Vec3(10.5, 64, 0), CouplingGeometry.meet(A, B));
     }
@@ -95,29 +122,22 @@ class CouplingGeometryTest {
     }
 
     @Test
-    void aKnuckleKeepsItsLengthAndPointsAtTheMeetingPoint() {
-        // ends swung 3 blocks apart on a curve: each knuckle reaches its own length towards the middle, no further
+    void onAStraightTheKnuckleDoesNotSlide() {
+        // ends a block apart, knuckles half a block long: they lock in the middle as they are
+        assertEquals(0, CouplingGeometry.slide(A, CouplingGeometry.meet(A, B), 0.5), 1e-9);
+    }
+
+    @Test
+    void onACurveTheKnuckleSlidesOutJustFarEnoughToKeepTheHeadsLocked() {
+        // ends swung apart round a tight curve: the meeting point is ~1.58 blocks out, the knuckle is 0.5 long
         CouplingGeometry.End far = new CouplingGeometry.End(new Vec3(13, 64, 1), new Vec3(-1, 0, 0), new Vec3(0, 0, -1), UP);
         Vec3 meet = CouplingGeometry.meet(A, far);
-        Vec3 head = CouplingGeometry.head(A, meet, 0.5);
-        assertEquals(0.5, head.distanceTo(A.centre()), 1e-9);
-        assertEquals(0, head.subtract(A.centre()).normalize().cross(meet.subtract(A.centre()).normalize()).length(), 1e-9);
+        assertEquals(meet.distanceTo(A.centre()) - 0.5, CouplingGeometry.slide(A, meet, 0.5), 1e-9);
     }
 
     @Test
-    void aKnuckleSwivelsNoFurtherThanItsDraftGearAllows() {
-        // the other carriage swung far round a tight curve: the knuckle turns towards it only so far
-        CouplingGeometry.End aside = new CouplingGeometry.End(new Vec3(11, 64, 2), new Vec3(-1, 0, 0), new Vec3(0, 0, -1), UP);
-        Vec3 head = CouplingGeometry.head(A, CouplingGeometry.meet(A, aside), 0.5);
-        Vec3 along = head.subtract(A.centre());
-        assertEquals(0.5, along.length(), 1e-9);
-        assertEquals(CouplingGeometry.MAX_SWIVEL, Math.toDegrees(Math.acos(along.normalize().dot(A.outward()))), 1e-6);
-        assertTrue(along.z > 0, "still towards the other carriage's side");
-    }
-
-    @Test
-    void endsCloserThanTwoKnucklesMeetHalfway() {
-        assertVec(new Vec3(10.5, 64, 0), CouplingGeometry.head(A, CouplingGeometry.meet(A, B), 0.75));
+    void endsCloserThanTwoKnucklesDoNotSlide() {
+        assertEquals(0, CouplingGeometry.slide(A, CouplingGeometry.meet(A, B), 0.75), 1e-9);
     }
 
     @Test

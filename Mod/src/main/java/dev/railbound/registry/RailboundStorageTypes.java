@@ -1,5 +1,9 @@
 package dev.railbound.registry;
 
+import dev.railbound.cargo.CargoHoldBlockEntity;
+import dev.railbound.cargo.CargoTankBlockEntity;
+import dev.railbound.cargo.HoldItemStorage;
+import dev.railbound.cargo.TankFluidStorage;
 import com.simibubi.create.api.contraption.storage.fluid.MountedFluidStorageType;
 import com.simibubi.create.api.contraption.storage.item.MountedItemStorageType;
 import com.simibubi.create.api.registry.CreateRegistries;
@@ -37,11 +41,29 @@ public final class RailboundStorageTypes {
                 }
             });
 
+    /** A goods wagon's hold and a tank wagon's tank: the train's cargo, as Create counts it. */
+    public static final DeferredHolder<MountedItemStorageType<?>, MountedItemStorageType<HoldItemStorage>> HOLD_ITEMS =
+            ITEM_TYPES.register("cargo_hold", () -> new MountedItemStorageType<>(HoldItemStorage.CODEC) {
+                @Override
+                public @Nullable HoldItemStorage mount(Level level, BlockState state, BlockPos pos, @Nullable BlockEntity be) {
+                    return be instanceof CargoHoldBlockEntity hold ? HoldItemStorage.of(hold) : null;
+                }
+            });
+    public static final DeferredHolder<MountedFluidStorageType<?>, MountedFluidStorageType<TankFluidStorage>> TANK_FLUID =
+            FLUID_TYPES.register("cargo_tank", () -> new MountedFluidStorageType<>(TankFluidStorage.CODEC) {
+                @Override
+                public @Nullable TankFluidStorage mount(Level level, BlockState state, BlockPos pos, @Nullable BlockEntity be) {
+                    return be instanceof CargoTankBlockEntity tank ? TankFluidStorage.of(tank) : null;
+                }
+            });
+
     private RailboundStorageTypes() {}
 
     /** Tells Create which block these storages belong to; call once the blocks are registered. */
     public static void linkToBlocks() {
         MountedItemStorageType.REGISTRY.register(RailboundBlocks.BUNKER.get(), BUNKER_ITEMS.get());
         MountedFluidStorageType.REGISTRY.register(RailboundBlocks.BUNKER.get(), BUNKER_WATER.get());
+        MountedItemStorageType.REGISTRY.register(RailboundBlocks.CARGO_HOLD.get(), HOLD_ITEMS.get());
+        MountedFluidStorageType.REGISTRY.register(RailboundBlocks.CARGO_TANK.get(), TANK_FLUID.get());
     }
 }

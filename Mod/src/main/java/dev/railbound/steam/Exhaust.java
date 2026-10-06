@@ -1,18 +1,12 @@
 package dev.railbound.steam;
 
 /**
- * What a steam loco blows out this tick: dark coal smoke from the chimney with each chuff (more while it works hard)
- * and a lazy plume while it stands with its fire lit; white steam from the cylinder drain cocks as it starts off and
- * again in a burst when it comes to a stand, and from the safety valve when it stands at full pressure. A dead fire
- * makes no smoke and no beat; steam left in the boiler can still be let out.
+ * What a steam loco blows out this tick besides its chimney smoke (see {@link Plume}): the exhaust beat (chuff); white
+ * steam from the cylinder drain cocks as it starts off and again in a burst when it comes to a stand, and from the
+ * safety valve when it stands at full pressure. A dead fire makes no beat; steam left in the boiler can still be let
+ * out.
  */
-public record Exhaust(int smokePuffs, boolean chuff, boolean wisp, boolean cylinderSteam, boolean blowdown,
-                      boolean safetyValve) {
-    /** Puffs per chuff while cruising, and while accelerating. */
-    static final int PUFFS = 2;
-    static final int HARD_PUFFS = 4;
-    /** Ticks between puffs of the idle plume. */
-    static final int WISP_EVERY = 4;
+public record Exhaust(boolean chuff, boolean cylinderSteam, boolean blowdown, boolean safetyValve) {
     /** Below this speed (blocks per tick, about 3 m/s) a pulling engine still has its cylinder cocks open. */
     static final double STARTING_SPEED = 0.15;
     static final double STANDING_SPEED = 0.01;
@@ -35,12 +29,10 @@ public record Exhaust(int smokePuffs, boolean chuff, boolean wisp, boolean cylin
         boolean blowdown = standing && ticksStopped >= 0 && ticksStopped <= BLOWDOWN_TICKS && pressure >= BLOWDOWN_PRESSURE;
         boolean valve = standing && pressure >= SAFETY_VALVE_PRESSURE && gameTime % SAFETY_VALVE_EVERY == 0;
         if (!fireLit) {
-            return new Exhaust(0, false, false, false, blowdown, valve);
+            return new Exhaust(false, false, blowdown, valve);
         }
-        int puffs = chuffs * (accelerating ? HARD_PUFFS : PUFFS);
-        boolean wisp = standing && gameTime % WISP_EVERY == 0;
         boolean cocks = accelerating && !standing && moving < STARTING_SPEED;
-        return new Exhaust(puffs, chuffs > 0, wisp, cocks, blowdown, valve);
+        return new Exhaust(chuffs > 0, cocks, blowdown, valve);
     }
 
     /** A model point (pixels) in design block space, as the converter's ModelSpace places the model. */

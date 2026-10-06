@@ -35,11 +35,23 @@ public final class RailboundBlockEntities {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SteamTruckBogeyBlockEntity>> STEAM_TRUCK_BOGEY =
             BLOCK_ENTITIES.register("steam_truck_bogey",
                     () -> BlockEntityType.Builder.of(SteamTruckBogeyBlockEntity::new, RailboundBlocks.STEAM_TRUCK_BOGEY.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<dev.railbound.bogey.FreightBogeyBlockEntity>> FREIGHT_BOGEY =
+            BLOCK_ENTITIES.register("freight_bogey",
+                    () -> BlockEntityType.Builder.of(dev.railbound.bogey.FreightBogeyBlockEntity::new, RailboundBlocks.FREIGHT_BOGEY.get()).build(null));
 
     @SuppressWarnings("DataFlowIssue")
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BunkerBlockEntity>> BUNKER =
             BLOCK_ENTITIES.register("loco_bunker",
                     () -> BlockEntityType.Builder.of(BunkerBlockEntity::new, RailboundBlocks.BUNKER.get()).build(null));
+
+    @SuppressWarnings("DataFlowIssue")
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<dev.railbound.cargo.CargoHoldBlockEntity>> CARGO_HOLD =
+            BLOCK_ENTITIES.register("cargo_hold",
+                    () -> BlockEntityType.Builder.of(dev.railbound.cargo.CargoHoldBlockEntity::new, RailboundBlocks.CARGO_HOLD.get()).build(null));
+    @SuppressWarnings("DataFlowIssue")
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<dev.railbound.cargo.CargoTankBlockEntity>> CARGO_TANK =
+            BLOCK_ENTITIES.register("cargo_tank",
+                    () -> BlockEntityType.Builder.of(dev.railbound.cargo.CargoTankBlockEntity::new, RailboundBlocks.CARGO_TANK.get()).build(null));
 
     @SuppressWarnings("DataFlowIssue")
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<WaterCraneBlockEntity>> WATER_CRANE =

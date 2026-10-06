@@ -3,8 +3,8 @@
   "category": "passenger",
   "size": { "length": 16, "width": 3, "height": 4 },
   "bogeys": [
-    { "z": 4, "style": "railbound:coach" },
-    { "z": 11, "style": "railbound:coach" }
+    { "z": 3, "style": "railbound:coach" },
+    { "z": 12, "style": "railbound:coach" }
   ],
   "power": "none",
   "coupler": { "height": -11, "gangway": { "half_width": 11.4, "bottom": -8.2, "top": 27.3 } },
@@ -37,7 +37,7 @@
       ".": "air"
     },
     "layers": [
-      ["X#X", "X#X", "T#T", "S#S", "S.S", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "S.S", "S#S", "T#T", "X#X", "X#X"],
+      ["X#X", "X#X", "T#T", "S.S", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "S#S", "S.S", "T#T", "X#X", "X#X"],
       ["XDX", "X.X", "D.D", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "L.R", "D.D", "X.X", "XDX"],
       ["XDX", "XcX", "DcD", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "KcJ", "DcD", "XcX", "XDX"],
       ["qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qAp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp", "qtp"]

@@ -7,8 +7,8 @@ package dev.railbound.steam;
  * Coal is counted in coal items (a coal block is 9); water in millibuckets.
  */
 public final class Boiler {
-    /** Coal burnt per tick at full effort; idling burns {@link #IDLE_SHARE} of that. */
-    static final double FULL_BURN = 1 / 140.0;
+    /** Coal burnt per tick at full effort, one coal in 80 s as in a furnace; idling burns {@link #IDLE_SHARE} of that. */
+    static final double FULL_BURN = 1 / 1600.0;
     /** Water boiled off per tick at full effort, in millibuckets. */
     static final double FULL_WATER = 1.0;
     /** How much of the full rate an idling engine still burns and boils. */

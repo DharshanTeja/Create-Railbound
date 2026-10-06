@@ -23,6 +23,38 @@ class InteriorPartsTest {
     }
 
     @Test
+    void aSeatFacesTheControlsBehindIt() {
+        // a cab's second driving position: sitting facing the bunker, its controls behind it in the carriage
+        assertEquals(Direction.SOUTH, InteriorParts.seatFacing(Direction.NORTH, false, true));
+        assertEquals(Direction.NORTH, InteriorParts.seatFacing(Direction.NORTH, true, false), "controls ahead");
+        assertEquals(Direction.NORTH, InteriorParts.seatFacing(Direction.NORTH, false, false), "a passenger seat");
+        assertEquals(Direction.NORTH, InteriorParts.seatFacing(Direction.NORTH, true, true), "controls both ways");
+    }
+
+    @Test
+    void aSeatFacingBackStillHasItsWallOnTheCarriageSide() {
+        // the right-hand seat facing back has the carriage side on its own left
+        Direction facing = InteriorParts.seatFacing(Direction.NORTH, false, true);
+        PlaceholderSide side = InteriorParts.seatSide(PlaceholderSide.RIGHT, facing != Direction.NORTH);
+        assertEquals(PlaceholderSide.LEFT, side);
+        assertEquals(Optional.of(InteriorParts.outward(Direction.NORTH, 1)), InteriorParts.seatOutward(facing, side));
+        assertTrue(contains(InteriorParts.seatShape(facing, side), 0.95, 0.5, 0.5), "the wall is on the east (outer) edge");
+        assertEquals(PlaceholderSide.RIGHT, InteriorParts.seatSide(PlaceholderSide.RIGHT, false));
+    }
+
+    @Test
+    void aCabControlStandIsSlimAgainstTheOuterWallInFrontOfItsSeat() {
+        // the tank engine's left stand: carriage facing north, its driver's seat behind it (south), so the stand faces
+        // south and the carriage's left (west) is on its own right
+        PlaceholderSide side = InteriorParts.seatSide(PlaceholderSide.LEFT, true);
+        VoxelShape stand = InteriorParts.cabControlsShape(Direction.SOUTH, side);
+        assertTrue(contains(stand, 0.05, 0.5, 0.5), "the carriage's outer wall");
+        assertTrue(contains(stand, 0.4, 0.5, 0.8), "the stand, beside the wall, right in front of the seat");
+        assertFalse(contains(stand, 0.9, 0.5, 0.8), "clear on the aisle side");
+        assertFalse(contains(stand, 0.4, 0.5, 0.2), "nothing on the far side, which may be the cab's back wall");
+    }
+
+    @Test
     void doorHalfComesFromTheCellBelow() {
         assertEquals(DoubleBlockHalf.LOWER, InteriorParts.doorHalf(false));
         assertEquals(DoubleBlockHalf.UPPER, InteriorParts.doorHalf(true));

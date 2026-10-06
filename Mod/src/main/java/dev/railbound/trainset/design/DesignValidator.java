@@ -94,6 +94,15 @@ public final class DesignValidator {
         return errors;
     }
 
+    private static void validateHold(List<LayoutCell> cells, PartType type, int capacity, String field, List<String> errors) {
+        long holds = cells.stream().filter(c -> c.part().type() == type).count();
+        if (capacity > 0 && holds != 1) {
+            errors.add("\"cargo\" " + field + " needs exactly 1 " + type.id() + " cell, found " + holds);
+        } else if (capacity == 0 && holds > 0) {
+            errors.add("the layout has a " + type.id() + " cell but no \"cargo\" " + field + " to hold");
+        }
+    }
+
     private static void validateLayoutContents(TrainsetDesign design, List<String> errors) {
         List<LayoutCell> cells = LayoutParser.parse(design);
 
@@ -101,6 +110,10 @@ public final class DesignValidator {
         if (anchors != 1) {
             errors.add("must have exactly 1 anchor, found " + anchors);
         }
+
+        // a goods wagon's whole load sits in one hold cell (items) or one tank cell (fluid)
+        validateHold(cells, PartType.CARGO_ITEM, design.cargo().itemSlots(), "item_slots", errors);
+        validateHold(cells, PartType.CARGO_FLUID, design.cargo().fluidMb(), "fluid_mb", errors);
 
         Set<BlockPos> doorCells = cells.stream()
                 .filter(c -> c.part().type() == PartType.DOOR)
@@ -207,9 +220,11 @@ public final class DesignValidator {
         if (locomotive && controls.isEmpty()) {
             errors.add("a locomotive needs Train Controls (a \"controls\" cell)");
         }
-        // Create only lets a seated mob run a schedule when the controls are right in front of its seat.
+        // A seated mob only runs a schedule from the seat its controls face: right in front of it, or across one open
+        // cell such as a doorway.
+        Set<BlockPos> occupied = cells.stream().map(LayoutCell::pos).collect(Collectors.toSet());
         for (BlockPos pos : controls) {
-            if (!seats.contains(pos.north()) && !seats.contains(pos.south())) {
+            if (!hasConductorSeat(pos, seats, occupied)) {
                 errors.add("controls at " + pos.toShortString() + " needs a seat directly ahead or behind (the conductor seat)");
             }
         }
@@ -253,5 +268,17 @@ public final class DesignValidator {
                 errors.add("steam bunker_slots must be 1 to 9, got " + s.bunkerSlots());
             }
         });
+    }
+
+    /** A seat right ahead of or behind controls, or across one open cell. */
+    private static boolean hasConductorSeat(BlockPos controls, Set<BlockPos> seats, Set<BlockPos> occupied) {
+        for (net.minecraft.core.Direction way : new net.minecraft.core.Direction[] {net.minecraft.core.Direction.NORTH,
+                net.minecraft.core.Direction.SOUTH}) {
+            if (seats.contains(controls.relative(way))
+                    || !occupied.contains(controls.relative(way)) && seats.contains(controls.relative(way, 2))) {
+                return true;
+            }
+        }
+        return false;
     }
 }

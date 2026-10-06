@@ -48,6 +48,28 @@ class LocoDesignValidatorTest {
     }
 
     @Test
+    void theTankEngineCabHasADriverEachWayAClearAisleAndADoorway() throws Exception {
+        try (var in = getClass().getResourceAsStream("/data/railbound/railbound/trainsets/loco_steam_tank.json")) {
+            ParsedDesign tank = ParsedDesign.of(TestDesigns.parse(new String(java.util.Objects.requireNonNull(in).readAllBytes(),
+                    java.nio.charset.StandardCharsets.UTF_8)));
+            // standing level (layer 1); x -1 is the left side, z runs from the front
+            assertEquals(Optional.of(PartType.CONTROLS), type(tank, -1, 11), "left: controls ahead of the driver");
+            assertEquals(Optional.of(PartType.SEAT), type(tank, -1, 12));
+            assertEquals(Optional.of(PartType.SEAT), type(tank, 1, 12), "right: a seat facing the bunker, ahead of the door");
+            assertEquals(Optional.of(PartType.CONTROLS), type(tank, 1, 14), "its controls after the door, at the back");
+            for (int z = 11; z <= 13; z++) {
+                assertEquals(Optional.empty(), type(tank, 0, z), "the aisle at z " + z);
+            }
+            assertEquals(Optional.empty(), type(tank, -1, 13), "left doorway");
+            assertEquals(Optional.empty(), type(tank, 1, 13), "right doorway");
+        }
+    }
+
+    private static Optional<PartType> type(ParsedDesign design, int x, int z) {
+        return design.partAt(new net.minecraft.core.BlockPos(x, 1, z)).map(HiddenPart::type);
+    }
+
+    @Test
     void readsPerformanceAndSteam() {
         TrainsetDesign d = TestDesigns.parse(LOCO);
         assertEquals(Optional.of(new PerformanceSpec(20, 10, 2)), d.performance());
@@ -114,6 +136,18 @@ class LocoDesignValidatorTest {
     @Test
     void controlsNeedTheConductorSeatDirectlyAheadOrBehind() {
         assertProblem(loco("\"#S#\"", "\"###\""), "needs a seat directly ahead or behind");
+    }
+
+    @Test
+    void controlsMayFaceTheirSeatAcrossAnOpenDoorway() {
+        // seat, an open cell, controls: valid; seat, a wall, controls: not (the anchor moved off the open cell)
+        String anchorLater = LOCO.replace("[\"...\",\"...\",\"...\",\".A.\",\"...\",\"...\",\"...\"]",
+                "[\"...\",\"...\",\"...\",\"...\",\"...\",\".A.\",\"...\"]");
+        assertNotEquals(LOCO, anchorLater);
+        assertEquals(List.of(), DesignValidator.validate(TestDesigns.parse(
+                anchorLater.replace("\"#C#\",\"#S#\",\"#C#\"", "\"#S#\",\"#.#\",\"#C#\""))));
+        assertProblem(TestDesigns.parse(anchorLater.replace("\"#C#\",\"#S#\",\"#C#\"", "\"#S#\",\"###\",\"#C#\"")),
+                "needs a seat directly ahead or behind");
     }
 
     /** The test loco with firebox cells either side of its front controls. */
