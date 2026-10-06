@@ -213,8 +213,8 @@ Issues and ideas are welcome. Before opening a pull request, please open an issu
 
 | | License |
 |---|---|
-| **Code** | [MIT](LICENSE.md#2-code--mit-license) — use, fork and build on it freely |
-| **Art & assets** — models, textures, renders | [All Rights Reserved](LICENSE.md#1-art--assets--all-rights-reserved) |
+| **Code** | [MIT](LICENSE.md#3-code-mit-license) — use, fork and build on it freely |
+| **Art & assets** — models, textures, renders, screenshots | [All Rights Reserved](LICENSE.md#2-art--assets-all-rights-reserved) |
 
 This mirrors the licensing of Create itself. Modpacks are always welcome to include the official release. See [LICENSE.md](LICENSE.md) for the full terms.
 
