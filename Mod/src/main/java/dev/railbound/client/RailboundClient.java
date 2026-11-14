@@ -10,6 +10,7 @@ import com.simibubi.create.content.trains.bogey.BogeyBlockEntityRenderer;
 import com.simibubi.create.content.trains.bogey.BogeyBlockEntityVisual;
 import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
 import dev.railbound.Railbound;
+import dev.railbound.client.ponder.RailboundPonderPlugin;
 import dev.railbound.registry.RailboundBlockEntities;
 import dev.railbound.registry.RailboundItems;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -17,6 +18,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.createmod.ponder.foundation.PonderIndex;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
@@ -92,6 +94,7 @@ public final class RailboundClient {
 
     /** Our bogey block entities draw like Create's own: their style's Flywheel visual, or the renderer without Flywheel. */
     private static void onClientSetup(FMLClientSetupEvent event) {
+        event.enqueueWork(() -> PonderIndex.addPlugin(new RailboundPonderPlugin()));
         SimpleBlockEntityVisualizer.builder(RailboundBlockEntities.COACH_BOGEY.get())
                 .factory(BogeyBlockEntityVisual::new)
                 .skipVanillaRender(be -> true)

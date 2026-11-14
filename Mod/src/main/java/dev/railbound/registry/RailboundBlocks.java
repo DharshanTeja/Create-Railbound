@@ -71,5 +71,10 @@ public final class RailboundBlocks {
             BLOCKS.register("coupler", () -> new dev.railbound.carriage.CouplerBlock(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL).strength(2.5f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
 
+    /** Not a carriage part: the buffer the Anti-Climber part places on the ends of hand-built carriages. */
+    public static final DeferredBlock<dev.railbound.carriage.BufferBlock> BUFFER =
+            BLOCKS.register("buffer", () -> new dev.railbound.carriage.BufferBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL).strength(2.5f).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
+
     private RailboundBlocks() {}
 }

@@ -1,0 +1,33 @@
+{
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": false,
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "railbound:anti_climber"
+    },
+    "T": {
+      "item": "create:fluid_tank"
+    },
+    "E": {
+      "item": "railbound:steam_engine_unit"
+    },
+    "B": {
+      "item": "railbound:steam_truck_unit"
+    },
+    "C": {
+      "item": "create:brass_casing"
+    }
+  },
+  "pattern": [
+    "ATEA",
+    "BCCB"
+  ],
+  "result": {
+    "id": "railbound:trainset",
+    "components": {
+      "railbound:trainset_design": "railbound:loco_steam_tank"
+    }
+  },
+  "show_notification": false
+}

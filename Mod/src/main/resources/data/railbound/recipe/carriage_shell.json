@@ -1,0 +1,90 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "create:railway_casing"
+  },
+  "results": [
+    {
+      "id": "railbound:carriage_shell"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_carriage_shell"
+        },
+        {
+          "item": "create:iron_sheet"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_carriage_shell"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_carriage_shell"
+        },
+        {
+          "item": "create:andesite_alloy"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_carriage_shell"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_carriage_shell"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_carriage_shell"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_carriage_shell"
+        },
+        {
+          "item": "create:iron_sheet"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_carriage_shell"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_carriage_shell"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_carriage_shell"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "railbound:incomplete_carriage_shell"
+  }
+}

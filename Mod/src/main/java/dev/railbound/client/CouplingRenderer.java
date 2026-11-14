@@ -1,6 +1,7 @@
 package dev.railbound.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.CreateClient;
 import com.simibubi.create.content.trains.entity.Carriage;
@@ -11,6 +12,7 @@ import dev.railbound.carriage.CarriageCouplers;
 import dev.railbound.carriage.CouplingGeometry;
 import dev.railbound.trainset.design.GangwaySpec;
 import dev.railbound.trainset.design.ParsedDesign;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -38,7 +40,7 @@ import java.util.UUID;
  * swivels at its carriage end to point there and, on curves tight enough to swing the ends apart, slides out of its
  * draft gear on a slimmer bar. Between two coaches the gangway bellows and floor flaps bend from one end door to the other; at a free
  * coach end its half of the bellows stands out. Parked carriages show the same through {@link #drawParked}. The parts
- * are Blockbench art (art/couplings/coupling_knuckle.bbmodel), each looking along +z away from its carriage.
+ * are Blockbench art (Gemini-Rail-Art/couplings/coupling_knuckle.bbmodel), each looking along +z away from its carriage.
  */
 public final class CouplingRenderer {
     static final RenderType TYPE = RenderType.cutout();
@@ -46,9 +48,15 @@ public final class CouplingRenderer {
     public static final ModelResourceLocation HEAD = part("head");
     public static final ModelResourceLocation BELLOWS = part("bellows");
     public static final ModelResourceLocation FLAP = part("flap");
-    public static final List<ModelResourceLocation> MODELS = List.of(SHANK, HEAD, BELLOWS, FLAP);
+    /** The knuckle's jaw and pin, drawn on the head and turned about the pin (see {@link JawAnimation}). */
+    public static final ModelResourceLocation JAW = part("jaw");
+    public static final List<ModelResourceLocation> MODELS = List.of(SHANK, HEAD, JAW, BELLOWS, FLAP);
     /** How far the knuckle head reaches back from its coupling face (blocks): the shank runs up to it. */
     private static final double HEAD_BACK = 7.6 / 16;
+    /** The jaw's pin, in the head's own frame (blocks): 2.1 px to the side of the coupling face's middle, 0.7 px behind it. */
+    private static final float JAW_PIVOT_X = 2.1f / 16, JAW_PIVOT_Z = -0.7f / 16;
+    /** Clips a knuckle at its carriage's end wall. Only the render thread draws, so one is enough. */
+    private static final WallClipVertexConsumer CLIP = new WallClipVertexConsumer();
     /** The bar a knuckle slides out on, as thick as this share of its shank. */
     private static final float SLIDE_THICKNESS = 0.7f;
     /** The art's sizes (blocks): a fold 4 px deep, the bellows' opening. Half the bellows stands out of a free end. */
@@ -61,6 +69,9 @@ public final class CouplingRenderer {
     private static final double FLAP_REACH = 0.55;
     /** How far from the meeting point a wrench still finds a joined coupler (blocks). */
     private static final double PICK_SIZE = 0.4;
+
+    /** One coupler of one carriage of a train: what its jaw's animation is kept under. */
+    private record JawKey(UUID train, int carriage, int coupler) {}
 
     /** A coupler in the world this frame. */
     private record Coupler(CouplingGeometry.End end, CarriageCouplers.Local local) {}
@@ -152,8 +163,8 @@ public final class CouplingRenderer {
                     continue;
                 }
                 int light = LevelRenderer.getLightColor(level, BlockPos.containing(meet));
-                drawKnuckle(pose, consumer, ca.end(), meet, ca.local().reach(), light);
-                drawKnuckle(pose, consumer, cb.end(), meet, cb.local().reach(), light);
+                drawKnuckle(pose, consumer, ca.end(), meet, ca.local().reach(), light, new JawKey(train.id, i, pair.get()[0]), true);
+                drawKnuckle(pose, consumer, cb.end(), meet, cb.local().reach(), light, new JawKey(train.id, i + 1, pair.get()[1]), true);
                 if (ca.local().gangway().isPresent() && cb.local().gangway().isPresent()) {
                     drawGangway(pose, consumer, ca.end(), cb.end(), ca.local().gangway().get(), ca.local().height(),
                             cb.local().gangway().get(), cb.local().height(), true, light);
@@ -167,7 +178,8 @@ public final class CouplingRenderer {
                         continue;
                     }
                     int light = LevelRenderer.getLightColor(level, BlockPos.containing(free.end().centre()));
-                    drawFreeEnd(pose, consumer, free.end(), free.local().reach(), free.local().height(), free.local().gangway(), light);
+                    drawFreeEnd(pose, consumer, free.end(), free.local().reach(), free.local().height(), free.local().gangway(), light,
+                            new JawKey(train.id, i, k));
                 }
             }
         }
@@ -186,14 +198,14 @@ public final class CouplingRenderer {
             CouplingGeometry.End front = new CouplingGeometry.End(new Vec3(0.5, y, 0), new Vec3(0, 0, -1), new Vec3(-1, 0, 0), up);
             CouplingGeometry.End back = new CouplingGeometry.End(new Vec3(0.5, y, design.length()), new Vec3(0, 0, 1), new Vec3(1, 0, 0), up);
             for (CouplingGeometry.End end : new CouplingGeometry.End[] {front, back}) {
-                drawFreeEnd(pose, consumer, end, CarriageCouplers.TRAINSET_REACH, coupler.height(), coupler.gangway(), light);
+                drawFreeEnd(pose, consumer, end, CarriageCouplers.TRAINSET_REACH, coupler.height(), coupler.gangway(), light, null);
             }
         });
     }
 
     private static void drawFreeEnd(PoseStack pose, VertexConsumer consumer, CouplingGeometry.End end, double reach, double height,
-                                    Optional<GangwaySpec> gangway, int light) {
-        drawKnuckle(pose, consumer, end, CouplingGeometry.rest(end, reach), reach, light);
+                                    Optional<GangwaySpec> gangway, int light, @Nullable JawKey jaw) {
+        drawKnuckle(pose, consumer, end, CouplingGeometry.rest(end, reach), reach, light, jaw, false);
         gangway.ifPresent(g -> {
             CouplingGeometry.End out = new CouplingGeometry.End(CouplingGeometry.rest(end, HALF_BELLOWS), end.outward().scale(-1),
                     end.right().scale(-1), end.up());
@@ -223,7 +235,10 @@ public final class CouplingRenderer {
      * One knuckle coupler with its head at the given point: its shank from the carriage end, swivelled to point at the
      * head, and where the head is further out than the knuckle's own length, a slimmer bar slid out of the draft gear.
      */
-    static void drawKnuckle(PoseStack pose, VertexConsumer consumer, CouplingGeometry.End end, Vec3 head, double reach, int light) {
+    static void drawKnuckle(PoseStack pose, VertexConsumer consumer, CouplingGeometry.End end, Vec3 head, double reach, int light,
+                            @Nullable JawKey jaw, boolean joined) {
+        // nothing of the knuckle shows behind its carriage's end wall, however far a curve swings it
+        CLIP.begin(consumer, pose.last().pose(), end.centre(), end.outward());
         Vec3 along = head.subtract(end.centre());
         if (along.lengthSqr() < 1e-6) {
             along = end.outward().scale(1e-3);
@@ -233,19 +248,24 @@ public final class CouplingRenderer {
             pose.pushPose();
             place(pose, end.centre(), along, end.up());
             pose.scale(1, 1, (float) shank);
-            draw(pose, consumer, SHANK, light);
+            draw(pose, CLIP, SHANK, light);
             pose.popPose();
         }
         if (CouplingGeometry.slide(end, head, reach) > 1e-3) {
             pose.pushPose();
             place(pose, end.centre(), along, end.up());
             pose.scale(SLIDE_THICKNESS, SLIDE_THICKNESS, (float) (along.length() - HEAD_BACK));
-            draw(pose, consumer, SHANK, light);
+            draw(pose, CLIP, SHANK, light);
             pose.popPose();
         }
+        // a joined knuckle has its jaw shut; a free one rests open, and each eases between the two as it joins or splits
+        float closure = jaw == null ? (joined ? 1 : 0) : JawAnimation.closure(jaw, joined, Util.getNanos());
         pose.pushPose();
         place(pose, head, along, end.up());
-        draw(pose, consumer, HEAD, light);
+        draw(pose, CLIP, HEAD, light);
+        pose.translate(JAW_PIVOT_X, 0, JAW_PIVOT_Z);
+        pose.mulPose(Axis.YP.rotationDegrees(JawAnimation.degrees(closure)));
+        draw(pose, CLIP, JAW, light);
         pose.popPose();
     }
 

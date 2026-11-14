@@ -28,6 +28,13 @@ public final class RailboundTabs {
                         TrainsetDesigns.all().keySet().forEach(id -> output.accept(TrainsetItem.of(id)));
                         output.accept(RailboundItems.WATER_CRANE.get());
                         output.accept(RailboundItems.COUPLER.get());
+                        output.accept(RailboundItems.STEAM_ENGINE_UNIT.get());
+                        output.accept(RailboundItems.COACH_BOGEY_UNIT.get());
+                        output.accept(RailboundItems.FREIGHT_BOGEY_UNIT.get());
+                        output.accept(RailboundItems.STEAM_TRUCK_UNIT.get());
+                        output.accept(RailboundItems.ANTI_CLIMBER.get());
+                        output.accept(RailboundItems.CARRIAGE_SHELL.get());
+                        output.accept(RailboundItems.WAGON_UNDERFRAME.get());
                     })
                     .build());
 

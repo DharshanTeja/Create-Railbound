@@ -1,0 +1,77 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "create:andesite_casing"
+  },
+  "results": [
+    {
+      "id": "railbound:freight_bogey_unit"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_freight_bogey_unit"
+        },
+        {
+          "item": "create:iron_sheet"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_freight_bogey_unit"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_freight_bogey_unit"
+        },
+        {
+          "item": "create:shaft"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_freight_bogey_unit"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_freight_bogey_unit"
+        },
+        {
+          "item": "create:cogwheel"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_freight_bogey_unit"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_freight_bogey_unit"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_freight_bogey_unit"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "railbound:incomplete_freight_bogey_unit"
+  }
+}

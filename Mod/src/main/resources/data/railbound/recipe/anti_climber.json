@@ -1,0 +1,75 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "create:iron_sheet"
+  },
+  "results": [
+    {
+      "id": "railbound:anti_climber",
+      "count": 2
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_anti_climber"
+        },
+        {
+          "item": "create:andesite_alloy"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_anti_climber"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_anti_climber"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_anti_climber"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_anti_climber"
+        },
+        {
+          "item": "create:iron_sheet"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_anti_climber"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_anti_climber"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_anti_climber"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "railbound:incomplete_anti_climber"
+  }
+}
