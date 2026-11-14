@@ -35,18 +35,12 @@ public class CouplerBlock extends HorizontalDirectionalBlock implements EntityBl
 
     static {
         for (Direction facing : Direction.Plane.HORIZONTAL) {
-            SHAPES.put(facing, Shapes.or(box(facing, 4, 4, 0, 12, 12, 1.5), box(facing, 5, 5, 1.5, 11, 11, 16)));
+            SHAPES.put(facing, Shapes.or(box(facing, 2.5, 3, 0, 13.5, 13, 1.5), box(facing, 3, 2, 1.5, 13, 14, 16)));
         }
     }
 
-    /** A box given looking south (+z), turned to face the other way. */
     private static VoxelShape box(Direction facing, double x1, double y1, double z1, double x2, double y2, double z2) {
-        return switch (facing) {
-            case NORTH -> Block.box(16 - x2, y1, 16 - z2, 16 - x1, y2, 16 - z1);
-            case EAST -> Block.box(z1, y1, 16 - x2, z2, y2, 16 - x1);
-            case WEST -> Block.box(16 - z2, y1, x1, 16 - z1, y2, x2);
-            default -> Block.box(x1, y1, z1, x2, y2, z2);
-        };
+        return FacingBoxes.box(facing, x1, y1, z1, x2, y2, z2);
     }
 
     public CouplerBlock(Properties properties) {

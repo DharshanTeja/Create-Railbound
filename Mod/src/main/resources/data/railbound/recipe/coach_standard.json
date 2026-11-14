@@ -1,0 +1,30 @@
+{
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": false,
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "railbound:anti_climber"
+    },
+    "S": {
+      "item": "railbound:carriage_shell"
+    },
+    "B": {
+      "item": "railbound:coach_bogey_unit"
+    },
+    "C": {
+      "item": "create:andesite_casing"
+    }
+  },
+  "pattern": [
+    "ASA",
+    "BCB"
+  ],
+  "result": {
+    "id": "railbound:trainset",
+    "components": {
+      "railbound:trainset_design": "railbound:coach_standard"
+    }
+  },
+  "show_notification": false
+}

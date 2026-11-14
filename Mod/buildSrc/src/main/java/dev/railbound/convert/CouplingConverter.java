@@ -19,12 +19,14 @@ import java.util.stream.Stream;
  * group, each centred on its group's pivot so the mod can place and turn it at the carriage end: `head` (the knuckle,
  * its pivot on the coupling face) and `shank` (modelled one block long out from the carriage end, sized to the
  * coupler's length), and optionally `bellows` (one gangway fold, its pivot at the middle of the gangway floor) and
- * `flap` (the gangway floor plate, hinged at its pivot). The model looks along +z, away from its carriage.
+ * `flap` (the gangway floor plate, hinged at its pivot), and `jaw` (the knuckle's movable jaw and pin, its pivot on the pin, which the renderer turns open and shut), and
+ * `block` (the whole coupler block standing in the world,
+ * in block coordinates with its pivot at the block's corner). The model looks along +z, away from its carriage.
  */
 public final class CouplingConverter {
     public static final String FOLDER = "coupling";
     private static final Set<String> REQUIRED = Set.of("head", "shank");
-    private static final Set<String> OPTIONAL = Set.of("bellows", "flap");
+    private static final Set<String> OPTIONAL = Set.of("bellows", "flap", "block", "jaw");
 
     private CouplingConverter() {}
 
@@ -49,7 +51,7 @@ public final class CouplingConverter {
             faces.addAll(element.faces());
         }
         if (!unknown.isEmpty()) {
-            problems.add("cubes in " + unknown + " belong to no part; parts are head, shank, bellows and flap");
+            problems.add("cubes in " + unknown + " belong to no part; parts are head, shank, jaw, bellows, flap and block");
         }
         for (String required : new TreeSet<>(REQUIRED)) {
             if (!parts.containsKey(required)) {

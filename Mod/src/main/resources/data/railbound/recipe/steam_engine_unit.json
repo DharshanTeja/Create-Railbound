@@ -1,0 +1,93 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "create:copper_casing"
+  },
+  "results": [
+    {
+      "id": "railbound:steam_engine_unit"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_steam_engine_unit"
+        },
+        {
+          "item": "create:fluid_pipe"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_steam_engine_unit"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_steam_engine_unit"
+        },
+        {
+          "item": "create:brass_sheet"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_steam_engine_unit"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_steam_engine_unit"
+        },
+        {
+          "item": "create:steam_whistle"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_steam_engine_unit"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_steam_engine_unit"
+        },
+        {
+          "item": "create:shaft"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_steam_engine_unit"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_steam_engine_unit"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_steam_engine_unit"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "railbound:incomplete_steam_engine_unit"
+  }
+}

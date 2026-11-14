@@ -1,0 +1,30 @@
+{
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": false,
+  "category": "misc",
+  "key": {
+    "T": {
+      "item": "create:fluid_tank"
+    },
+    "P": {
+      "item": "create:fluid_pipe"
+    },
+    "U": {
+      "item": "railbound:wagon_underframe"
+    },
+    "B": {
+      "item": "railbound:freight_bogey_unit"
+    }
+  },
+  "pattern": [
+    "TPT",
+    "BUB"
+  ],
+  "result": {
+    "id": "railbound:trainset",
+    "components": {
+      "railbound:trainset_design": "railbound:wagon_tank"
+    }
+  },
+  "show_notification": false
+}

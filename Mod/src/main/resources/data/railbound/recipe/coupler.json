@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AIA",
+    " H ",
+    "AIA"
+  ],
+  "key": {
+    "A": {
+      "item": "create:andesite_alloy"
+    },
+    "I": {
+      "item": "create:iron_sheet"
+    },
+    "H": {
+      "item": "create:shaft"
+    }
+  },
+  "result": {
+    "id": "railbound:coupler",
+    "count": 2
+  }
+}

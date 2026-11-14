@@ -1,0 +1,77 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "create:brass_casing"
+  },
+  "results": [
+    {
+      "id": "railbound:steam_truck_unit"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_steam_truck_unit"
+        },
+        {
+          "item": "create:brass_sheet"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_steam_truck_unit"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_steam_truck_unit"
+        },
+        {
+          "item": "create:shaft"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_steam_truck_unit"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_steam_truck_unit"
+        },
+        {
+          "item": "create:large_cogwheel"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_steam_truck_unit"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_steam_truck_unit"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_steam_truck_unit"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "railbound:incomplete_steam_truck_unit"
+  }
+}

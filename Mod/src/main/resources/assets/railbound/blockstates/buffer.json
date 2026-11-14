@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=south": { "model": "railbound:block/buffer" },
+    "facing=west": { "model": "railbound:block/buffer", "y": 90 },
+    "facing=north": { "model": "railbound:block/buffer", "y": 180 },
+    "facing=east": { "model": "railbound:block/buffer", "y": 270 }
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "create:iron_sheet"
+  },
+  "results": [
+    {
+      "id": "railbound:wagon_underframe"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_wagon_underframe"
+        },
+        {
+          "item": "railbound:anti_climber"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_wagon_underframe"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_wagon_underframe"
+        },
+        {
+          "item": "railbound:anti_climber"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_wagon_underframe"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_wagon_underframe"
+        },
+        {
+          "item": "create:andesite_alloy"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_wagon_underframe"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "railbound:incomplete_wagon_underframe"
+        }
+      ],
+      "results": [
+        {
+          "id": "railbound:incomplete_wagon_underframe"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "railbound:incomplete_wagon_underframe"
+  }
+}

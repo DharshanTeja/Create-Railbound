@@ -101,6 +101,21 @@ class CouplingConverterTest {
     }
 
     @Test
+    void theStandingBlockIsAnOptionalPart() throws Exception {
+        ConvertedParts out = CouplingConverter.convert("railbound", "knuckle", coupling("block"));
+        assertEquals(Set.of("head", "shank", "block"), out.objects().keySet());
+        assertTrue(out.modelJsons().containsKey("block"));
+    }
+
+    @Test
+    void theKnuckleJawIsAnOptionalPartTurnedAboutItsOwnPivot() throws Exception {
+        ConvertedParts out = CouplingConverter.convert("railbound", "knuckle", coupling("jaw"));
+        assertEquals(Set.of("head", "shank", "jaw"), out.objects().keySet());
+        // the jaw's cube spans 0..2 around a pivot at 0, so it stays out of the head's way until the renderer turns it
+        assertTrue(out.objects().get("jaw").contains("v 0.125 0.125 0.125\n"), out.objects().get("jaw"));
+    }
+
+    @Test
     void loaderJsonPointsAtTheCouplingTexture() throws Exception {
         JsonObject json = JsonParser.parseString(CouplingConverter.convert("railbound", "knuckle", coupling()).modelJsons().get("head"))
                 .getAsJsonObject();
